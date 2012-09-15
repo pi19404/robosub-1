@@ -11,7 +11,7 @@
     #error Must include from RealMotorCtrlHandler.h
 #endif
 
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 void RealMotorCtrlHandler::Initialize()
 {

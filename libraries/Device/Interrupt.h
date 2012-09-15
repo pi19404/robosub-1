@@ -2,7 +2,7 @@
 #define __INTERRUPT_H__
 
 #include "DeviceHandler.h"
-#include "..\Containers\Array.h"
+#include "../Containers/Array.h"
 
 #if (ARDUINO >= 100)
     #include <Arduino.h>

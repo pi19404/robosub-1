@@ -1,8 +1,8 @@
 #ifndef __TEST_MANAGER_H__
 #define __TEST_MANAGER_H__
 
-#include "..\Utility\Singleton.h"
-#include "..\Logging\LogManager.h"
+#include "../Utility/Singleton.h"
+#include "../Logging/LogManager.h"
 #include <String.h>
 
 class TestManager

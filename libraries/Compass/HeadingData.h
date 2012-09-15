@@ -1,7 +1,7 @@
 #ifndef __HEADING_DATA_H__
 #define __HEADING_DATA_H__
 
-#include "..\Math\Vector.h"
+#include "../Math/Vector.h"
 
 template <class T>
 class HeadingData

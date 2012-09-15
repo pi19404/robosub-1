@@ -3,7 +3,7 @@
 
 #include "Thruster.h"
 #include "ThrusterPlant.h"
-#include "..\Containers\Array.h"
+#include "../Containers/Array.h"
 
 class RealThrusterPlant
     :

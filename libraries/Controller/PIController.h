@@ -3,7 +3,7 @@
 
 #include "ProportionalController.h"
 #include "IntegralController.h"
-#include "..\Pipeline\IOPipedDevice.h"
+#include "../Pipeline/IOPipedDevice.h"
 
 template <class T, class U>
 class PIController

@@ -1,9 +1,9 @@
 #ifndef __ROBOSUB_CONTROLLER_H__
 #define __ROBOSUB_CONTROLLER_H__
 
-#include ".\RoboSubControllerData.h"
-#include "..\Utility\NoCopy.h"
-#include "..\Configurations\IMCS_Configuration.h"
+#include "./RoboSubControllerData.h"
+#include "../Utility/NoCopy.h"
+#include "../Configurations/IMCS_Configuration.h"
 
 
 class RoboSubController

@@ -1,7 +1,7 @@
 #ifndef __ARRAY_UNIT_TEST_IMPL_H__
 #define __ARRAY_UNIT_TEST_IMPL_H__
 
-#include "..\Containers\Array.h"
+#include "../Containers/Array.h"
 
 #ifndef __ARRAY_UNIT_TEST_H__
     #error Must include from ArrayUnitTest.h

@@ -2,7 +2,7 @@
 #define __MOTOR_CTRL_HANDLER_H__
 
 #include "MotorCtrlCfgData.h"
-#include "..\Device\DeviceHandler.h"
+#include "../Device/DeviceHandler.h"
 #include <stdint.h>
 
 ////////////////////////////////////////////////////////

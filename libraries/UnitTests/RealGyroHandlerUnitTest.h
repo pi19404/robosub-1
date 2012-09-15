@@ -3,13 +3,13 @@
 
 #define GYRO L3G4200D   //Use ST Microelectronics Gyroscope
 
-#include "..\Containers\Queue.h"
-#include "..\ComPort\SimulatedComPort.h"
+#include "../Containers/Queue.h"
+#include "../ComPort/SimulatedComPort.h"
 
-#include "..\TestFramework\UnitTest.h"
-#include "..\Device\SimulatedDeviceController.h"
+#include "../TestFramework/UnitTest.h"
+#include "../Device/SimulatedDeviceController.h"
 
-#include "..\Gyro\RealGyroHandler.h"
+#include "../Gyro/RealGyroHandler.h"
 
 #include <stdint.h>
 

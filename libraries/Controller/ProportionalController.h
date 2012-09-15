@@ -2,7 +2,7 @@
 #define __PROPORTIONAL_CONTROLLER_H__
 
 #include "AbstractController.h"
-#include "..\Pipeline\IOPipedDevice.h"
+#include "../Pipeline/IOPipedDevice.h"
 
 template <class T, class U>
 class ProportionalController

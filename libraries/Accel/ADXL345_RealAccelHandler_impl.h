@@ -5,7 +5,7 @@
     #error Must be included from ADXL345_RealAccelHandler.h
 #endif
 
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 class RealAccelHandler 
     :

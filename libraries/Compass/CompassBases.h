@@ -2,8 +2,8 @@
 #define __COMPASS_BASES_H__
 
 #include "CompassCfgData.h"
-#include "..\Utility\Singleton.h"
-#include "..\Math\BasisVector.h"
+#include "../Utility/Singleton.h"
+#include "../Math/BasisVector.h"
 
 class CompassBases
     :

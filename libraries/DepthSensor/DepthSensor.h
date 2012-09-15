@@ -1,8 +1,8 @@
 #ifndef __DEPTH_SENSOR_H__
 #define __DEPTH_SENSOR_H__
 
-#include "..\Device\MeasurementDevice.h"
-#include "..\Pipeline\OPipedDevice.h"
+#include "../Device/MeasurementDevice.h"
+#include "../Pipeline/OPipedDevice.h"
 
 template <class T>
 class DepthSensor

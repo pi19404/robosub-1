@@ -2,7 +2,7 @@
 #define __ACCEL_CFG_DATA_H__
 
 #include <stdint.h>
-#include "..\Device\DeviceCfgData.h"
+#include "../Device/DeviceCfgData.h"
 
 namespace Accel {
 

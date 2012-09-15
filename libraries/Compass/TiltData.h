@@ -1,7 +1,7 @@
 #ifndef __TILT_DATA_H__
 #define __TILT_DATA_H__
 
-#include "..\Math\Vector.h"
+#include "../Math/Vector.h"
 
 // Tilt Data is not coordinate, but is 3 dimensional
 // (Pitch, Roll, Temp) Abuse this characteristic

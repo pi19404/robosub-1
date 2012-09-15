@@ -3,7 +3,7 @@
 
 #include "ProportionalController.h"
 #include "DerivativeController.h"
-#include "..\Pipeline\IOPipedDevice.h"
+#include "../Pipeline/IOPipedDevice.h"
 
 template <class T, class U>
 class PDController

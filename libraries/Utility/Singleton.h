@@ -2,7 +2,7 @@
 #define __SINGLETON_H__
 
 #include "ExplicitLifetime.h"
-#include "..\new\new.h"
+#include "../new/new.h"
 
 template <class T>
 class Singleton

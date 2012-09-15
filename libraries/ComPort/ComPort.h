@@ -1,7 +1,7 @@
 #ifndef __COM_PORT_H__
 #define __COM_PORT_H__
 
-#include "..\Utility\NoCopy.h"
+#include "../Utility/NoCopy.h"
 #include <stddef.h>
 #include <stdint.h>
 

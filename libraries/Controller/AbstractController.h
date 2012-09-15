@@ -1,8 +1,8 @@
 #ifndef __ABSTRACT_CONTROLLER_H__
 #define __ABSTRACT_CONTROLLER_H__
 
-#include "..\Containers\Array.h"
-#include "..\Utility\NoCopy.h"
+#include "../Containers/Array.h"
+#include "../Utility/NoCopy.h"
 
 class AbstractController
     :

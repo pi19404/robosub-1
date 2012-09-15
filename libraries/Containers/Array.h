@@ -1,7 +1,7 @@
 #ifndef __Array_H__
 #define __Array_H__
 
-#include "..\new\new.h"
+#include "../new/new.h"
 #include <stddef.h>
 
 //////////////////////////////////////////////////////////////

@@ -1,8 +1,8 @@
 #ifndef __SIMULATED_COM_PORT_IMPL_H__
 #define __SIMULATED_COM_PORT_IMPL_H__
 
-#include "..\Device\SimulatedDeviceController.h"
-#include "..\Device\SimulatedDevice.h"
+#include "../Device/SimulatedDeviceController.h"
+#include "../Device/SimulatedDevice.h"
 
 #ifndef __SIMULATED_COM_PORT_H__
     #error This file must be included from SimulatedComPort.h"

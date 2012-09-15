@@ -2,8 +2,8 @@
 #define __ACCEL_HANDLER_H__
 
 #include "AccelData.h"
-#include "..\Device\MeasurementDevice.h"
-#include "..\Pipeline\OPipedDevice.h"
+#include "../Device/MeasurementDevice.h"
+#include "../Pipeline/OPipedDevice.h"
 
 template <class T>
 class AccelHandler

@@ -2,7 +2,7 @@
 #define __WIRE_COM_PORT_H__
 
 #include <Wire.h>
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 // ComPort Definition for Wire Devices
 class WireComPort 

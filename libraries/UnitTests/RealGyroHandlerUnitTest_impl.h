@@ -5,7 +5,7 @@
     #error Must be included from RealGyroHandlerUnitTest.h
 #endif
 
-#include "..\Gyro\RealGyroHandler.h"
+#include "../Gyro/RealGyroHandler.h"
 
 RealGyroHandlerUnitTest::RealGyroHandlerUnitTest()
     :

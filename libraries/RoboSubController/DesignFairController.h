@@ -1,16 +1,16 @@
 #ifndef __ROBOSUB_CONTROLLER_H__
 #define __ROBOSUB_CONTROLLER_H__
 
-#include "..\Math\Vector.h"
-#include "..\Thruster\ThrusterPlant.h"
-#include "..\Thruster\ThrusterData.h"
-#include "..\PneumaticController\PneumaticPlant.h"
-#include "..\PneumaticController\PneumaticControllerData.h"
-#include "..\Compass\CompassData.h"
-#include "..\Compass\CompassHandler.h"
-#include "..\Device\AnalogDevice.h"
-#include "..\ComPort\ComPort.h"
-#include "..\Utility\NoCopy.h"
+#include "../Math/Vector.h"
+#include "../Thruster/ThrusterPlant.h"
+#include "../Thruster/ThrusterData.h"
+#include "../PneumaticController/PneumaticPlant.h"
+#include "../PneumaticController/PneumaticControllerData.h"
+#include "../Compass/CompassData.h"
+#include "../Compass/CompassHandler.h"
+#include "../Device/AnalogDevice.h"
+#include "../ComPort/ComPort.h"
+#include "../Utility/NoCopy.h"
 
 class RoboSubController
     :

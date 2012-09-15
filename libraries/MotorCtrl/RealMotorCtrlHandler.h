@@ -1,12 +1,6 @@
 #ifndef __REAL_MOTOR_CTRL_HANDLER_H__
 #define __REAL_MOTOR_CTRL_HANDLER_H__
 
-#if ARUDINO >= 100
-    #include <Arduino.h>
-#else
-    #include <WProgram.h>
-#endif
-
 #include "MotorCtrlHandler.h"
 
 class SerialComPort;

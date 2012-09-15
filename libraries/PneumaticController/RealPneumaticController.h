@@ -9,7 +9,7 @@
     #include <WProgram.h>
 #endif
 
-#include "..\Pipeline\IPipedDevice.h"
+#include "../Pipeline/IPipedDevice.h"
 #include "PneumaticControllerData.h"
 
 class RealPneumaticController

@@ -5,7 +5,7 @@
     #error Must be included from RealCompassHandlerUnitTest.h
 #endif
 
-#include "..\Compass\RealCompassHandler.h"
+#include "../Compass/RealCompassHandler.h"
 #include <HardwareSerial.h>
 
 RealCompassHandlerUnitTest::RealCompassHandlerUnitTest()

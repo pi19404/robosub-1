@@ -1,7 +1,7 @@
 #ifndef __MAGNETO_DATA_H__
 #define __MAGNETO_DATA_H__
 
-#include "..\Math\Vector.h"
+#include "../Math/Vector.h"
 
 // Magnetometer Data
 template <class T>

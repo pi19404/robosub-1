@@ -1,7 +1,7 @@
 #ifndef __SERIAL_COM_PORT_H__
 #define __SERIAL_COM_PORT_H__
 
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 #if (ARDUINO >= 100)
   #include <Arduino.h>

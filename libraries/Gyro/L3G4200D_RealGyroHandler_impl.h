@@ -5,7 +5,7 @@
     #error Must be included from L3G4200D_RealGyroHandlerInterface.h
 #endif
 
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 class RealGyroHandler
     :

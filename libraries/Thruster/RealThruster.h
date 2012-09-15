@@ -3,8 +3,8 @@
 
 #include "Thruster.h"
 #include "ThrusterData.h"
-#include "..\MotorCtrl\MotorCtrlHandler.h"
-#include "..\Pipeline\IPipedDevice.h"
+#include "../MotorCtrl/MotorCtrlHandler.h"
+#include "../Pipeline/IPipedDevice.h"
 
 class RealThruster
     :

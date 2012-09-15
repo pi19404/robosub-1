@@ -2,7 +2,7 @@
 #define __OUTPUT_PIPED_DEVICE_H__
 
 #include "OPipeline.h"
-#include "..\Containers\Array.h"
+#include "../Containers/Array.h"
 
 // A device that transmits output
 // via pipelines

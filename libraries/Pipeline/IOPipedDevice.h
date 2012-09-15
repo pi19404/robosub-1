@@ -2,7 +2,7 @@
 #define __IO_PIPED_DEVICE_H__
 
 #include "IOPipeline.h"
-#include "..\Containers\Array.h"
+#include "../Containers/Array.h"
 
 // A device that receives and
 // transmits data via pipelines

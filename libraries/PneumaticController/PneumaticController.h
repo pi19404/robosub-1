@@ -1,7 +1,7 @@
 #ifndef __PNEUMATIC_CONTROLLER_H__
 #define __PNEUMATIC_CONTROLLER_H__
 
-#include "..\Device\DeviceHandler.h"
+#include "../Device/DeviceHandler.h"
 
 class PneumaticController
     :

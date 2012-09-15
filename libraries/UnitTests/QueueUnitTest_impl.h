@@ -1,7 +1,7 @@
 #ifndef __QUEUE_UNIT_TEST_IMPL_H__
 #define __QUEUE_UNIT_TEST_IMPL_H__
 
-#include "..\Containers\Queue.h"
+#include "../Containers/Queue.h"
 
 #ifndef __QUEUE_UNIT_TEST_H__
     #error Must be included from QueueUnitTest.h

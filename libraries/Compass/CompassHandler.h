@@ -2,8 +2,8 @@
 #define __COMPASS_HANDLER_H__
 
 #include "CompassData.h"
-#include "..\Device\MeasurementDevice.h"
-#include "..\Pipeline\OPipedDevice.h"
+#include "../Device/MeasurementDevice.h"
+#include "../Pipeline/OPipedDevice.h"
 
 template <class T>
 class CompassHandler

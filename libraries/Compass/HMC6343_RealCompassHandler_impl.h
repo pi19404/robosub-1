@@ -12,7 +12,7 @@
     #error Should only be included from HMC6343_RealCompassHandler.h
 #endif
 
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 class RealCompassHandler
       :

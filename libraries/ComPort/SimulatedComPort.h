@@ -2,10 +2,10 @@
 #define __SIMULATED_COM_PORT_H__
 
 #include <stdint.h>
-#include "..\Containers\Queue.h"
-#include "..\ComPort\ComPort.h"
-#include "..\Device\SimulatedDevice.h"
-#include "..\Device\SimulatedDeviceController.h"
+#include "../Containers/Queue.h"
+#include "../ComPort/ComPort.h"
+#include "../Device/SimulatedDevice.h"
+#include "../Device/SimulatedDeviceController.h"
 
 class SimulatedComPort
     :

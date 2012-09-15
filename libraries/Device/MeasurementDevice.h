@@ -1,7 +1,7 @@
 #ifndef __MEASUREMENT_DEVICE_H__
 #define __MEASUREMENT_DEVICE_H__
 
-#include "..\Device\DeviceHandler.h"
+#include "../Device/DeviceHandler.h"
 
 class MeasurementDevice
     :

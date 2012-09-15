@@ -1,7 +1,7 @@
 #ifndef __DEVICE_HANDLER_H__
 #define __DEVICE_HANDLER_H__
 
-#include "..\Utility\NoCopy.h"
+#include "../Utility/NoCopy.h"
 
 class ComPort;
 

@@ -2,7 +2,7 @@
 #define __INPUT_PIPED_DEVICE_H__
 
 #include "IPipeline.h"
-#include "..\Containers\Array.h"
+#include "../Containers/Array.h"
 
 // A device that receives input
 // via pipelines

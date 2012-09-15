@@ -1,7 +1,7 @@
 #ifndef __ARRAY_UNIT_TEST_H__
 #define __ARRAY_UNIT_TEST_H__
 
-#include "..\TestFramework\UnitTest.h"
+#include "../TestFramework/UnitTest.h"
 
 class ArrayUnitTest
     :

@@ -1,7 +1,7 @@
 #ifndef __COMPASS_DATA_H__
 #define __COMPASS_DATA_H__
 
-#include "..\Math\Vector.h"
+#include "../Math/Vector.h"
 
 template <class T>
 class CompassData

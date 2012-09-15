@@ -1,13 +1,13 @@
 #ifndef __RMCHUT_H__
 #define __RMCHUT_H__
 
-#include "..\Containers\Queue.h"
-#include "..\ComPort\SimulatedComPort.h"
+#include "../Containers/Queue.h"
+#include "../ComPort/SimulatedComPort.h"
 
-#include "..\TestFramework\UnitTest.h"
-#include "..\Device\SimulatedDeviceController.h"
+#include "../TestFramework/UnitTest.h"
+#include "../Device/SimulatedDeviceController.h"
 
-#include "..\MotorCtrl\RealMotorCtrlHandler.h"
+#include "../MotorCtrl/RealMotorCtrlHandler.h"
 
 #include <stdint.h>
 

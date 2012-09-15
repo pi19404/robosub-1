@@ -1,7 +1,7 @@
 #ifndef __SPI_COM_PORT_H__
 #define __SPI_COM_PORT_H__
 
-#include "..\ComPort\ComPort.h"
+#include "../ComPort/ComPort.h"
 
 class SpiComPort : public ComPort
 {

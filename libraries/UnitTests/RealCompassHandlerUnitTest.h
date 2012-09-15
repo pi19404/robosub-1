@@ -3,13 +3,13 @@
 
 #define COMPASS HMC6343
 
-#include "..\Containers\Queue.h"
-#include "..\ComPort\SimulatedComPort.h"
+#include "../Containers/Queue.h"
+#include "../ComPort/SimulatedComPort.h"
 
-#include "..\TestFramework\UnitTest.h"
-#include "..\Device\SimulatedDeviceController.h"
+#include "../TestFramework/UnitTest.h"
+#include "../Device/SimulatedDeviceController.h"
 
-#include "..\Compass\RealCompassHandler.h"
+#include "../Compass/RealCompassHandler.h"
 
 #include <stdint.h>
 

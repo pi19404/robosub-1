@@ -11,7 +11,7 @@
     #include <WProgram.h>
 #endif
 
-#include "..\Logging\LogManager.h"
+#include "../Logging/LogManager.h"
 
 SerialComPort::SerialComPort( HardwareSerial& serial, uint8_t device, unsigned long timeOutMillis )
   :

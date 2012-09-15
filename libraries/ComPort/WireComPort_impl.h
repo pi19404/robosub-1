@@ -5,7 +5,7 @@
     #error This file must be included from WireComPort.h
 #endif
 
-#include "..\Logging\LogManager.h"
+#include "../Logging/LogManager.h"
 
 #if (ARDUINO >= 100)
   #define __WIRE_WRITE(x) mWire.write(x)

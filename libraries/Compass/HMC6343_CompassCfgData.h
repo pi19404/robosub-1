@@ -1,7 +1,7 @@
 #ifndef __HMC6343_COMPASS_CFG_DATA_H__
 #define __HMC6343_COMPASS_CFG_DATA_H__
 
-#include "..\Device\DeviceCfgData.h"
+#include "../Device/DeviceCfgData.h"
 #include <stdint.h>
 
 namespace CompassRegNames {

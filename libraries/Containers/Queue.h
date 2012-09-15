@@ -1,7 +1,7 @@
 #ifndef __QUEUE_H__
 #define __QUEUE_H__
 
-#include "..\new\new.h"
+#include "../new/new.h"
 
 template <class T>
 class Queue

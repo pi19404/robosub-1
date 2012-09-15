@@ -2,7 +2,7 @@
 #define __L3G4200D_GYRO_CFG_DATA_H__
 
 #include <stdint.h>
-#include "..\Device\DeviceCfgData.h"
+#include "../Device/DeviceCfgData.h"
 
 // Register Names:
 namespace GyroRegNames {

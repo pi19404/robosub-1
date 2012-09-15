@@ -2,13 +2,7 @@
 #define __DERIVATIVE_CONTROLLER_H__
 
 #include "TimeDependentController.h"
-#include "..\Pipeline\IOPipedDevice.h"
-
-#if (ARDUINO >= 100)
-    #include <Arduino.h>
-#else
-    #include <Wprogram.h>
-#endif
+#include "../Pipeline/IOPipedDevice.h"
 
 template <class T, class U>
 class DerivativeController

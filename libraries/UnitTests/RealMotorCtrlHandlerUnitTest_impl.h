@@ -5,7 +5,7 @@
     #error Must be included from RealMotorCtrlHandlerUnitTest.h
 #endif
 
-#include "..\MotorCtrl\RealMotorCtrlHandler.h"
+#include "../MotorCtrl/RealMotorCtrlHandler.h"
 
 #define MCTRL_ADDR 0x45
 
