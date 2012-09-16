@@ -9,7 +9,8 @@ class NoCopy
         NoCopy(){ }
         
     private:
-        NoCopy( const NoCopy& ) { }
+        NoCopy( const NoCopy& );
+        const NoCopy& operator=(const NoCopy& );
 };
 
 #endif //__NO_COPY_H__

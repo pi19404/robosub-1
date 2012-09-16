@@ -1,57 +1,61 @@
-#ifndef __ADXL345_REAL_ACCEL_HANDLER_INTERFACE_H__
-#define __ADXL345_REAL_ACCEL_HANDLER_INTERFACE_H__
+#ifndef __ADXL345_REAL_ACCEL_HANDLER__
+#define __ADXL345_REAL_ACCEL_HANDLER__
 
 #ifndef __REAL_ACCEL_HANDLER_H__
     #error Must be included from RealAccelHandler.h
 #endif
 
-#include "AccelHandler.h"
-#include "ADXL345_AccelCfgData.h"
+#include "ADXL345_RealAccelHandlerInterface.h"
 
-using namespace Accel;
-
-template <class T>
-class RealAccelHandlerInterface
+class RealAccelHandler 
     :
-    public AccelHandler<T>
+    public RealAccelHandlerInterface<float>
 {
-    typedef T data_type;
- 
+    typedef float data_type;
+    
     public:
-        using AccelHandler<data_type>::AttachOutputLine;
+        using RealAccelHandlerInterface<data_type>::AttachOutputLine;
         
-        virtual void Initialize() = 0;
-        virtual void GetData() = 0;
+        RealAccelHandler( ComPort& );
         
-        virtual void SetXOffsetInMillig( data_type ) = 0;
-        virtual void SetYOffsetInMillig( data_type ) = 0;
-        virtual void SetZOffsetInMillig( data_type ) = 0;
-        virtual void SetTapDurationInMilliseconds( data_type ) = 0;
-        virtual void SetLatencyInMiliseconds( data_type ) = 0;       
-        virtual void SetTapWindowInMilliseconds( data_type ) = 0;
-        virtual void SetTapThresholdInMillig( data_type ) = 0;
-        virtual void SetActivityThresholdInMillig( data_type ) = 0;
-        virtual void SetInactivityThresholdInMillig( data_type ) = 0;
-        virtual void SetInactivityTimeInSeconds( data_type ) = 0;
-        virtual void SetActInactCtrl( const ActInactCtrlReg& ) = 0;
-        virtual void SetFreeFallThresholdInMillig( data_type ) = 0;
-        virtual void SetFreeFallTimeInMilliseconds( data_type ) = 0;
-        virtual void SetTapAxesControl( const TapAxesCtrlReg& )  = 0;
-        virtual const ActTapSrcReg& GetActTapSrc() = 0;
-        virtual void SetDataRatePwrModeCtrl( const DataRatePwrModeCtrlReg& ) = 0;
-        virtual void SetPwrCtrl( const PwrCtrlReg& ) = 0;
-        virtual void SetIntCtrl( const IntCtrlReg& ) = 0;
-        virtual void SetIntMap( const IntMapReg& ) = 0;
-        virtual const IntSrcReg& GetIntSrc() = 0;
-        virtual void SetDataFormat( const DataFormatReg& ) = 0;
-        virtual void SetFifoCtrl( const FifoCtrlReg& ) = 0;
-        virtual const FifoStatusReg& GetFifoStatus() = 0;
-           
-    protected:
-        using AccelHandler<data_type>::mOPipes;
+        virtual void Initialize();
+        virtual void GetData();
+        
+        virtual void SetXOffsetInMillig( data_type );
+        virtual void SetYOffsetInMillig( data_type );
+        virtual void SetZOffsetInMillig( data_type );
+        virtual void SetTapDurationInMilliseconds( data_type );
+        virtual void SetLatencyInMiliseconds( data_type );       
+        virtual void SetTapWindowInMilliseconds( data_type );
+        virtual void SetTapThresholdInMillig( data_type );
+        virtual void SetActivityThresholdInMillig( data_type );
+        virtual void SetInactivityThresholdInMillig( data_type );
+        virtual void SetInactivityTimeInSeconds( data_type );
+        virtual void SetActInactCtrl( const ActInactCtrlReg& );
+        virtual void SetFreeFallThresholdInMillig( data_type );
+        virtual void SetFreeFallTimeInMilliseconds( data_type );
+        virtual void SetTapAxesControl( const TapAxesCtrlReg& ) ;
+        virtual const ActTapSrcReg& GetActTapSrc();
+        virtual void SetDataRatePwrModeCtrl( const DataRatePwrModeCtrlReg& );
+        virtual void SetPwrCtrl( const PwrCtrlReg& );
+        virtual void SetIntCtrl( const IntCtrlReg& );
+        virtual void SetIntMap( const IntMapReg& );
+        virtual const IntSrcReg& GetIntSrc();
+        virtual void SetDataFormat( const DataFormatReg& );
+        virtual void SetFifoCtrl( const FifoCtrlReg& );
+        virtual const FifoStatusReg& GetFifoStatus();
+        
+    private:
+        void    WriteReg( RegNames::Enum, uint8_t );
+        uint8_t ReadReg( RegNames::Enum );
+        void    DoGetData();
+        
+    private:
+        using RealAccelHandlerInterface< data_type >::mOPipes;
+        
+        ComPort&            mComPort;
+        AccelData<int16_t>  mAccelData;
 };
 
-// Include implementation
-#include "ADXL345_RealAccelHandler_impl.h"
 
-#endif //__ADXL345_REAL_ACCEL_HANDLER_INTERFACE_H__
+#endif //__ADXL345_REAL_ACCEL_HANDLER__

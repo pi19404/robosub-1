@@ -1,62 +1,64 @@
-#ifndef __HMC6343_REAL_COMPASS_HANDLER_INTERFACE_H__
-#define __HMC6343_REAL_COMPASS_HANDLER_INTERFACE_H__
+#ifndef __HMC6343_REAL_COMPASS_HANDLER_H__
+#define __HMC6343_REAL_COMPASS_HANDLER_H__
 
 // Only include this file from RealCompassHandler.h
 #ifndef __REAL_COMPASS_HANDLER_H__
     #error Should only be included from RealCompassHandler.h
 #endif
 
-#include "CompassHandler.h"
-#include "HMC6343_CompassCfgData.h"
-
-////////////////////////////////////////////////////////
-// class Compass Handler
-// Device Handler for Honeywell HMC6343Tilt-Compensated 
-// Compass is a:
-//             - Compass                
-//             - 3-axis magnetometer    
-//             - 3-axis accelerometer.  
-//             - 3-axis tilt sensor.    
-//             - temperature sensor.    
-////////////////////////////////////////////////////////
-template <class T>
-class RealCompassHandlerInterface
-    :
-    public CompassHandler<T>
-{
+class RealCompassHandler
+      :
+       public RealCompassHandlerInterface<float>
+{    
+    typedef float data_type;
     
     public:
-        using CompassHandler<T>::AttachOutputLine;
-    
-        // From MeasurementDevice:
-        virtual void Initialize()                         = 0;
-        virtual void GetData()                            = 0;
+        RealCompassHandler( ComPort& );
+        ~RealCompassHandler();
         
-        // For HMC6343's to Implement:
-        virtual void SetOrientationLevel()                = 0;
-        virtual void SetOrientationUprightEdge()          = 0;
-        virtual void SetOrientationUprightFront()         = 0;
+        using RealCompassHandlerInterface<data_type>::AttachOutputLine;
         
-        virtual void EnterRunMode()                       = 0;
-        virtual void EnterStandbyMode()                   = 0;
-        virtual void EnterCalibrationMode()               = 0;
-        virtual void ExitCalibrationMode()                = 0;
-        virtual void ResetDevice()                        = 0;
-        virtual void EnterSleepMode()                     = 0;
-        virtual void ExitSleepMode()                      = 0;
+        // From HMC6343 CompassHandler
+        virtual void Initialize();
+        virtual void GetData();
+        
+        virtual void SetOrientationLevel();
+        virtual void SetOrientationUprightEdge();
+        virtual void SetOrientationUprightFront();
+        
+        virtual void EnterRunMode();
+        virtual void EnterStandbyMode();
+        virtual void EnterCalibrationMode();
+        virtual void ExitCalibrationMode();
+        virtual void ResetDevice();
+        virtual void EnterSleepMode();
+        virtual void ExitSleepMode();
         
         // EEPROM-commands (Persistent)
-        virtual void              SetConfig( CompassConfig& )             = 0;
-        virtual CompassConfig     GetConfig()                             = 0;
-        virtual CompassRate::Enum GetMeasurementRate()                    = 0;
-        virtual void              SetMeasurementRate( CompassRate::Enum ) = 0;     
+        virtual void              SetConfig( CompassConfig& );
+        virtual CompassConfig     GetConfig();
+        virtual CompassRate::Enum GetMeasurementRate();
+        virtual void              SetMeasurementRate( CompassRate::Enum );   
 
-    protected:
-        using CompassHandler<T>::mOPipes;
+        
+    private:
+        void        EepromWrite( uint8_t, uint8_t );
+        uint8_t     EepromRead( uint8_t  );      
+        void        DoSendCommand( uint8_t );
+        void        SetDeviceConfig();
+        void        GetDeviceConfig();
+        void        SetDeviceRate();
+        void        GetDeviceRate();
+        
+        void        DoGetData();
+        
+    private:
+        using RealCompassHandlerInterface<data_type>::mOPipes;
+
+        CompassData<int16_t> mCompassData;
+        CompassConfig        mDeviceConfig;
+        CompassRate          mDeviceRate;
+        ComPort&             mComPort;
 };
 
-
-// Include Implementation
-#include "HMC6343_RealCompassHandler_impl.h"
-
-#endif //__HMC6343_REAL_COMPASS_HANDLER_INTERFACE_H__
+#endif //__HMC6343_REAL_COMPASS_HANDLER_H__

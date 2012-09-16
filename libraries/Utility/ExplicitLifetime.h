@@ -13,6 +13,10 @@ class ExplicitLifetime
         
     protected:
         ExplicitLifetime() : NoCopy() { }
+
+    private:
+        ExplicitLifetime(const ExplicitLifetime& );
+        const ExplicitLifetime& operator=(const ExplicitLifetime&);
 };
         
 #endif //__EXPLICIT_LIFETIME_H__

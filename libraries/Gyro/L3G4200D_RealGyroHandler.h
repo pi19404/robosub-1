@@ -1,60 +1,67 @@
-#ifndef __L3G4200D_REAL_GYRO_HANDLER_INTERFACE_H__
-#define __L3G4200D_REAL_GYRO_HANDLER_INTERFACE_H__
+#ifndef __L3G4200D_REAL_GYRO_HANDLER_H__
+#define __L3G4200D_REAL_GYRO_HANDLER_H__
 
 #ifndef __REAL_GYRO_HANDLER_H__
     #error Must be included from RealGyroHandler.h
 #endif
 
-#include "GyroHandler.h"
-#include "L3G4200D_GyroCfgData.h"
+#include "L3G4200D_RealGyroHandlerInterface.h"
 
-template <class T>
-class RealGyroHandlerInterface 
+class RealGyroHandler
     :
-    public GyroHandler<T>
+    public RealGyroHandlerInterface<float>
 {
-    typedef T data_type;
+    typedef float data_type;
     
     public:
-        using GyroHandler<data_type>::AttachOutputLine;
+        RealGyroHandler( ComPort& comPort );
+        
+        using RealGyroHandlerInterface<data_type>::AttachOutputLine;
         
         // From DeviceHandler
-        virtual void Initialize() = 0;
-        virtual void GetData() = 0;
+        virtual void Initialize();
+        virtual void GetData();
         
-        virtual void SetCtrlReg1( const GyroCtrlReg1& ) = 0;
-        virtual void SetCtrlReg2( const GyroCtrlReg2& ) = 0;
-        virtual void SetCtrlReg3( const GyroCtrlReg3& ) = 0;
-        virtual void SetCtrlReg4( const GyroCtrlReg4& ) = 0;
-        virtual void SetCtrlReg5( const GyroCtrlReg5& ) = 0;
+        virtual void SetCtrlReg1( const GyroCtrlReg1& );
+        virtual void SetCtrlReg2( const GyroCtrlReg2& );
+        virtual void SetCtrlReg3( const GyroCtrlReg3& );
+        virtual void SetCtrlReg4( const GyroCtrlReg4& );
+        virtual void SetCtrlReg5( const GyroCtrlReg5& );
         
         // StatusReg
-        virtual const GyroStatusReg& GetStatus() = 0;
+        virtual const GyroStatusReg& GetStatus();
         
         // FifoCtrlReg
-        virtual void SetFifoCtrlReg( const GyroFifoCtrlReg& ) = 0;
+        virtual void SetFifoCtrlReg( const GyroFifoCtrlReg& );
         
         // FifoSrcReg
-        virtual const GyroFifoSrcReg& GetFifoStatus() = 0;
+        virtual const GyroFifoSrcReg& GetFifoStatus();
         
         // Int1CfgReg
-        virtual void SetInt1Config( const GyroInt1CfgReg& ) = 0;
+        virtual void SetInt1Config( const GyroInt1CfgReg& );
         
         // Int1SrcReg
-        virtual const GyroInt1SrcReg& GetInt1Status() = 0;
+        virtual const GyroInt1SrcReg& GetInt1Status();
         
         // Thresholds
-        virtual void SetThresholdX( uint16_t ) = 0;
-        virtual void SetThresholdY( uint16_t ) = 0;
-        virtual void SetThresholdZ( uint16_t ) = 0;
+        virtual void SetThresholdX( uint16_t );
+        virtual void SetThresholdY( uint16_t );
+        virtual void SetThresholdZ( uint16_t );
         
         // Int1Duration
-        virtual void SetInt1Duration( const GyroInt1Duration& ) = 0;
+        virtual void SetInt1Duration( const GyroInt1Duration& );
+            
+    private:
+        void WriteReg( GyroRegNames::Enum, uint8_t );
+        uint8_t ReadReg( GyroRegNames::Enum );
+        void DoGetData();
         
-    protected:
-        using GyroHandler<data_type>::mOPipes;
+    private:
+        using RealGyroHandlerInterface<data_type>::mOPipes;
+        
+        GyroData<int16_t>   mGyroData;
+        ComPort&            mComPort;
+        
 };
 
-#include "L3G4200D_RealGyroHandler_impl.h"
-
-#endif //__L3G4200D_REAL_GYRO_HANDLER_INTERFACE_H__
+#endif //__L3G4200D_REAL_GYRO_HANDLER_H__

@@ -10,8 +10,6 @@ class Singleton
     public ExplicitLifetime
 {
     public:
-        Singleton() { }
-        
         ~Singleton()
         {
             if( mInstance )
@@ -28,6 +26,13 @@ class Singleton
             }
             return *mInstance;
         }
+
+    protected:
+        Singleton() : ExplicitLifetime() { }
+
+    private:
+        Singleton(const Singleton&);
+        const Singleton<T>& operator=(const Singleton<T>& );
         
     private:
         static T* mInstance;
