@@ -6,6 +6,8 @@
     #error Should only be included from RealCompassHandler.h
 #endif
 
+#include "HMC6343_RealCompassHandlerInterface.h"
+
 class RealCompassHandler
       :
        public RealCompassHandlerInterface<float>

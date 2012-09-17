@@ -1,7 +1,8 @@
 #ifndef __SPI_COM_PORT_H__
 #define __SPI_COM_PORT_H__
 
-#include "../ComPort/ComPort.h"
+#include <ComPort/ComPort.h>
+#include <SPI.h>
 
 class SpiComPort : public ComPort
 {
@@ -41,9 +42,10 @@ class SpiComPort : public ComPort
    * -returns: none
    */
   virtual void read(uint8_t*, uint8_t, uint8_t*, uint8_t);
-};
 
-// include implementation
-#include "SpiComPort_impl.h"
+  private:
+    SpiComPort(const SpiComPort&);
+    const SpiComPort& operator=(const SpiComPort&);
+};
 
 #endif //__SPI_COM_PORT_H__

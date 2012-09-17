@@ -1,13 +1,8 @@
 #ifndef __SERIAL_COM_PORT_H__
 #define __SERIAL_COM_PORT_H__
 
-#include "../ComPort/ComPort.h"
-
-#if (ARDUINO >= 100)
-  #include <Arduino.h>
-#else
-  #include <WProgram.h>
-#endif
+#include <ComPort/ComPort.h>
+#include <HardwareSerial.h>
 
 // ComPort Definition for Serial Devices
 class SerialComPort 
@@ -54,10 +49,11 @@ class SerialComPort
    * -returns: device address
    */
    uint8_t getDeviceAddress( void ){ return mDevice; }
+
+  private:
+    SerialComPort(const SerialComPort&);
+    const SerialComPort& operator=(const SerialComPort&);
   
 };
-
-//Include implementation
-#include "SerialComPort_impl.h"
 
 #endif //__SERIAL_COM_PORT_H__

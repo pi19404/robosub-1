@@ -1,7 +1,7 @@
 #ifndef __COM_PORT_H__
 #define __COM_PORT_H__
 
-#include "../Utility/NoCopy.h"
+#include <Utility/NoCopy.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -58,7 +58,10 @@ class ComPort
   
   protected:
     uint8_t mDevice;
-  
+
+  private:
+        ComPort(const ComPort&);
+        const ComPort& operator=(const ComPort&);
 };
 
 #endif //__COM_PORT_H__

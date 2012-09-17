@@ -2,10 +2,10 @@
 #define __SIMULATED_COM_PORT_H__
 
 #include <stdint.h>
-#include "../Containers/Queue.h"
-#include "../ComPort/ComPort.h"
-#include "../Device/SimulatedDevice.h"
-#include "../Device/SimulatedDeviceController.h"
+#include <Containers/Queue.h>
+#include <ComPort/ComPort.h>
+#include <Device/SimulatedDevice.h>
+#include <Device/SimulatedDeviceController.h>
 
 class SimulatedComPort
     :
@@ -74,8 +74,10 @@ class SimulatedComPort
     private:
         Queue<uint8_t>             mReceiveBuffer;  // Data received by Device Handler
         Queue<uint8_t>             mSendBuffer;     // Data written by Device Handler
-};
 
-#include "SimulatedComPort_impl.h"
+    private:
+        SimulatedComPort(const SimulatedComPort& );
+        const SimulatedComPort& operator=(const SimulatedComPort&);
+};
 
 #endif //__SIMULATED_COM_PORT_H__

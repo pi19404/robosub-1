@@ -72,6 +72,4 @@ class RealMotorCtrlHandler
         ComPort& mComPort;
 };
 
-#include "RealMotorCtrlHandler_impl.h"
-
 #endif //__REAL_MOTOR_CTRL_HANDLER_H__

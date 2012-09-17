@@ -1,11 +1,11 @@
 #ifndef __ROBOSUB_CONTROLLER_H__
 #define __ROBOSUB_CONTROLLER_H__
 
-#include "./RoboSubControllerData.h"
-#include "../Utility/NoCopy.h"
-#include "../Configurations/IMCS_Configuration.h"
+#include "RoboSubControllerData.h"
+#include <Utility/NoCopy.h>
+#include <Configurations/IMCS_Configuration.h>
 
-#include "../Controller/PDController.h"
+#include <Controller/PDController.h>
 
 #define PWM_MAX  127
 #define PWM_MIN -127

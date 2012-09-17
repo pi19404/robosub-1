@@ -2,15 +2,10 @@
 #define __IMCS_CONFIGURATION_H__
 
 // LIST (ARRAY) GENERATION MACROS
-#include "../MacroTricks/MacroTricks.h"
-
-// BEGIN DEVICE DEFINITIONS:
-#define COMPASS HMC6343     // Use Honeywell Compass
-#define GYRO    L3G4200D    // Use ST Microelectronics Gyroscope
-#define ACCEL   ADXL345     // Use Analog Devices Accelerometer
+#include <MacroTricks/MacroTricks.h>
 
 // BEGIN DEVICE CREATION
-#include "../Math/Vector.h"
+#include <Math/Vector.h>
 #define DEVICES      _Devices
 #define DEVICES_TYPE DeviceHandler*
 #define NUM_DEVICES  LIST_N_ELEMS(DEVICES,DEVICES_TYPE)
@@ -27,8 +22,8 @@
 #define MOTOR_CTRLS_LIST LIST(MOTOR_CTRLS_TYPE,MOTOR_CTRLS,MCTRL)
 
 #include <HardwareSerial.h>
-#include "../ComPort/SerialComPort.h"
-#include "../MotorCtrl/RealMotorCtrlHandler.h"
+#include <ComPort/SerialComPort.h>
+#include <MotorCtrl/RealMotorCtrlHandler.h>
 
 SerialComPort _M1Com( Serial1, M1_ADDR );
 SerialComPort _M2Com( Serial1, M2_ADDR );
@@ -49,8 +44,8 @@ MOTOR_CTRLS_LIST;
 #define DEVICE1_1 LIST_ELEM( MOTOR_CTRLS[1], DEVICE2 )
 
 // THRUSTERS
-#include "../Thruster/RealThrusterPlant.h"
-#include "../Thruster/RealThruster.h"
+#include <Thruster/RealThrusterPlant.h>
+#include <Thruster/RealThruster.h>
 
 #define THRUSTERS      _Thrusters
 #define THRUSTERS_TYPE RealThruster*
@@ -78,9 +73,9 @@ THRUSTERS_LIST;
 Vector<ThrusterData,NUM_THRUSTERS> THRUSTERS_DATA;
 
 // PNEUMATICS:
-#include "../PneumaticController/RealPneumaticPlant.h"
-#include "../PneumaticController/RealPneumaticController.h"
-#include "../PneumaticController/RealTimedPneumaticController.h"
+#include <PneumaticController/RealPneumaticPlant.h>
+#include <PneumaticController/RealPneumaticController.h>
+#include <PneumaticController/RealTimedPneumaticController.h>
 
 #define PNEUMATICS      _Pneumatics
 #define PNEUMATICS_TYPE RealPneumaticController*
@@ -120,9 +115,9 @@ Vector<PneumaticControllerData, NUM_PNEUMATICS> PNEUMATICS_DATA;
 // Compass
 #define COMPASS_ADDR 0x19
 #include <Wire.h>
-#include "../ComPort/WireComPort.h"
-#include "../Compass/CompassData.h"
-#include "../Compass/RealCompassHandler.h"
+#include <ComPort/WireComPort.h>
+#include <Compass/CompassData.h>
+#include <Compass/RealCompassHandler.h>
 
 WireComPort _CompassCom( Wire, COMPASS_ADDR );
 RealCompassHandler COMPASS( _CompassCom );
@@ -132,14 +127,14 @@ CompassData<float> COMPASS_DATA;
 #define DEVICE5 LIST_ELEM(&COMPASS, DEVICE6)
 
 // Depth Sensor
-#include "../DepthSensor/RealDepthSensor.h"
+#include <DepthSensor/RealDepthSensor.h>
 #define DEPTH_PIN A7
 int DEPTH_DATA;
 #define DEPTH_SCALE (5.0L / 12.0L)
 #define DEVICE6 LIST_GO_TO( DEVICE7 )
 
 // Begin Interrupt
-#include "../Device/Interrupt.h"
+#include <Device/Interrupt.h>
 #define RUN_PIN 2
 #define RUN_INT 0
 //Interrupt RUN_INTERRUPT( RUN_INT, RUN_PIN );
