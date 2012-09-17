@@ -1,5 +1,5 @@
 #include "RealMotorCtrlHandler.h"
-#include "../ComPort/ComPort.h"
+#include <ComPort/ComPort.h>
 
 void RealMotorCtrlHandler::Initialize()
 {
