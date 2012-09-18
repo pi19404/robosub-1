@@ -1,11 +1,11 @@
-TARGET       = Competition_2012
+TARGET       = Arduino
 ifdef DEBUG
 BOARD_TAG    = mega_pic32_dbg
 else
 BOARD_TAG    = mega_pic32
 endif
 
-USER_LIB_PATH = $(dir $(CURDIR))/libraries
+USER_LIB_PATH = libraries
 
 ARDUINO_LIBS = Wire \
                Wire/utility \
@@ -17,7 +17,7 @@ ARDUINO_LIBS = Wire \
 
 ARDUINO_PORT = /dev/ttyUSB*
 
-include $(dir $(CURDIR))/makefiles/chipKIT.mk
+include makefiles/chipKIT.mk
 
 ## update system includes -> must follow 'include' line ##
 SYS_INCLUDES += $(patsubst %,-I%,$(USER_LIB_PATH))
