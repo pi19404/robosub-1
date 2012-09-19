@@ -1,0 +1,6 @@
+#!/bin/bash
+g++ -c sub.cpp
+g++ -c coreAI.cpp
+g++ sub.o coreAI.o -lpthread -lboost_regex -lboost_system -o AI
+
+    

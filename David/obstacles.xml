@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<obstacles>
+	<obstacle name="Gate"></obstacle>
+	<obstacle name="Buoy"></obstacle>
+	<obstacle name="Obstacle Course"></obstacle>
+	<obstacle name="Torpedo"></obstacle>
+	<obstacle name="Dropper"></obstacle>
+	<obstacle name="Feed Emperor"></obstacle>
+	<obstacle name="Laurel Wreath"></obstacle>
+</obstacles>
+
+

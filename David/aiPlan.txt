@@ -1,0 +1,66 @@
+Core AI
+
+How to start the sub? 
+
+Expecting to see
+
+What is seen
+
+keep track of time
+
+keep track of what is finished what still needs to be done
+
+
+
+loop:
+	getInput()
+	analyseInput()
+	doAction()
+
+getInput() -> Ben Smith
+
+analyseInput() -> David
+	
+Do Action() -> David
+	dictionary with what to do when something found
+
+
+## Psuedo Code
+
+Start - Figure out 
+Gate - write quick program to see gate, run on front camera: 
+        recognize gate 
+        get corner coords 
+        pos = centerCoord(topL, topR, bottomL, bottomR) 
+        output <"gate", orange, pos.x, pos.y, pos.z> 
+        
+          if gate: 
+                move(pos) 
+Buoy 
+Obstacle Course - Use same program as gate look for green instead 
+Targets - Look for blue or red with empty circles 
+        find the empty circles center point (invert?) 
+        determine smaller circle (if 2 circles) 
+        send move coord till directly in front of circle 
+        send fire command to correct colored torpedo 
+
+bins - fix matching program, have output <"sword", red, X, Y, Z> 
+        AI: 
+        if not in mission plan move to side of bin to find next one 
+        if in mission plan: 
+                if centered: 
+                        if large enough: 
+                                drop correct marker 
+                        else: 
+                                move down 
+                else: 
+                        pos = centerCoord(topL, topR, bottomL, bottomR) 
+                        move(pos) 
+        
+feed Emperor - worry about later 
+
+Laurel - worry about later 
+
+        
+14x19x12 inches 
+
