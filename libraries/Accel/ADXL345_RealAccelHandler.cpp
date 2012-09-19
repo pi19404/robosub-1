@@ -1,5 +1,7 @@
+// Verify ADXL345 is being used
+#ifdef ACL && ACL == ADXL345
 
-#include "ADXL345_RealAccelHandler.h"
+#include "RealAccelHandler.h"
 #include "../ComPort/ComPort.h"
 
 RealAccelHandler::RealAccelHandler( ComPort& comPort )
@@ -227,3 +229,5 @@ void RealAccelHandler::DoGetData()
     mAccelData[1] = (int16_t)( (ReadReg(DataYH) << 8) | ReadReg(DataYL) );
     mAccelData[2] = (int16_t)( (ReadReg(DataZH) << 8) | ReadReg(DataZL) );
 }
+
+#endif //(ACCEL) && (ACCEL == ADXL345)

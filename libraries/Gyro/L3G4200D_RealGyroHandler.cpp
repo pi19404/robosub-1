@@ -1,7 +1,7 @@
-#ifndef __L3G4200D_REAL_GYRO_HANDLER_H__
-#define __L3G4200D_REAL_GYRO_HANDLER_H__
+// Verify L3G4200 is being used
+#ifdef GYR && GYR == L3G4200D
 
-#include "L3G4200D_RealGyroHandler.h"
+#include "RealGyroHandler.h"
 #include "../ComPort/ComPort.h"
 
 RealGyroHandler::RealGyroHandler( ComPort& comPort )
@@ -183,4 +183,4 @@ void RealGyroHandler::DoGetData( )
     mGyroData[2]  = (int16_t)( (ReadReg(OutZH) << 8) | ReadReg(OutZL) );
 }
 
-#endif //__L3G4200D_REAL_GYRO_HANDLER_H__
+#endif //(GYRO) && (GYRO == L3G4200D)

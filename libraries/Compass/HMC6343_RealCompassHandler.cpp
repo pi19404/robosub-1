@@ -1,5 +1,5 @@
-#ifndef __REAL_COMPASS_HANDLER_CPP__
-#define __REAL_COMPASS_HANDLER_CPP__
+// Verify that the HMC6343 verison of the handler is being used
+#ifdef COMP && COMP == HMC6343
 
 #include "RealCompassHandler.h"
 #include <ComPort/ComPort.h>
@@ -202,4 +202,4 @@ void RealCompassHandler::DoGetData( )
     }
 }
 
-#endif //__REAL_COMPASS_HANDLER_CPP__
+#endif // (COMPASS) && (COMPASS == HMC6343)

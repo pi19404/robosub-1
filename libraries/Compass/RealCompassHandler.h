@@ -3,7 +3,7 @@
 
 #include <MacroTricks/MacroTricks.h>
 
-#if defined (COMP)
+#if defined COMP
     #include LOCAL_INCLUDE( JOIN( COMP , _RealCompassHandler.h ) )
 #endif
 
