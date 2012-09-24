@@ -5,69 +5,45 @@
 #include <Utility/NoCopy.h>
 #include <Configurations/IMCS_Configuration.h>
 
-#include <Controller/PDController.h>
-
 #define PWM_MAX  127
 #define PWM_MIN -127
 
-#define LIN_KP (127.0L/1000.0L) //30.3398L
-#define LIN_KD 21.942L
-#define ANG_KP LIN_KP
-#define ANG_KD LIN_KD
 #define N_CTRL_VALS 3
-typedef int8_t CTRL_TYPE;
-
 #define SEND_READY 'A'
 
 class RoboSubController
     :
     public NoCopy
 {    
+    typedef int8_t CTRL_TYPE;
 
     public:
         RoboSubController(  
-                            ComPort                                           &
+                            ComPort&
                            ,float
                           );
                           
         void Run();
         
     private:
-        RoboSubControllerData                              mState;
-        //PDController< CTRL_TYPE, CTRL_TYPE >               mLinearController;
-        //Vector< CTRL_TYPE, N_CTRL_VALS >                   mLinearError;
-        Vector< CTRL_TYPE, N_CTRL_VALS >                   mLinearPWM;
-        //PDController< CTRL_TYPE, CTRL_TYPE >               mAngularController;
-        //Vector< CTRL_TYPE, N_CTRL_VALS >                   mAngularError;
-        Vector< CTRL_TYPE, N_CTRL_VALS >                   mAngularPWM;
-        
-        ComPort                                           &mComPort;
-        unsigned long                                      mLoopDelay;
+        RoboSubControllerData            mState;
+        Vector< CTRL_TYPE, N_CTRL_VALS > mLinearPWM;
+        Vector< CTRL_TYPE, N_CTRL_VALS > mAngularPWM;
+        ComPort                         &mComPort;
+        unsigned long                    mLoopDelay;
 };
 
 RoboSubController::RoboSubController(  
-                            ComPort                                           &comPort
-                           ,float                                              loopFrequency
+                            ComPort &comPort
+                           ,float    loopFrequency
                           )
     :
      mState()
-    //,mLinearController( LIN_KP, LIN_KD )
-    //,mLinearError()
     ,mLinearPWM()
-    //,mAngularController( ANG_KP, ANG_KD )
-    //,mAngularError()
     ,mAngularPWM()
     ,mComPort(comPort)
     ,mLoopDelay( (loopFrequency) ? (unsigned long)(1000/loopFrequency) : 0 )
-{ 
-
-    // Setup Controllers:
-    // for( int i = 0; i < N_CTRL_VALS; ++i )
-    // {
-        // mLinearController.AttachIOLine ( mLinearError[i], mLinearPWM[i] );
-        // mAngularController.AttachIOLine(mAngularError[i],mAngularPWM[i] );
-    // }
-}
+{ }
 
 void RoboSubController::Run()
 {
@@ -105,25 +81,35 @@ void RoboSubController::Run()
         // Get command data:
         mComPort.read( (uint8_t *)recvData, sizeof(recvData)/sizeof(int8_t) );
                 
-        // Copy data
-        if( _RUN )
+        // Check _RUN switch is enabled
+        if( !_RUN )
+        {
+            // Command all thrusters to full stop
+            for( int i = 0; i < (N_CTRL_VALS * 2); ++i )
+            {
+                THRUSTERS_DATA[i] = 0;
+            }
+        }
+        // Update Control Data
+        else
         {
             newState = RoboSubControllerData( recvData );
             
-            // check reset
+            // Check reset pin
             if( newState.Status & 0x80 )
             {
-                // call reset function:
+                // reset by returning
                 return;
             }
             
-            // compute new status
-            newState.Status = ( ( ( mState.Status | newState.Status )&0x0F ) | ( newState.Status & 0xF0 ) );
+            // Single-fire devices remain high after first fire command
+            newState.Status = (((mState.Status | newState.Status)&0x0F) | (newState.Status & 0xF0));
             
-            // Update fire status
-            fireStatus = ( ( newState.Status ^ mState.Status )&0x0F ) | ( newState.Status & 0xF0 );
+            // Fire status is what is sent to the Pneumatics Plant
+            // Fire commands after the first for single-fire devices are ignored
+            fireStatus = ((newState.Status ^ mState.Status)&0x0F) | (newState.Status & 0xF0);
             
-            // update mState
+            // Update State
             mState = newState;
             
             // Update Pneumatics
@@ -132,34 +118,29 @@ void RoboSubController::Run()
                 PNEUMATICS_DATA[i] = fireStatus & (1 << i);
             }
             
-            //Compute Thruster Linear PWM Values:
-            // mLinearError[0] = (CTRL_TYPE)((mState.OffsetXH << 8 ) + mState.OffsetXL );
-            // mLinearError[1] = (CTRL_TYPE)((mState.OffsetYH << 8 ) + mState.OffsetYL );
-            // mLinearError[2] = (CTRL_TYPE)((mState.OffsetZH << 8 ) + mState.OffsetZL );
+            // Get Thruster PWM Values from State
             mLinearPWM[0] = mState.OffsetX;
             mLinearPWM[1] = mState.OffsetY;
             mLinearPWM[2] = mState.OffsetZ;
-            
             mAngularPWM[0] = 0;
             mAngularPWM[1] = mState.OffsetH;
             mAngularPWM[2] = 0;
             
-            // Compute Thruster Angular PWM Values:
-            // mAngularError[0] = 0.0;//(CTRL_TYPE)mCompassData[CompassData<float>::Roll ]; we have no roll for strafing anymore.
-            // mAngularError[1] = (CTRL_TYPE)((mState.OffsetHH << 8 ) + mState.OffsetHL );
-            // mAngularError[2] = 0.0;//(CTRL_TYPE)mCompassData[CompassData<float>::Pitch ];
-            
-                
-            // Update Thruster pwm values
-            for( int i = 0, j = 0;  j < N_CTRL_VALS; i+=2, j+=1 )
-            {
-                pwmValues[i]   = mLinearPWM[j] + mAngularPWM[j];
-                pwmValues[i+1] = mLinearPWM[j] - mAngularPWM[j];
-            }
-            
-            // Scale Pwm Values
+            // Update Thruster PWM Values
             for( int i = 0; i < (N_CTRL_VALS * 2); ++i )
             {
+                // The first thruster of a pair is the sum of the PWMs
+                if( (i % 2) == 0 )
+                {
+                    pwmValues[i] = mLinearPWM[i/2] + mAngularPWM[i/2];
+                }
+                // The second is the difference of the PWMs
+                else
+                {
+                    pwmValues[i] = mLinearPWM[i/2] - mAngularPWM[i/2];
+                }
+
+                // Scale PWM Values:
                 if( pwmValues[i] > PWM_MAX )
                 {
                     pwmValues[i] = PWM_MAX;
@@ -168,28 +149,20 @@ void RoboSubController::Run()
                 {
                     pwmValues[i] = PWM_MIN;
                 }
-                
+
+                // Update data of each thruster to scaled value
                 THRUSTERS_DATA[i] = pwmValues[i];
-                _lm.Log( String( (int)THRUSTERS_DATA[i] ) );
             }
             
             // mirror Y across X
             THRUSTERS_DATA[2] *= -1;
             THRUSTERS_DATA[3] *= -1;
         }
-        else
-        {
-            // all stop
-            for( int i = 0; i < (N_CTRL_VALS * 2); ++i )
-            {
-                THRUSTERS_DATA[i] = 0;
-            }
-        }
         
-        // Run Pneumatics
+        // Send Pneumatics Commands
         PNEUMATIC_PLANT.CommandAll();
         
-        // Run Thrusters
+        // Send Thruster Commands
         THRUSTER_PLANT.DriveAll(); 
         
         // stop time; Check loop rate

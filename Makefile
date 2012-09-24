@@ -13,6 +13,8 @@ ARDUINO_LIBS = Wire \
                HardwareSerial \
                ComPort \
                MotorCtrl \
+               Gyro \
+               Accel \
                Compass 
 
 ARDUINO_PORT = /dev/ttyUSB*
@@ -24,5 +26,5 @@ SYS_INCLUDES += $(patsubst %,-I%,$(USER_LIB_PATH))
 
 ## define compass gyro and accelerometer -> must follow 'include' line ##
 CPPFLAGS += -DCOMP='HMC6343' \
-            -DGYRO='L3G4200D' \
-            -DACCEL='ADXL345'
+            -DGYR='L3G4200D' \
+            -DACL='ADXL345'
