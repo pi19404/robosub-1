@@ -36,6 +36,14 @@ void setup()
   // Initialize I2C Bus
   _lm.Log("Initializing I2C Bus for Wire Devices.");
   Wire.begin();
+
+  // Attach Gyro Pipeline
+  _lm.Log("Attaching Gyroscope.");
+  GYRO.AttachOutputLine( GYRO_DATA );
+
+  // Attach Accelerometer Pipeline
+  _lm.Log("Attaching Accelerometer.");
+  ACCEL.AttachOutputLine( ACCEL_DATA );
   
   // Attach Compass Pipeline
   _lm.Log("Attaching Compass.");

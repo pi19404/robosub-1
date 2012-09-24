@@ -110,7 +110,33 @@ Vector<PneumaticControllerData, NUM_PNEUMATICS> PNEUMATICS_DATA;
 #define DEVICE2_3 LIST_ELEM( PNEUMATICS[3], DEVICE2_4 )
 #define DEVICE2_4 LIST_ELEM( PNEUMATICS[4], DEVICE2_5 )
 #define DEVICE2_5 LIST_ELEM( PNEUMATICS[5], DEVICE2_6 )
-#define DEVICE2_6 LIST_ELEM( PNEUMATICS[6], DEVICE5   )
+#define DEVICE2_6 LIST_ELEM( PNEUMATICS[6], DEVICE3   )
+
+// Gyro
+#define GYRO_ADDR 0x69
+#include <Wire.h>
+#include <ComPort/WireComPort.h>
+#include <Gyro/GyroData.h>
+#include <Gyro/RealGyroHandler.h>
+
+WireComPort _GyroCom( Wire, GYRO_ADDR );
+RealGyroHandler GYRO( _GyroCom );
+GyroData<float> GYRO_DATA;
+
+#define DEVICE3 LIST_ELEM(&GYRO, DEVICE4)
+
+// Accelerometer
+#define ACCEL_ADDR 0x1D
+#include <Wire.h>
+#include <ComPort/WireComPort.h>
+#include <Accel/AccelData.h>
+#include <Accel/RealAccelHandler.h>
+
+WireComPort _AccelCom( Wire, ACCEL_ADDR );
+RealAccelHandler ACCEL( _AccelCom );
+AccelData<float> ACCEL_DATA;
+
+#define DEVICE4 LIST_ELEM(&ACCEL, DEVICE5)
 
 // Compass
 #define COMPASS_ADDR 0x19
@@ -121,7 +147,6 @@ Vector<PneumaticControllerData, NUM_PNEUMATICS> PNEUMATICS_DATA;
 
 WireComPort _CompassCom( Wire, COMPASS_ADDR );
 RealCompassHandler COMPASS( _CompassCom );
-
 CompassData<float> COMPASS_DATA;
 
 #define DEVICE5 LIST_ELEM(&COMPASS, DEVICE6)
