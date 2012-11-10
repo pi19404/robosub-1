@@ -2,8 +2,10 @@
 
 class KB {
 
-    Public:
-        KB::KB(); // Constructor
+    public:
+        KB(); // Constructor
+        int updateKB(); 
+
 
         // Multiple Tasks
         bool StartGateComplete;
@@ -17,64 +19,66 @@ class KB {
         bool AttemptTask;
 
         // Start Gate  // Used for Obstacle Course Too
-        bool Pillar1Seen;
-        bool Pillar2Seen;
         bool Pillar1Found;
         bool Pillar2Found;
 
         // Paths
-        bool Path1Seen;
-        bool Path2Seen;
-        bool Path3Seen;
-        bool Path4Seen;
-        bool Path5Seen;
-        bool Path6Seen;
-        bool Path7Seen;
+
 
         // Buoys
         bool CorrectHeading;
-        bool BuoyGreenSeen;
-        bool BuoyRedSeen;
-        bool BuoyYellowSeen;
-        bool BuoyGreenFound;
-        bool BuoyRedFound;
-        bool BuoyYellowFound;
+        bool buoyPrimaryFound;
+        bool buoySecondaryFound;
         bool PrimaryBuoyComplete;
         bool SecondaryBuoyComplete;
         
         // Obstacle Course
-        bool BarSeen;
         bool BarFound;
 
         // re use gate pillar booleans
 
         // Torpedoes
-        bool PrimaryTorpedoTargetSeen;
         bool PrimaryTorpedoTargetComplete;
-        bool SecondaryTorpedoTargetSeen;
         bool SecondaryTorpedoTargetComplete;
 
         // Bins
-        bool BinsSeen;
         bool BinsFound;
-        bool Image1Seen;
-        bool Image2Seen;
-        bool Image3Seen;
-        bool Image4Seen;
-        bool PrimaryBinTargetSeen;
+        bool BinsPrimaryFound;
+        bool BinsSeondaryFound;
         bool PrimaryBinTargetComplete;
-        bool SecondaryBinTargetSeen;
         bool SecondaryBinTargetComplete;
         bool DistancesCalculated;
 
-
         // Positioning Variables
-        int x;  // pixels? 
-        int y;
-        int z;
-        int heading; // degrees
+        // Center point for primary target
 
-    Private:
+        int x1;  // pixels? 
+        int y1;
+        int z1;
+        int heading1; // degrees
+
+        // Center point for secondary target 
+        int x2;
+        int y2;
+        int z2;
+        int heading2;
+        
+
+        // Predefined at competition time
+        // Buoy Targets
+        colors buoyPrimary;
+        colors buoySecondary;
+        
+        // Torpedo Targets
+        colors torpedoPrimary;
+        colors torpedoSecondary;
+
+        // Bin Targets
+        images binPrimary;
+        images binSecondary;
+
+
+    private:
 
 
 };
