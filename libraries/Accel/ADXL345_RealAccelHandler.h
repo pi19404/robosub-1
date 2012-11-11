@@ -5,6 +5,7 @@
     #error Must be included from RealAccelHandler.h
 #endif
 
+#include "../ComPort/ComPort.h"
 #include "ADXL345_RealAccelHandlerInterface.h"
 
 class RealAccelHandler 
@@ -57,5 +58,6 @@ class RealAccelHandler
         AccelData<int16_t>  mAccelData;
 };
 
+#include "ADXL345_RealAccelHandler.cpp"
 
 #endif //__ADXL345_REAL_ACCEL_HANDLER__

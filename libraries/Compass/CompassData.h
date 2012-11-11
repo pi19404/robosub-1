@@ -5,47 +5,42 @@
 
 template <class T>
 class CompassData
-    : 
-    public Vector<T>
+	: 
+	public Vector<T>
 {
-    public:
-        enum Enum {
-             Heading
-            ,Pitch
-            ,Roll
-        };
-    public: 
-        CompassData() : Vector<T>() { }
-        CompassData( const CompassData<T>& tiltData ) : Vector<T>( tiltData ) { }
-        CompassData( const Vector<T>& coordVec ) : Vector<T>( coordVec ) { }
-        
-        using Vector<T>::operator+=;
-        using Vector<T>::operator-=;
-        using Vector<T>::operator*=;
-        using Vector<T>::operator/=;
-        using Vector<T>::operator--;
-        using Vector<T>::operator++;
-        using Vector<T>::operator+;
-        using Vector<T>::operator-;
-        using Vector<T>::operator*;
-        using Vector<T>::operator/;
-        using Vector<T>::operator=;
-        using Vector<T>::operator,;
-        using Vector<T>::operator[];
-        using Vector<T>::operator==;
-        using Vector<T>::operator!=;
-        
-        const T& operator[]( Enum en ) const
-        {
-            int index = (int)en;
-            return (*this)[index];
-        }
-        
-        T& operator[]( Enum en )
-        {
-            int index = (int)en;
-            return (*this)[index];
-        }
+	public:
+		enum Enum 
+		{
+			 Heading
+			,Pitch
+			,Roll
+		};
+
+	public: 
+		CompassData() : Vector<T>() { }
+		CompassData( const CompassData<T>& tiltData ) : Vector<T>( tiltData ) { }
+		CompassData( const Vector<T>& coordVec ) : Vector<T>( coordVec ) { }
+
+		using Vector<T>::operator+=;
+		using Vector<T>::operator-=;
+		using Vector<T>::operator*=;
+		using Vector<T>::operator/=;
+		using Vector<T>::operator--;
+		using Vector<T>::operator++;
+		using Vector<T>::operator+;
+		using Vector<T>::operator-;
+		using Vector<T>::operator*;
+		using Vector<T>::operator/;
+		using Vector<T>::operator=;
+		using Vector<T>::operator,;
+		using Vector<T>::operator[];
+		using Vector<T>::operator==;
+		using Vector<T>::operator!=;
+
+		const T& operator[]( Enum en ) const;
+		T& operator[]( Enum en );
 };
+
+#include "CompassData.cpp"
 
 #endif //__COMPASS_DATA_H__

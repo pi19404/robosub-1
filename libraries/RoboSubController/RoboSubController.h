@@ -18,11 +18,7 @@ class RoboSubController
     typedef int8_t CTRL_TYPE;
 
     public:
-        RoboSubController(  
-                            ComPort&
-                           ,float
-                          );
-                          
+        RoboSubController(ComPort&, float);
         void Run();
         
     private:
@@ -33,10 +29,7 @@ class RoboSubController
         unsigned long                    mLoopDelay;
 };
 
-RoboSubController::RoboSubController(  
-                            ComPort &comPort
-                           ,float    loopFrequency
-                          )
+RoboSubController::RoboSubController(ComPort &comPort, float loopFrequency)
     :
      mState()
     ,mLinearPWM()
@@ -81,8 +74,14 @@ void RoboSubController::Run()
         // Get command data:
         mComPort.read( (uint8_t *)recvData, sizeof(recvData)/sizeof(int8_t) );
                 
+<<<<<<< local
+        // Copy data
+=======
         // Check _RUN switch is enabled
+>>>>>>> other
         if( !_RUN )
+<<<<<<< local
+=======
         {
             // Command all thrusters to full stop
             for( int i = 0; i < (N_CTRL_VALS * 2); ++i )
@@ -92,7 +91,17 @@ void RoboSubController::Run()
         }
         // Update Control Data
         else
+>>>>>>> other
         {
+            // all stop
+            for( int i = 0; i < (N_CTRL_VALS * 2); ++i )
+            {
+                THRUSTERS_DATA[i] = 0;
+            }
+        }
+        else
+        {
+				// all go
             newState = RoboSubControllerData( recvData );
             
             // Check reset pin
@@ -126,7 +135,53 @@ void RoboSubController::Run()
             mAngularPWM[1] = mState.OffsetH;
             mAngularPWM[2] = 0;
             
+<<<<<<< local
+            // Compute Thruster Angular PWM Values:
+            // mAngularError[0] = 0.0;//(CTRL_TYPE)mCompassData[CompassData<float>::Roll ]; we have no roll for strafing anymore.
+            // mAngularError[1] = (CTRL_TYPE)((mState.OffsetHH << 8 ) + mState.OffsetHL );
+            // mAngularError[2] = 0.0;//(CTRL_TYPE)mCompassData[CompassData<float>::Pitch ];
+            
+// begin update by John Cox 9-17-2012             
+            // Update Thruster pwm values
+            for( int i = 0, j = 0;  j < N_CTRL_VALS; i+=2, j+=1 )
+            {
+// ??why are thruster values created differently?  One is made with linear+angular, the other with linear-angular.  Won't they 
+// always be different??
+
+// ??pwm1 is created by an addition, so does it need a PWM_MIN check??
+                int pwm1 = mLinearPWM[j] + mAngularPWM[j];
+                if( pwm1 > PWM_MAX )
+                {
+                    pwm1 = PWM_MAX;
+                }
+                else if( pwm1 < PWM_MIN )
+                {
+                    pwm1 = PWM_MIN;
+                }
+                pwmValues[i]   = pwm1
+                THRUSTERS_DATA[i] = pwmValues[i];
+                _lm.Log( String( (int)THRUSTERS_DATA[i] ) );
+
+// ??pwm2 is created by an addition, so does it need a PWM_MAX check??
+                int pwm2 = mLinearPWM[j] - mAngularPWM[j];
+                if( pwm2 > PWM_MAX )
+                {
+                    pwm2 = PWM_MAX;
+                }
+                else if( pwm2 < PWM_MIN )
+                {
+                    pwm2 = PWM_MIN;
+                }
+                pwmValues[i+1] = pwm2
+                THRUSTERS_DATA[i+1] = pwmValues[i+1];
+                _lm.Log( String( (int)THRUSTERS_DATA[i+1] ) );
+            }
+
+/*            
+            // Scale Pwm Values
+=======
             // Update Thruster PWM Values
+>>>>>>> other
             for( int i = 0; i < (N_CTRL_VALS * 2); ++i )
             {
                 // The first thruster of a pair is the sum of the PWMs
@@ -153,6 +208,8 @@ void RoboSubController::Run()
                 // Update data of each thruster to scaled value
                 THRUSTERS_DATA[i] = pwmValues[i];
             }
+*/
+// end update by John Cox 9-17-2012
             
             // mirror Y across X
             THRUSTERS_DATA[2] *= -1;

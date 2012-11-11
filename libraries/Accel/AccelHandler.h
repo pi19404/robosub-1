@@ -7,20 +7,20 @@
 
 template <class T>
 class AccelHandler
-    :
-     public MeasurementDevice
-    ,public OPipedDevice< AccelData<T> >
+	:
+	 public MeasurementDevice
+	,public OPipedDevice< AccelData<T> >
 {
-    typedef AccelData<T> data_type;
-    
-    public:
-        using OPipedDevice<data_type>::AttachOutputLine;
-        
-        virtual void Initialize() = 0;
-        virtual void GetData() = 0;
-        
-    protected:
-        using OPipedDevice<data_type>::mOPipes;
+	typedef AccelData<T> data_type;
+
+	public:
+		using OPipedDevice<data_type>::AttachOutputLine;
+
+		virtual void Initialize() = 0;
+		virtual void GetData() = 0;
+
+	protected:
+		using OPipedDevice<data_type>::mOPipes;
 };
 
 #endif //__ACCEL_HANDLER_H__
