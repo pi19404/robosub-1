@@ -9,6 +9,8 @@ class IMAGE_KB {
         // Start Gate
         bool Pillar1Seen;
         bool Pillar2Seen;
+	int  Pillar1X;
+	int  Pillar2X;
 
         // Paths
         bool Path1Seen;
