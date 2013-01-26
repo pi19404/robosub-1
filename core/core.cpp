@@ -1,11 +1,22 @@
 /* Core AI file */
 
 #include "core.h"
+#include "kb.h"
+#include "image_kb.h"
+
+using namespace std;
 
 int main(int argc, char* argv[])
 {
     // Setup
-    KB kb; // Set Knowledge Base
+    KB *kb;// = new KB();//(sizeof(KB)); // Set Knowledge Base
+    IMAGE_KB *im;// = new IMAGE_KB();// (sizeof(IMAGE_KB)); // Set Image KB
+    
+    kb = new KB();
+    im = new IMAGE_KB();
+    //KB kb = kb1;
+    //IMAGE_KB im = im1;
+    //kb = new KB::KB();
     
     // add error handling
     while(1)
@@ -16,35 +27,35 @@ int main(int argc, char* argv[])
 
 int mainLoop(KB *kb, IMAGE_KB *im)
 {
-    kb->updateKB();
+    kb->updateKB(im);
 
     if (!kb->StartGateComplete)
     {
         StartGate(kb, im);
     }
-    else if (!kb->BuoysComplete)
+    else if (!kb->BuoyTaskComplete)
     {
-        Paths(kb);
-        Buoys(kb);
+        Paths(kb, im);
+        Buoys(kb, im);
     }
     else if (!kb->ObstacleCourse1Complete)
     {
-        Paths(kb);
+        Paths(kb, im);
         ObstacleCourse(kb);
     }
     else if (!kb->TorpedoTaskComplete)
     {
-        Paths(kb);
+        Paths(kb, im);
         Torpedos(kb);
     }
     else if (!kb->BinsTaskComplete)
     {
-        Paths(kb);
-        Bins(kb);
+        Paths(kb, im);
+        Bins(kb, im);
     }
     else if (!kb->ObstacleCourse2Complete)
     {
-        Paths(kb);
+        Paths(kb, im);
         ObstacleCourse(kb);
     }
     return 0;
@@ -67,7 +78,7 @@ int StartGate(KB *kb, IMAGE_KB *im)
         // y is set to 1 to move forward
         // update x and z from image recognition
 
-        move(kb->x1,kb->y1,kb->z1,heading1);
+        move(kb->x1,kb->y1,kb->z1,kb->heading1);
     }
     if(kb->Pillar1Found && kb->Pillar2Found && !im->Pillar1Seen && !im->Pillar2Seen)
     {
@@ -76,11 +87,11 @@ int StartGate(KB *kb, IMAGE_KB *im)
     return 0;
 }
 
-int Paths(KB *kb)
+int Paths(KB *kb, IMAGE_KB *im)
 {
     // get all from image recognition
 
-    if (kb->twoPaths)
+    if (im->twoPaths)
     {
         // follow the right one
         if(kb->x1 > kb->x2)
@@ -97,7 +108,7 @@ int Paths(KB *kb)
     return 0;
 }
 
-int Buoys(KB *kb, IMAGE_KB *image_kb)
+int Buoys(KB *kb, IMAGE_KB *im)
 {
     if(kb->AttemptTask) // Buoys found and labeled, do the task now
     {
@@ -109,7 +120,7 @@ int Buoys(KB *kb, IMAGE_KB *image_kb)
             //  if primary is found
             if(kb->buoyPrimaryFound)
             {
-                move(kb->x1,kb->y1,kb->z1,heading1);
+                move(kb->x1,kb->y1,kb->z1,kb->heading1);
                 if(!im->BuoyGreenSeen && !im->BuoyRedSeen && !im->BuoyYellowSeen)
                 {
                     // TODO wait x time
@@ -131,14 +142,14 @@ int Buoys(KB *kb, IMAGE_KB *image_kb)
             // move towards secondary
             if(kb->buoySecondaryFound)
             {
-                move(kb->x2,kb->y2,kb->z2,heading2);
+                move(kb->x2,kb->y2,kb->z2,im->heading2);
                 if(!im->BuoyGreenSeen && !im->BuoyRedSeen && !im->BuoyYellowSeen)
                 {
                     // TODO wait x time
                     // to guarantee running into the buoy
                     // Run tests to determine x
                     kb->SecondaryBuoyComplete = true;
-                    while(depth < x)
+                    while(kb->depth < kb->minDepth)
                     {
                         // Move backwards and up
                         move(0,-1,-1, 0);
@@ -183,7 +194,7 @@ int ObstacleCourse(KB *kb)
 }
 
 
-int Torpedoes(KB *kb)
+int Torpedos(KB *kb)
 {
 
     return 0;
@@ -193,4 +204,9 @@ int Bins(KB *kb, IMAGE_KB *im)
 {
 
     return 0;
+}
+
+bool move(int x, int y, int z, int heading)
+{
+
 }

@@ -4,84 +4,95 @@
 
 KB::KB()
 {
-    
         // Multiple Tasks
-        bool StartGateComplete = false;
-        bool BuoyTaskComplete = false;
-        bool ObstacleCourse1Complete = false;
-        bool TorpedoTaskComplete = false;
-        bool BinsTaskComplete = false;
-        bool ObstacleCourse2Complete = false;
+        StartGateComplete = false;
+        BuoyTaskComplete = false;
+        ObstacleCourse1Complete = false;
+        TorpedoTaskComplete = false;
+        BinsTaskComplete = false;
+        ObstacleCourse2Complete = false;
 
-        bool TargetInRange = false; // Torpedos, Bins
-        bool AttemptTask = false;
+        TargetInRange = false; // Torpedos, Bins
+        AttemptTask = false;
 
         // Start Gate  // Used for Obstacle Course Too
-        bool Pillar1Found = false;
-        bool Pillar2Found = false;
+        Pillar1Found = false;
+        Pillar2Found = false;
 
         // Paths
 
         // Buoys
-        bool CorrectHeading = false;
-        bool BuoyRedSeen = false;
-        bool BuoyGreenFound = false;
-        bool BuoyRedFound = false;
-        bool BuoyYellowFound = false;
-        bool PrimaryBuoyComplete = false;
-        bool SecondaryBuoyComplete = false;
+        CorrectHeading = false;
+        BuoyRedSeen = false;
+        BuoyGreenFound = false;
+        BuoyRedFound = false;
+        BuoyYellowFound = false;
+        PrimaryBuoyComplete = false;
+        SecondaryBuoyComplete = false;
         
         // Obstacle Course
-        bool BarFound = false;
+        BarFound = false;
 
         // re use gate pillar booleans
 
         // Torpedoes
-        bool PrimaryTorpedoTargetComplete = false;
-        bool SecondaryTorpedoTargetComplete = false;
+        PrimaryTorpedoTargetComplete = false;
+        SecondaryTorpedoTargetComplete = false;
 
         // Bins
-        bool BinsFound  = false;
-        bool BinsPrimaryFound;
-        bool PrimaryBinTargetComplete = false;
-        bool BinsSeondaryFound;
-        bool SecondaryBinTargetComplete = false;
-        bool DistancesCalculated = false;
+        BinsFound  = false;
+        BinsPrimaryFound = false;
+        PrimaryBinTargetComplete = false;
+        BinsSeondaryFound = false;
+        SecondaryBinTargetComplete = false;
+        DistancesCalculated = false;
 
         // Positioning Variables
         // Center point for target one
-        int x1 = 0;  // pixels? 
-        int y1 = 0;
-        int z1 = 0;
-        int heading1 = 0; // degrees
+        x1 = 0;  // pixels? 
+        y1 = 0;
+        z1 = 0;
+        heading1 = 0; // degrees
 
         // Center point for target two 
-        int x2 = 0;
-        int y2 = 0;
-        int z2 = 0;
-        int heading2 = 0;
+        x2 = 0;
+        y2 = 0;
+        z2 = 0;
+        heading2 = 0;
         
         // Center point for target three
-        int x3 = 0;
-        int y3 = 0;
-        int z3 = 0;
-        int heading3 = 0;
+        x3 = 0;
+        y3 = 0;
+        z3 = 0;
+        heading3 = 0;
+
+        // Center point for target three
+        x4 = 0;
+        y4 = 0;
+        z4 = 0;
+        heading4 = 0;
+
+        // current depth and min depth for traveling
+        depth = 0;
+        minDepth = 1;
 
         // If needed can add other variable for storage
             // buoys and bins might need more
         
         // TODO LIVE MISSION PLAN UPDATE
         // Buoy Targets
-        colors buoyPrimary   = DEFAULT;
-        colors buoySecondary = DEFAULT;
+        buoyPrimary   = DEFAULT;
+        buoySecondary = DEFAULT;
         
         // Torpedo Targets
-        colors torpedoPrimary   = DEFAULT;
-        colors torpedoSecondary = DEFAULT;
+        torpedoPrimary   = DEFAULT;
+        torpedoSecondary = DEFAULT;
 
         // Bin Targets
-        images binPrimary   = UNKOWN;
-        images binSecondary = UNKOWN;
+        binPrimary   = UNKNOWN;
+        binSecondary = UNKNOWN;
+
+        return this;
 }
 
 // update KB found based on image recognition

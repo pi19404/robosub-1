@@ -1,11 +1,25 @@
 /* Knowledge Base Class */
 
+#ifndef __KB__
+#define __KB__
+
+class IMAGE_KB;
+
+namespace colors
+{
+    enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN}; 
+}
+namespace images
+{
+
+    enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
+}
+
 class KB {
 
     public:
         KB(); // Constructor
-        int updateKB(); 
-
+        int updateKB(IMAGE_KB *im); 
 
         // Multiple Tasks
         bool StartGateComplete;
@@ -44,7 +58,7 @@ class KB {
         // Bins
         bool BinsFound;
         bool BinsPrimaryFound;
-        bool BinsSeondaryFound;
+        bool BinsSecondaryFound;
         bool PrimaryBinTargetComplete;
         bool SecondaryBinTargetComplete;
         bool DistancesCalculated;
@@ -62,23 +76,38 @@ class KB {
         int y2;
         int z2;
         int heading2;
-        
 
+        // Center point for third target 
+        int x3;
+        int y3;
+        int z3;
+        int heading3;
+
+        // Center point for fourth target 
+        int x4;
+        int y4;
+        int z4;
+        int heading4;
+
+        // current depth and min depth for traveling
+        int depth;
+        int minDepth;
+        
         // Predefined at competition time
         // Buoy Targets
-        colors buoyPrimary;
-        colors buoySecondary;
+        colors::colors buoyPrimary;
+        colors::colors buoySecondary;
         
         // Torpedo Targets
-        colors torpedoPrimary;
-        colors torpedoSecondary;
+        colors::colors torpedoPrimary;
+        colors::colors torpedoSecondary;
 
         // Bin Targets
-        images binPrimary;
-        images binSecondary;
-
+        images::images binPrimary;
+        images::images binSecondary;
 
     private:
 
-
 };
+
+#endif

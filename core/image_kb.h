@@ -1,16 +1,21 @@
 /* Image Recognition Knowledge Base Class */
 
+#ifndef __IMAGE_KB__
+#define __IMAGE_KB__
+
+class KB;
+
 class IMAGE_KB {
     public:
 
         IMAGE_KB();
+        enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN}; 
+        enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
 
 
         // Start Gate
         bool Pillar1Seen;
         bool Pillar2Seen;
-	int  Pillar1X;
-	int  Pillar2X;
 
         // Paths
         bool Path1Seen;
@@ -80,3 +85,5 @@ class IMAGE_KB {
 
 
 };
+
+#endif
