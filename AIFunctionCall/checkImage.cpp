@@ -1,43 +1,45 @@
-#include "image_kb.h"
+#include "../core/image_kb.h"
+#include "../core/image_kb.cpp"
+#include <iostream>
 
-// make cap global so that functions in the following included
-// files have access to it.
-VideoCapture cap(0); // open the downward facing camera
-
-
-#include "match.cpp"
+//#include "match.cpp"
 #include "gate.cpp"
+
+using namespace std;
 
 void updateKB(IMAGE_KB *kb)
 {
   Mat query;
+  VideoCapture cap(0); // open the downward facing camera
 
   // make sure the cap opened
   if(!cap.isOpened())
   {
       cout << "failed to open camera" << endl;
-      return 0;
+      return;
   }
 
   // get an image from the camera
-  query << cap;
+  // query << cap;
 
   // Hold coordinates of images seen in the following image matching functions
-  int leftPostX = 0, rightPostX = 0;
+  float leftPostX = 0, rightPostX = 0;
 
   // Find the gate
-  if(checkGate(query, &leftPostX, &rightPostX)){
+  if(checkGate(cap, &leftPostX, &rightPostX)){
     kb->Pillar1Seen = true;
     kb->Pillar2Seen = true;
     kb->Pillar1X = leftPostX;
     kb->Pillar2X = rightPostX;
   }
 
+  /*
   if(match(query, "sword"))
     kb->swordSeen = true;
 
   if(match(query, "shield"))
     kb->shieldSeen = true;
+    */
 
 }
 
@@ -54,4 +56,7 @@ int main()
   updateKB(knowledge);
 
   // compare results to expected results to determine correctness of test
+
+
+  return 0;
 }
