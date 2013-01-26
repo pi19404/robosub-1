@@ -220,162 +220,176 @@ float approxCoordX(float distance, float radX) {
 	return (tan(radX) * distance);
 }
 
-bool isGate(Mat query, float *leftPostX, float *rightPostX)
+bool checkGate(VideoCapture cap, float *leftPostX, float *rightPostX)
 {
-	//VALIDIFY COLOR
-	vColor lookForColor = orange;
-	echo("Initializing... (orange post finder)");
+  bool foundGate = false;
 
-	//INITIALIZE COLOR VALUES BASED ON VALIDIFIED NUMBER
-	hardDataStruct hardData;
-	initColorPresets(&hardData);
-	echo("hardData.hue[low][lookForColor]", hardData.hue[low][lookForColor]);
-	echo("hardData.hue[high][lookForColor]", hardData.hue[high][lookForColor]);
-	echo("hardData.sat[low][lookForColor]", hardData.sat[low][lookForColor]);
-	echo("hardData.sat[high][lookForColor]", hardData.sat[high][lookForColor]);
-	echo("hardData.value[low][lookForColor]", hardData.value[low][lookForColor]);
-	echo("hardData.value[high][lookForColor]", hardData.value[high][lookForColor]);
+  //VALIDIFY COLOR
+  vColor lookForColor = orange;
+  //echo("Initializing... (orange post finder)");
+
+  //INITIALIZE COLOR VALUES BASED ON VALIDIFIED NUMBER
+  hardDataStruct hardData;
+  initColorPresets(&hardData);
+
+#ifdef DEBUG
+  echo("hardData.hue[low][lookForColor]", hardData.hue[low][lookForColor]);
+  echo("hardData.hue[high][lookForColor]", hardData.hue[high][lookForColor]);
+  echo("hardData.sat[low][lookForColor]", hardData.sat[low][lookForColor]);
+  echo("hardData.sat[high][lookForColor]", hardData.sat[high][lookForColor]);
+  echo("hardData.value[low][lookForColor]", hardData.value[low][lookForColor]);
+  echo("hardData.value[high][lookForColor]", hardData.value[high][lookForColor]);
+#endif
 
 
-	Mat frame; //Source frame
-	Mat hsv;   //Converted to HSV
-	Mat mask;  //Binary mask
-	Mat blurMask; //fscale, blurred mask
-	Mat nullMat;
-	Point nullPoint(-1,-1);
+  Mat frame; //Source frame
+  Mat hsv;   //Converted to HSV
+  Mat mask;  //Binary mask
+  Mat blurMask; //fscale, blurred mask
+  Mat nullMat;
+  Point nullPoint(-1,-1);
 
-	Mat orig_frame;
+  Mat orig_frame;
 
-	int midpointX = cap.get(CV_CAP_PROP_FRAME_WIDTH)/2;  //Precalculate midpoint
-	int midpointY = cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2;
+  int midpointX = cap.get(CV_CAP_PROP_FRAME_WIDTH)/2;  //Precalculate midpoint
+  int midpointY = cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2;
 
-	// CRITICAL OBJECT VARIABLES
-	Rect objRect(0,0,0,0);
-	Rect objRect2(0,0,0,0);
-	Rect objPostBox(0,0,0,0);
-	objStruct giroObject;
+  // CRITICAL OBJECT VARIABLES
+  Rect objRect(0,0,0,0);
+  Rect objRect2(0,0,0,0);
+  Rect objPostBox(0,0,0,0);
+  objStruct giroObject;
 
-	// CAMERA INPUT
-	if (STATIC_DEBUG) {
-		orig_frame = imread(STATIC_IMAGE, CV_LOAD_IMAGE_COLOR);
-		midpointX = orig_frame.cols/2;  //Precalculate midpoint
-		midpointY = orig_frame.rows/2;
-	}
+  // WINDOW OUTPUT
+#ifdef DEBUG
+  namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
+  namedWindow("Mask", CV_WINDOW_AUTOSIZE);
+#endif
 
-	// WINDOW OUTPUT
-	namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
-	namedWindow("Mask", CV_WINDOW_AUTOSIZE);
+  // Capture the frame and save a copy of it
+  printf("here");
+  cap >> frame;
+  frame.copyTo(orig_frame);
 
-	while (1) {
-		// CAPTURE AND CONVERT FRAME
-		if (!STATIC_DEBUG) cap >> frame;
-		else orig_frame.copyTo(frame);
+  cvtColor( frame, hsv, CV_BGR2HSV );
 
-		cvtColor( frame, hsv, CV_BGR2HSV );
+  // CALCULATIONS
+  // Stores the hue saturation values at the center of the image
+  // never really used but possibly useful
+  /*
+  Vec3b colorHSV = hsv.at<Vec3b>( //HSV for everything else
+      midpointY,
+      midpointX);
+  */
 
-		// CALCULATIONS
-		Vec3b colorHSV = hsv.at<Vec3b>( //HSV for everything else
-			midpointY,
-			midpointX);
+  // CREATE MASK
+  inRange( hsv,
+           Scalar((hardData.hue[low][lookForColor]/360.0)*255,
+              (hardData.sat[low][lookForColor]/100.0)*255,
+              (hardData.value[low][lookForColor]/100.0)*255, 0),
+           Scalar((hardData.hue[high][lookForColor]/360.0)*255,
+              (hardData.sat[high][lookForColor]/100.0)*255,
+              (hardData.value[high][lookForColor]/100.0)*255, 0),
+           mask );
+  dilate(mask,mask,nullMat,nullPoint, 1*(DILATE_ERODE_SCALE)); //The calibrateMode*10 expression reduces strain on the processor.
+  erode(mask,mask,nullMat,nullPoint, 1*(DILATE_ERODE_SCALE)); 
+  GaussianBlur( mask, blurMask, Size(9,9), 2, 2);		
 
-		// CREATE MASK
-		inRange( hsv,
-                 Scalar((hardData.hue[low][lookForColor]/360.0)*255,
-					(hardData.sat[low][lookForColor]/100.0)*255,
-					(hardData.value[low][lookForColor]/100.0)*255, 0),
-                 Scalar((hardData.hue[high][lookForColor]/360.0)*255,
-					(hardData.sat[high][lookForColor]/100.0)*255,
-					(hardData.value[high][lookForColor]/100.0)*255, 0),
-                 mask );
-       	dilate(mask,mask,nullMat,nullPoint, 1*(DILATE_ERODE_SCALE)); //The calibrateMode*10 expression reduces strain on the processor.
-       	erode(mask,mask,nullMat,nullPoint, 1*(DILATE_ERODE_SCALE)); 
-		GaussianBlur( mask, blurMask, Size(9,9), 2, 2);		
+  // INTERPRET MASK
+  //void minMaxLoc(const SparseMat& src, double* minVal, double* maxVal, int* minIdx=0, int* maxIdx=0)
+  std::list<Rect> rectangles = getSortedRectangles(blurMask);		
+  objRect = rectangles.front();
+  rectangles.pop_front();
+  if (objRect.width > objRect.height*1.2)
+  {
+      objRect = rectangles.front();
+              rectangles.pop_front();
+  }
+  objRect2 = rectangles.front();
+          rectangles.pop_front();
+  // JUDGE RESULTS
+      //Situation 1: Circle and Rectangle match up.
+  float percentOfScreen;
+  float xRad;
+  float yScale;
 
-		// INTERPRET MASK
-		//void minMaxLoc(const SparseMat& src, double* minVal, double* maxVal, int* minIdx=0, int* maxIdx=0)
-		std::list<Rect> rectangles = getSortedRectangles(blurMask);		
-		objRect = rectangles.front();
-		rectangles.pop_front();
-		if (objRect.width > objRect.height*1.2)
-		{
-			objRect = rectangles.front();
-					rectangles.pop_front();
-		}
-		objRect2 = rectangles.front();
-				rectangles.pop_front();
-		// JUDGE RESULTS
-			//Situation 1: Circle and Rectangle match up.
-		float percentOfScreen;
-		float xRad;
-		float yScale;
+#ifdef DEBUG
+  echo("objRect.x",objRect.x);
+  echo("objRect2.x",objRect2.x);
+#endif
 
-		echo("objRect.x",objRect.x);
-		echo("objRect2.x",objRect2.x);
+  if (objRect != objRect2) {
+    if (objRect.x < objRect2.x) {
+      // makes a rectangle that outlines the path through the gate
+      objPostBox = objRect;
+      objPostBox.width = objRect2.x + objRect2.width - objRect.x;
+      *leftPostX  = objRect.x;
+      *rightPostX = objRect2.x;
 
-		if (objRect != objRect2) {
-			if (objRect.x < objRect2.x) {
-				objPostBox = objRect;
-				objPostBox.width = objRect2.x + objRect2.width - objRect.x;
-			} else {
-				objPostBox = objRect2;
-				objPostBox.width = objRect.x + objRect.width - objRect2.x;
-			}
-			
-			//echo("objRect", objRect.x);
-			//echo("objPostBox.x",objPostBox.x);
-			percentOfScreen = getPercentOfScreen(midpointX*2, objPostBox.width/2);
-			giroObject.z_cm = approxDistance(percentOfScreen, BUOY_WIDTH);
-			xRad = approxRadX(FOV, midpointX, objPostBox.x+(objPostBox.width/2));
-			giroObject.x_cm = approxCoordX(giroObject.z_cm, xRad);
-			yScale = (giroObject.x_cm)/(objRect.x+(objRect.width/2) - midpointX);
-			giroObject.y_cm = (objPostBox.y+(objPostBox.height/2) - midpointY)*(yScale)*-1;
-			giroObject.confirmation = SQUARE_CH;
-		}
-		else
-		{
-			giroObject.x_cm = 0;
-			giroObject.y_cm = 0;
-			giroObject.z_cm = 0;
-			giroObject.confirmation = '?';
-		}
+    } else {       
+      // makes a rectangle that outlines the path through the gate
+      objPostBox = objRect2;
+      objPostBox.width = objRect.x + objRect.width - objRect2.x;
+      *leftPostX  = objRect2.x;
+      *rightPostX = objRect.x;
+    }
+      
+#ifdef DEBUG
+      echo("objRect", objRect.x);
+      echo("objPostBox.x",objPostBox.x);
+#endif
 
-		// DRAW RESULTS
-			//void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-			//void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
-		if (VISUAL_DEBUG) {
-			// DRAW RETICLE
-			rectangle ( frame, Point(-1,-1), Point(midpointX, midpointY), vColorBGR[lookForColor],1,1,0);
-			rectangle ( frame, Point(midpointX*2+1,midpointY*2+1), Point(midpointX, midpointY), vColorBGR[lookForColor],1,1,0);
-			// DRAW BOUNDS
-			Point rectP1;
-			rectP1.x = objPostBox.x;
-			rectP1.y = objPostBox.y;
-			Point rectP2;
-			rectP2.x = objPostBox.x + objPostBox.width;
-			rectP2.y = objPostBox.y + objPostBox.height;
-			//echo("rectP1.x", rectP1.x);
-			rectangle(frame, rectP1, rectP2, vColorBGR[lookForColor]+OFF_SCALAR, 2, 8, 0);
-		}
-		
+      // TODO
+      // VERIFY BUOY_WIDTH IS WHAT SHOULD BE USED, I BELIEVE ITS A MISTAKE
+      // FROM COPIED BUOY CODE
+      percentOfScreen = getPercentOfScreen(midpointX*2, objPostBox.width/2);
+      giroObject.z_cm = approxDistance(percentOfScreen, BUOY_WIDTH);
+      xRad = approxRadX(FOV, midpointX, objPostBox.x+(objPostBox.width/2));
+      giroObject.x_cm = approxCoordX(giroObject.z_cm, xRad);
+      yScale = (giroObject.x_cm)/(objRect.x+(objRect.width/2) - midpointX);
+      giroObject.y_cm = (objPostBox.y+(objPostBox.height/2) - midpointY)*(yScale)*-1;
+      giroObject.confirmation = SQUARE_CH;
 
-		printf("<post_target, %s, %lf, %lf, %lf, %c>\n",
-			vColorStr[lookForColor].c_str(),
-			giroObject.x_cm,
-			giroObject.y_cm,
-			giroObject.z_cm, 
-			giroObject.confirmation);
-		global_logger << "<post_target, " << vColorStr[lookForColor]
-				<< ", " << giroObject.x_cm
-				<< ", " << giroObject.y_cm
-				<< ", " << giroObject.z_cm
-				<< ", " << giroObject.confirmation << ">\n";
+      foundGate = true;
+  }
+  else
+  {
+      giroObject.x_cm = 0;
+      giroObject.y_cm = 0;
+      giroObject.z_cm = 0;
+      giroObject.confirmation = '?';
+      foundGate = false;
+  }
 
-		// UPDATE WINDOWS
-		if (VISUAL_DEBUG) {
-			imshow("Camera Display", frame);
-			imshow("Mask", blurMask);
-		}
+#ifdef DEBUG
+  // DRAW RESULTS
+      //void circle(Mat& img, Point center, int radius, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+      //void rectangle(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness=1, int lineType=8, int shift=0)
+      // DRAW RETICLE
 
-	}
-  return true;
+      rectangle ( frame, Point(-1,-1), Point(midpointX, midpointY), vColorBGR[lookForColor],1,1,0);
+      rectangle ( frame, Point(midpointX*2+1,midpointY*2+1), Point(midpointX, midpointY), vColorBGR[lookForColor],1,1,0);
+      // DRAW BOUNDS
+      Point rectP1;
+      rectP1.x = objPostBox.x;
+      rectP1.y = objPostBox.y;
+      Point rectP2;
+      rectP2.x = objPostBox.x + objPostBox.width;
+      rectP2.y = objPostBox.y + objPostBox.height;
+      //echo("rectP1.x", rectP1.x);
+      rectangle(frame, rectP1, rectP2, vColorBGR[lookForColor]+OFF_SCALAR, 2, 8, 0);
+
+  printf("<post_target, %s, %lf, %lf, %lf, %c>\n",
+      vColorStr[lookForColor].c_str(),
+      giroObject.x_cm,
+      giroObject.y_cm,
+      giroObject.z_cm, 
+      giroObject.confirmation);
+
+  // UPDATE WINDOWS
+      imshow("Camera Display", frame);
+      imshow("Mask", blurMask);
+#endif
+
+  return foundGate;
 }
