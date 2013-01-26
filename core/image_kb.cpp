@@ -5,39 +5,39 @@
 IMAGE_KB::IMAGE_KB()
 {
     // Start Gate
-    Pillar1Seen = false;
-    Pillar2Seen = false;
+    pillar1Seen = false;
+    pillar2Seen = false;
 
     // Paths
-    Path1Seen = false;
-    Path2Seen = false;
-    Path3Seen = false;
-    Path4Seen = false;
-    Path5Seen = false;
-    Path6Seen = false;
-    Path7Seen = false;
+    path1Seen = false;
+    path2Seen = false;
+    path3Seen = false;
+    path4Seen = false;
+    path5Seen = false;
+    path6Seen = false;
+    path7Seen = false;
     twoPaths = false;
 
     // Buoys
-    BuoyGreenSeen = false;
-    BuoyRedSeen = false;
-    BuoyYellowSeen = false;
+    buoyGreenSeen = false;
+    buoyRedSeen = false;
+    buoyYellowSeen = false;
 
     // Obstacle Course
-    BarSeen = false;
+    barSeen = false;
 
     // Torpedoes
-    PrimaryTorpedoTargetSeen = false;
-    SecondaryTorpedoTargetSeen = false;
+    primaryTorpedoTargetSeen = false;
+    secondaryTorpedoTargetSeen = false;
 
     // Bins
-    BinsSeen = false;
+    binsSeen = false;
     swordSeen = false;
     shieldSeen = false;
     netSeen = false;
     tridentSeen = false;
-    PrimaryBinTargetSeen = false;
-    SecondaryBinTargetSeen = false;
+    primaryBinTargetSeen = false;
+    secondaryBinTargetSeen = false;
 
     // Center point for target one
     x1 = 0;  // pixels? 
