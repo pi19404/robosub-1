@@ -7,37 +7,104 @@ IMAGE_KB::IMAGE_KB()
     // Start Gate
     pillar1Seen = false;
     pillar2Seen = false;
+    pillar1X    = 0;
+    pillar2X    = 0;
 
     // Paths
-    path1Seen = false;
-    path2Seen = false;
-    path3Seen = false;
-    path4Seen = false;
-    path5Seen = false;
-    path6Seen = false;
-    path7Seen = false;
-    twoPaths = false;
+    path1Seen  = false;
+    path2Seen  = false;
+    path3Seen  = false;
+    path4Seen  = false;
+    path5Seen  = false;
+    path6Seen  = false;
+    path7Seen  = false;
+    twoPaths   = false;
+    leftPathX  = 0
+    rightPathX = 0;
 
     // Buoys
-    buoyGreenSeen = false;
-    buoyRedSeen = false;
+    buoyGreenSeen  = false;
+    buoyRedSeen    = false;
     buoyYellowSeen = false;
+    buoyGreenX     = 0;
+    buoyGreenY     = 0;
+    buoyGreenZ     = 0;
+    buoyRedX       = 0;
+    buoyRedY       = 0;
+    buoyRedZ       = 0;
+    buoyYellowX    = 0;
+    buoyYellowY    = 0;
+    buoyYellowZ    = 0;
 
-    // Obstacle Course
-    barSeen = false;
+    // Parking Obastacle
+    horizBarSeen false;
+    leftBarSeen  false;
+    rightBarSeen false;
+    
+    horizBarX = 0; // midpoint
+    horizBarY = 0;
+    horizBarZ = 0;
+    leftBarX  = 0; // stop light
+    leftBarY  = 0; // bottom of bar
+    leftBarZ  = 0;
+    rightBarX = 0;
+    rightBarY = 0; // bottom of bar
+    rightBarZ = 0;
 
     // Torpedoes
-    primaryTorpedoTargetSeen = false;
-    secondaryTorpedoTargetSeen = false;
+    redTargetSeen    = false;
+    greenTargetSeen  = false;
+    purpleTargetSeen = false;
+    blueTargetSeen   = false;
+
+    redTargetX    = 0;
+    redTargetY    = 0;
+    redTargetZ    = 0;
+    greenTargetX  = 0;
+    greenTargetY  = 0;
+    greenTargetZ  = 0;
+    purpleTargetX = 0;
+    purpleTargetY = 0;
+    purpleTargetZ = 0;
+    blueTargetX   = 0;
+    blueTargetY   = 0;
+    blueTargetZ   = 0;
 
     // Bins
-    binsSeen = false;
-    swordSeen = false;
-    shieldSeen = false;
-    netSeen = false;
+    swordSeen   = false;
+    shieldSeen  = false;
+    netSeen     = false;
     tridentSeen = false;
-    primaryBinTargetSeen = false;
-    secondaryBinTargetSeen = false;
+    
+    swordX   = 0;
+    swordY   = 0;
+    swordZ   = 0;
+    shieldX  = 0;
+    shieldY  = 0;
+    shieldZ  = 0;
+    netX     = 0;
+    netY     = 0;
+    netZ     = 0;
+    tridentX = 0;
+    tridentY = 0;
+    tridentZ = 0;
+
+    // Manipulation
+    wheelSeen   = false;
+    shifterSeen = false;
+    wheelRot    = false;
+    wheelX      = 0;
+    wheelY      = 0;
+    wheelZ      = 0;
+    shiftX      = 0;
+    shiftY      = 0;
+    shiftZ      = 0;
+
+    // Octagons
+    objectSeen = false;
+    objectX    = 0;  // object to pick up below the octagon
+    objectY    = 0;
+    objectZ    = 0;
 
     // Center point for target one
     x1 = 0;  // pixels? 

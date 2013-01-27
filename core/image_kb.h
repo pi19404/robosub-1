@@ -15,8 +15,8 @@ class IMAGE_KB {
         // Start Gate
         bool pillar1Seen;
         bool pillar2Seen;
-	int  pillar1X;
-	int  pillar2X;
+        int  pillar1X;
+        int  pillar2X;
 
         // Paths
         bool path1Seen;
@@ -27,58 +27,58 @@ class IMAGE_KB {
         bool path6Seen;
         bool path7Seen;
         bool twoPaths;
-	int  leftPathX;
-	int  rightPathX;
+        int  leftPathX;
+        int  rightPathX;
 
         // Buoys
         bool buoyGreenSeen;
         bool buoyRedSeen;
         bool buoyYellowSeen;
-	int  buoyGreenX;
-	int  buoyGreenY;
-	int  buoyGreenZ;
-	int  buoyRedX;
-	int  buoyRedY;
-	int  buoyRedZ;
-	int  buoyYellowX;
-	int  buoyYellowY;
-	int  buoyYellowZ;
+        int  buoyGreenX;
+        int  buoyGreenY;
+        int  buoyGreenZ;
+        int  buoyRedX;
+        int  buoyRedY;
+        int  buoyRedZ;
+        int  buoyYellowX;
+        int  buoyYellowY;
+        int  buoyYellowZ;
 
         // Parking Obastacle
         bool horizBarSeen;
-	bool leftBarSeen;
-	bool rightBarSeen;
+        bool leftBarSeen;
+        bool rightBarSeen;
 
-	int  horizBarX; // midpoint
-	int  horizBarY;
-	int  horizBarZ;
-	int  leftBarX; // stop light
-	int  leftBarY; // bottom of bar
-	int  leftBarZ;
-	int  rightBarX;
-	int  rightBarY; // bottom of bar
-	int  rightBarZ;
+        int  horizBarX; // midpoint
+        int  horizBarY;
+        int  horizBarZ;
+        int  leftBarX; // stop light
+        int  leftBarY; // bottom of bar
+        int  leftBarZ;
+        int  rightBarX;
+        int  rightBarY; // bottom of bar
+        int  rightBarZ;
 
         // Torpedoes
         //bool primaryTorpedoTargetSeen;
         //bool secondaryTorpedoTargetSeen;
-	bool redTargetSeen;
-	bool greenTargetSeen;
-	bool purpleTargetSeen;
-	bool blueTargetSeen;
+        bool redTargetSeen;
+        bool greenTargetSeen;
+        bool purpleTargetSeen;
+        bool blueTargetSeen;
 
-	int  redTargetX;
-	int  redTargetY;
-	int  redTargetZ;
-	int  greenTargetX;
-	int  greenTargetY;
-	int  greenTargetZ;
-	int  purpleTargetX;
-	int  purpleTargetY;
-	int  purpleTargetZ;
-	int  blueTargetX;
-	int  blueTargetY;
-	int  blueTargetZ;
+        int  redTargetX;
+        int  redTargetY;
+        int  redTargetZ;
+        int  greenTargetX;
+        int  greenTargetY;
+        int  greenTargetZ;
+        int  purpleTargetX;
+        int  purpleTargetY;
+        int  purpleTargetZ;
+        int  blueTargetX;
+        int  blueTargetY;
+        int  blueTargetZ;
 
         // Bins
         //bool binsSeen;
@@ -88,35 +88,35 @@ class IMAGE_KB {
         bool tridentSeen;
         //bool primaryBinTargetSeen;
         //bool secondaryBinTargetSeen;
-	int  swordX;
-	int  swordY;
-	int  swordZ;
-	int  shieldX;
-	int  shieldY;
-	int  shieldZ;
-	int  netX;
-	int  netY;
-	int  netZ;
-	int  tridentX;
-	int  tridentY;
-	int  tridentZ;
+        int  swordX;
+        int  swordY;
+        int  swordZ;
+        int  shieldX;
+        int  shieldY;
+        int  shieldZ;
+        int  netX;
+        int  netY;
+        int  netZ;
+        int  tridentX;
+        int  tridentY;
+        int  tridentZ;
 
-	// Manipulation
-	bool wheelSeen;
-	bool shifterSeen;
-	int  wheelRot;
-	int  wheelX;
-	int  wheelY;
-	int  wheelZ;
-	int  shiftX;
-	int  shiftY;
-	int  shiftZ;
+        // Manipulation
+        bool wheelSeen;
+        bool shifterSeen;
+        int  wheelRot;
+        int  wheelX;
+        int  wheelY;
+        int  wheelZ;
+        int  shiftX;
+        int  shiftY;
+        int  shiftZ;
 
-	// Octagons
-	bool objectSeen;
-	int  objectX;  // object to pick up below the octagon
-	int  objectY;
-	int  objectZ;
+        // Octagons
+        bool objectSeen;
+        int  objectX;  // object to pick up below the octagon
+        int  objectY;
+        int  objectZ;
 	
         // Center point for target one
         int x1;  // pixels? 
