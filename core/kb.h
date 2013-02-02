@@ -22,46 +22,69 @@ class KB {
         int updateKB(IMAGE_KB *im); 
 
         // Multiple Tasks
-        bool StartGateComplete;
-        bool BuoyTaskComplete;
-        bool ObstacleCourse1Complete;
-        bool TorpedoTaskComplete;
-        bool BinsTaskComplete;
-        bool ObstacleCourse2Complete;
+        bool startGateComplete;
+        bool buoyTaskComplete;
+        bool obstacleCourse1Complete;
+        bool torpedoTaskComplete;
+        bool binsTaskComplete;
+        bool obstacleCourse2Complete;
 
-        bool TargetInRange; // Torpedos, Bins
-        bool AttemptTask;
+        bool targetInRange; // Torpedos, Bins
+        bool attemptTask;
 
         // Start Gate  // Used for Obstacle Course Too
-        bool Pillar1Found;
-        bool Pillar2Found;
+        bool pillar1Found;
+        bool pillar2Found;
 
         // Paths
-
+        bool path1found;
+        bool path2found;
+        bool path3found;
+        bool path4found;
+        bool path5found;
+        bool path6found;
+        bool path7found;
 
         // Buoys
-        bool CorrectHeading;
-        bool buoyPrimaryFound;
-        bool buoySecondaryFound;
-        bool PrimaryBuoyComplete;
-        bool SecondaryBuoyComplete;
+        bool correctHeading;
+        bool buoy1Found;
+        bool buoy2Found;
+        bool buoy3Found;
+        bool buoy1Complete;
+        bool buoy2Complete;
+        bool buoy3Complete;
+        colors::colors buoy1Color;
+        colors::colors buoy2Color;
+        colors::colors buoy3Color;
         
-        // Obstacle Course
-        bool BarFound;
+        // Parking Obstacle
+        bool horizBarFound;
+        bool leftBarFound;
+        bool rightBarFound;
 
         // re use gate pillar booleans
 
         // Torpedoes
-        bool PrimaryTorpedoTargetComplete;
-        bool SecondaryTorpedoTargetComplete;
+        bool primaryTorpedoTargetComplete;
+        bool secondaryTorpedoTargetComplete;
+        int  torpedoDistance;
 
         // Bins
-        bool BinsFound;
-        bool BinsPrimaryFound;
-        bool BinsSecondaryFound;
-        bool PrimaryBinTargetComplete;
-        bool SecondaryBinTargetComplete;
-        bool DistancesCalculated;
+        bool binsFound;
+        bool binsPrimaryFound;
+        bool binsSecondaryFound;
+        bool primaryBinTargetComplete;
+        bool secondaryBinTargetComplete;
+        int  binDistance;
+
+        // Octaons
+        bool objectFound;
+        bool objectGrabbed;
+        int  objectDistance;
+        int  pingerDistance;
+        int  pingerHeading; 
+         
+        
 
         // Positioning Variables
         // Center point for primary target
@@ -96,7 +119,6 @@ class KB {
         // Predefined at competition time
         // Buoy Targets
         colors::colors buoyPrimary;
-        colors::colors buoySecondary;
         
         // Torpedo Targets
         colors::colors torpedoPrimary;

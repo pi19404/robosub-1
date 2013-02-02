@@ -5,47 +5,69 @@
 KB::KB()
 {
         // Multiple Tasks
-        StartGateComplete = false;
-        BuoyTaskComplete = false;
-        ObstacleCourse1Complete = false;
-        TorpedoTaskComplete = false;
-        BinsTaskComplete = false;
-        ObstacleCourse2Complete = false;
+        startGateComplete = false;
+        buoyTaskComplete = false;
+        obstacleCourse1Complete = false;
+        torpedoTaskComplete = false;
+        binsTaskComplete = false;
+        obstacleCourse2Complete = false;
 
-        TargetInRange = false; // Torpedos, Bins
-        AttemptTask = false;
+        targetInRange = false; // Torpedos, Bins
+        attemptTask = false;
 
         // Start Gate  // Used for Obstacle Course Too
-        Pillar1Found = false;
-        Pillar2Found = false;
+        pillar1Found = false;
+        pillar2Found = false;
 
         // Paths
+		path1found = true;
+        path2found = true;
+        path3found = true;
+        path4found = true;
+        path5found = true;
+        path6found = true;
+        path7found = true;
 
         // Buoys
-        CorrectHeading = false;
-        BuoyRedSeen = false;
-        BuoyGreenFound = false;
-        BuoyRedFound = false;
-        BuoyYellowFound = false;
-        PrimaryBuoyComplete = false;
-        SecondaryBuoyComplete = false;
+		correctHeading = false;
+        buoy1Found = false;
+        buoy2Found = false;
+        buoy3Found = false;
+        buoy1Complete = false;
+        buoy2Complete = false;
+        buoy3Complete = false;
+        buoy1Color = colors::DEFAULT;
+        buoy2Color = colors::DEFAULT; 
+        buoy3Color = colors::DEFAULT;
         
-        // Obstacle Course
-        BarFound = false;
+        // Parking Obstacle
+        horizBarFound = true;
+        leftBarFound = true;
+        rightBarFound = true;
 
         // re use gate pillar booleans
 
         // Torpedoes
-        PrimaryTorpedoTargetComplete = false;
-        SecondaryTorpedoTargetComplete = false;
+        primaryTorpedoTargetComplete = false;
+        secondaryTorpedoTargetComplete = false;
+		int torpedoDistance = 0;
 
         // Bins
-        BinsFound  = false;
-        BinsPrimaryFound = false;
-        PrimaryBinTargetComplete = false;
-        BinsSeondaryFound = false;
-        SecondaryBinTargetComplete = false;
-        DistancesCalculated = false;
+        binsFound  = false;
+        binsPrimaryFound = false;
+		binsSecondaryFound = false;
+        primaryBinTargetComplete = false;
+        secondaryBinTargetComplete = false;
+        binDistance = false;
+
+		// Octaons
+        bool objectFound;
+        bool objectGrabbed;
+        int  objectDistance;
+        int  pingerDistance;
+        int  pingerHeading; 
+
+
 
         // Positioning Variables
         // Center point for target one
@@ -81,18 +103,23 @@ KB::KB()
         
         // TODO LIVE MISSION PLAN UPDATE
         // Buoy Targets
-        buoyPrimary   = DEFAULT;
-        buoySecondary = DEFAULT;
+		buoy1Complete = false;
+		buoy1Found = false;
+		buoy2Complete = false;
+		buoy2Found = false;
+		buoy3Complete = false;
+		buoy3Found = false;
+		buoyPrimary = colors::DEFAULT;
         
         // Torpedo Targets
-        torpedoPrimary   = DEFAULT;
-        torpedoSecondary = DEFAULT;
+        torpedoPrimary   = colors::DEFAULT;
+        torpedoSecondary = colors::DEFAULT;
 
         // Bin Targets
-        binPrimary   = UNKNOWN;
-        binSecondary = UNKNOWN;
+        binPrimary   = images::UNKNOWN;
+        binSecondary = images::UNKNOWN;
 
-        return this;
+//        return this;
 }
 
 // update KB found based on image recognition
