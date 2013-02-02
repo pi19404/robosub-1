@@ -31,18 +31,21 @@ class IMAGE_KB {
         int  rightPathX;
 
         // Buoys
-        bool buoyGreenSeen;
-        bool buoyRedSeen;
-        bool buoyYellowSeen;
-        int  buoyGreenX;
-        int  buoyGreenY;
-        int  buoyGreenZ;
-        int  buoyRedX;
-        int  buoyRedY;
-        int  buoyRedZ;
-        int  buoyYellowX;
-        int  buoyYellowY;
-        int  buoyYellowZ;
+        bool buoy1Seen;
+        bool buoy2Seen;
+        bool buoy3Seen;
+        int  buoy100X;
+        int  buoy1Y;
+        int  buoy1Z;
+        int  buoy2X;
+        int  buoy2Y;
+        int  buoy2Z;
+        int  buoy3X;
+        int  buoy3Y;
+        int  buoy3Z;
+        colors buoy1Color;
+        colors buoy2Color;
+        colors buoy3Color;
 
         // Parking Obastacle
         bool horizBarSeen;
@@ -64,7 +67,6 @@ class IMAGE_KB {
         //bool secondaryTorpedoTargetSeen;
         bool redTargetSeen;
         bool greenTargetSeen;
-        bool purpleTargetSeen;
         bool blueTargetSeen;
 
         int  redTargetX;

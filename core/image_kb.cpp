@@ -23,23 +23,26 @@ IMAGE_KB::IMAGE_KB()
     rightPathX = 0;
 
     // Buoys
-    buoyGreenSeen  = false;
-    buoyRedSeen    = false;
-    buoyYellowSeen = false;
-    buoyGreenX     = 0;
-    buoyGreenY     = 0;
-    buoyGreenZ     = 0;
-    buoyRedX       = 0;
-    buoyRedY       = 0;
-    buoyRedZ       = 0;
-    buoyYellowX    = 0;
-    buoyYellowY    = 0;
-    buoyYellowZ    = 0;
+    buoy1Seen  = false;
+    buoy2Seen  = false;
+    buoy3Seen  = false;
+    buoy1X     = 0;
+    buoy1Y     = 0;
+    buoy1Z     = 0;
+    buoy2X     = 0;
+    buoy2Y     = 0;
+    buoy2Z     = 0;
+    buoy3X     = 0;
+    buoy3Y     = 0;
+    buoy3Z     = 0;
+    buoy1Color = 0;
+    buoy2Color = 0;
+    buoy3Color = 0;
 
     // Parking Obastacle
-    horizBarSeen false;
-    leftBarSeen  false;
-    rightBarSeen false;
+    horizBarSeen = false;
+    leftBarSeen  = false;
+    rightBarSeen = false;
     
     horizBarX = 0; // midpoint
     horizBarY = 0;
