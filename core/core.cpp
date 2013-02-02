@@ -112,16 +112,49 @@ int Buoys(KB *kb, IMAGE_KB *im)
 {
     if(kb->AttemptTask) // Buoys found and labeled, do the task now
     {
-        if(!kb->PrimaryBuoyComplete)
+        if(!kb->buoy1Complete)
         {
-            // move towards primary
+            // move towards first buoy (left to right)
             // get heading, x, y, z from image recognition
+            int buoyHeading = 0; // Should be zero, TODO verify with tests
 
             //  if primary is found
-            if(kb->buoyPrimaryFound)
+            if(im->buoy1Seen)
             {
-                move(kb->x1,kb->y1,kb->z1,kb->heading1);
-                if(!im->BuoyGreenSeen && !im->BuoyRedSeen && !im->BuoyYellowSeen)
+                // Move close to buoy
+                if (im->buoy1Z > 2 ) // if farther than 2 ft, move closer
+                {
+                    move(im->buoy1X, im->buoy1Y, im->buoy1Z, buoyHeading);
+                }
+                else
+                {
+                    // Pause until goal color // TODO update with tests
+                    move(0,0,0,0);
+
+                    // Detect color of buoy, 
+                    if(buoy1Color == buoyPrimary)
+                    { 
+                        // once changed to goal color
+                            // immediately move to hit 
+                        move(0,0,1,0); // move forward
+                    }
+
+                }
+                // Record color hit
+
+                // TODO determine hit buoy // size or percentage of buoy on screen
+
+                // Once hit, reverse till all three are seen again
+                // Repeat with buoy 2 
+                    // Hit when it's goal color
+                // Repeat with buoy 3
+                    // Hit when it's goal color
+
+
+
+
+ 
+                if(!im->buoy1Seen && !im->buoy2Seen && !im->buoy3Seen)
                 {
                     // TODO wait x time
                     // to guarantee running into the buoy
@@ -137,10 +170,10 @@ int Buoys(KB *kb, IMAGE_KB *im)
                 // continue following heading
             }
         }
-        else if(!kb->SecondaryBuoyComplete)
+        else if(!kb->buoy2Complete)
         {
             // move towards secondary
-            if(kb->buoySecondaryFound)
+            if(kb->buoy2Found)
             {
                 move(kb->x2,kb->y2,kb->z2,im->heading2);
                 if(!im->BuoyGreenSeen && !im->BuoyRedSeen && !im->BuoyYellowSeen)
@@ -156,6 +189,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
                     }
                     //Move Forward to look for path
                     move(0,1,0,0);
+                }
             }
             else
             {
@@ -163,8 +197,12 @@ int Buoys(KB *kb, IMAGE_KB *im)
             }
 
         }
+        else if(!kb->buoy3Complete)
+        {
 
-        if (kb->PrimaryBuoyComplete && kb->SecondaryBuoyComplete)
+        }
+
+        if (kb->buoy1Complete && kb->buoy2Complete && kb->buoy3Complete)
         {
             kb->BuoyTaskComplete = true;
             kb->AttemptTask = false;

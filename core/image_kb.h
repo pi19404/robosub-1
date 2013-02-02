@@ -34,7 +34,7 @@ class IMAGE_KB {
         bool buoy1Seen;
         bool buoy2Seen;
         bool buoy3Seen;
-        int  buoy100X;
+        int  buoy1X;
         int  buoy1Y;
         int  buoy1Z;
         int  buoy2X;
@@ -43,6 +43,10 @@ class IMAGE_KB {
         int  buoy3X;
         int  buoy3Y;
         int  buoy3Z;
+        int  buoy1Distance;
+        int  buoy2Distance;
+        int  buoy3Distance;
+        
         colors buoy1Color;
         colors buoy2Color;
         colors buoy3Color;

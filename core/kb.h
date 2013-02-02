@@ -46,7 +46,7 @@ class KB {
         bool path7found;
 
         // Buoys
-        bool CorrectHeading;
+        bool correctHeading;
         bool buoy1Found;
         bool buoy2Found;
         bool buoy3Found;
