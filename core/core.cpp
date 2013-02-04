@@ -112,7 +112,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
 {
     if(kb->AttemptTask) // Buoys found and labeled, do the task now
     {
-        if(!kb->buoy1Complete)
+        if(!(kb->buoy1Complete))
         {
             // move towards first buoy (left to right)
             // get heading, x, y, z from image recognition
@@ -128,16 +128,39 @@ int Buoys(KB *kb, IMAGE_KB *im)
                 }
                 else
                 {
-                    // Pause until goal color // TODO update with tests
+                    // Pause until goal color // TODO update with tests 
+                    // might need to stop forward momentum with a burst of reverse
                     move(0,0,0,0);
+                    
 
-                    // Detect color of buoy, 
+                    // Detect color of buoy, pre hit, go for goal color
                     if(buoy1Color == buoyPrimary)
                     { 
                         // once changed to goal color
                             // immediately move to hit 
                         move(0,0,1,0); // move forward
+
+                        // TODO Set up some sort of timer (preferably non halting)
+                        /* Possible option to look into: http://stackoverflow.com/questions/5773088/making-a-timer-in-c
+                        #include <chrono>
+                        #include <iostream>
+
+                        int main()
+                        {
+                            std::cout << "begin\n";
+                            std::chrono::steady_clock::time_point tend = std::chrono::steady_clock::now()
+                                                                       + std::chrono::minutes(1);
+                            while (std::chrono::steady_clock::now() < tend)
+                            {
+                                // do your game
+                            }
+                            std::cout << "end\n";
+                        }
+                        */
                     }
+                    // TODO set buoy1Complete = True; 
+                    // TODO Move back after hitting the buoy
+                       // Move to see both other buoys
 
                 }
                 // Record color hit
@@ -145,15 +168,10 @@ int Buoys(KB *kb, IMAGE_KB *im)
                 // TODO determine hit buoy // size or percentage of buoy on screen
 
                 // Once hit, reverse till all three are seen again
-                // Repeat with buoy 2 
-                    // Hit when it's goal color
-                // Repeat with buoy 3
-                    // Hit when it's goal color
-
-
 
 
  
+                // TODO fix this logic, doesn't look right
                 if(!im->buoy1Seen && !im->buoy2Seen && !im->buoy3Seen)
                 {
                     // TODO wait x time
@@ -170,8 +188,10 @@ int Buoys(KB *kb, IMAGE_KB *im)
                 // continue following heading
             }
         }
-        else if(!kb->buoy2Complete)
+        else if(!(kb->buoy2Complete))
         {
+            // Repeat with buoy 2 
+                // Hit when it's goal color
             // move towards secondary
             if(kb->buoy2Found)
             {
@@ -197,8 +217,10 @@ int Buoys(KB *kb, IMAGE_KB *im)
             }
 
         }
-        else if(!kb->buoy3Complete)
+        else if(!(kb->buoy3Complete))
         {
+        // Repeat with buoy 3
+            // Hit when it's goal color
 
         }
 
