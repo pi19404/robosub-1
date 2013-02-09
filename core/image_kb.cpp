@@ -11,16 +11,19 @@ IMAGE_KB::IMAGE_KB()
     pillar2X    = 0;
 
     // Paths
-    path1Seen  = false;
-    path2Seen  = false;
-    path3Seen  = false;
-    path4Seen  = false;
-    path5Seen  = false;
-    path6Seen  = false;
-    path7Seen  = false;
-    twoPaths   = false;
-    leftPathX  = 0;
-    rightPathX = 0;
+    path1Seen        = false;
+    path2Seen        = false;
+    path3Seen        = false;
+    path4Seen        = false;
+    path5Seen        = false;
+    path6Seen        = false;
+    path7Seen        = false;
+    twoPaths         = false;
+    leftPathX        = 0;  
+    rightPathX       = 0; // if only one path use the right path variable
+    leftPathHeading  = 0;  
+    rightPathHeading = 0; // if only one path use the right path variable
+
 
     // Buoys
     buoy1Seen  = false;

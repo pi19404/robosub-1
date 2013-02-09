@@ -6,6 +6,9 @@
 
 using namespace std;
 
+#define FORWARD 1  // Move forward at a constant speed
+#define DEPTH   5  // Default depth, 5 ft
+
 int main(int argc, char* argv[])
 {
     // Setup
@@ -93,18 +96,18 @@ int Paths(KB *kb, IMAGE_KB *im)
 
     if (im->twoPaths)
     {
-        // follow the right one
-        if(kb->x1 > kb->x2)
+        // follow the right one // Verify the right one is on the right
+        if(im->leftPathX > im->rightPathX)
         {
-            move(kb->x1, kb->y1, kb->z1, kb->heading1);
+            move(im->leftPathX, DEPTH, FORWARD, im->leftPathHeading);
         }
         else
         {
-            move(kb->x2, kb->y2, kb->z2, kb->heading2);
+            move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
         }
     }
     // else just follow path
-    move(kb->x1, kb->y1, kb->z1, kb->heading1);
+    move(rightPathX, DEPTH, FORWARD, im->rightPathHeading);
     return 0;
 }
 
