@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
 
 int mainLoop(KB *kb, IMAGE_KB *im)
 {
+	initializeIM(im);	// reset the Image KB
     kb->updateKB(im);
 
     if (!kb->startGateComplete)
@@ -67,15 +68,15 @@ int mainLoop(KB *kb, IMAGE_KB *im)
 
 int StartGate(KB *kb, IMAGE_KB *im)
 {
-    if(im->pillar1Seen && !kb->pillar1Found)
+    if(im->sgPillars[0].pillarSeen && !kb->pillar1Found)
     {
         kb->pillar1Found = true;
     }
-    if(im->pillar2Seen && !kb->pillar2Found)
+    if(im->sgPillars[1].pillarSeen && !kb->pillar2Found)
     {
         kb->pillar2Found = true;
     }
-    if(kb->pillar1Found && kb->pillar2Found && ( im->pillar1Seen || im->pillar2Seen))
+    if(kb->pillar1Found && kb->pillar2Found && ( im->sgPillars[0].pillarSeen || im->sgPillars[1].pillarSeen))
     {
         // don't need to rotate, so heading is 0
         // y is set to 1 to move forward
@@ -83,7 +84,7 @@ int StartGate(KB *kb, IMAGE_KB *im)
 
         move(kb->x1,kb->y1,kb->z1,kb->heading1);
     }
-    if(kb->pillar1Found && kb->pillar2Found && !im->pillar1Seen && !im->pillar2Seen)
+    if(kb->pillar1Found && kb->pillar2Found && !im->sgPillars[0].pillarSeen && !im->sgPillars[1].pillarSeen)
     {
         kb->startGateComplete = true;
     }
@@ -107,12 +108,12 @@ int Paths(KB *kb, IMAGE_KB *im)
         }
     }
     // else just follow path
-    move(rightPathX, DEPTH, FORWARD, im->rightPathHeading);
+    move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
     return 0;
 }
 
 int Buoys(KB *kb, IMAGE_KB *im)
-{
+{/*
     if(kb->attemptTask) // Buoys found and labeled, do the task now
     {
         if(!(kb->buoy1Complete))
@@ -122,12 +123,12 @@ int Buoys(KB *kb, IMAGE_KB *im)
             int buoyHeading = 0; // Should be zero, TODO verify with tests
 
             //  if primary is found
-            if(im->buoy1Seen)
+            if(im->buoys[0].buoySeen)
             {
                 // Move close to buoy
-                if (im->buoy1Z > 2 ) // if farther than 2 ft, move closer
+                if (im->buoys[0].buoyZ > 2 ) // if farther than 2 ft, move closer
                 {
-                    move(im->buoy1X, im->buoy1Y, im->buoy1Z, buoyHeading);
+                    move(im->buoys[0].buoyX, im->buoys[0].buoyY, im->buoys[0].buoyZ, buoyHeading);
                 }
                 else
                 {
@@ -137,30 +138,30 @@ int Buoys(KB *kb, IMAGE_KB *im)
                     
 
                     // Detect color of buoy, pre hit, go for goal color
-                    if(buoy1Color == buoyPrimary)
+                    if(kb->buoy1Color == kb->buoyPrimary)
                     { 
                         // once changed to goal color
                             // immediately move to hit 
                         move(0,0,1,0); // move forward
 
                         // TODO Set up some sort of timer (preferably non halting)
-                        /* Possible option to look into: http://stackoverflow.com/questions/5773088/making-a-timer-in-c
-                        #include <chrono>
-                        #include <iostream>
-
-                        int main()
-                        {
-                            std::cout << "begin\n";
-                            std::chrono::steady_clock::time_point tend = std::chrono::steady_clock::now()
-                                                                       + std::chrono::minutes(1);
-                            while (std::chrono::steady_clock::now() < tend)
-                            {
-                                // do your game
-                            }
-                            std::cout << "end\n";
-                        }
-                        */
-                    }
+//                        Possible option to look into: http://stackoverflow.com/questions/5773088/making-a-timer-in-c
+//                        #include <chrono>
+//                        #include <iostream>
+//
+//                        int main()
+//                        {
+//                            std::cout << "begin\n";
+//                            std::chrono::steady_clock::time_point tend = std::chrono::steady_clock::now()
+//                                                                       + std::chrono::minutes(1);
+//                            while (std::chrono::steady_clock::now() < tend)
+//                            {
+//                                // do your game
+//                            }
+//                            std::cout << "end\n";
+//                        }
+//                        
+//                    }
                     // TODO set buoy1Complete = True; 
                     // TODO Move back after hitting the buoy
                        // Move to see both other buoys
@@ -175,7 +176,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
 
  
                 // TODO fix this logic, doesn't look right
-                if(!im->buoy1Seen && !im->buoy2Seen && !im->buoy3Seen)
+                if(!im->buoys[0].buoySeen && !im->buoys[1].buoySeen && !im->buoys[2].buoySeen)
                 {
                     // TODO wait x time
                     // to guarantee running into the buoy
@@ -234,19 +235,19 @@ int Buoys(KB *kb, IMAGE_KB *im)
         }
     }
     
-   /* if(kb->BuoyGreeFound || kb->BuoyRedFound || kb->BuoyYellowFound)
-    {
-        //compareSize(); // in case we got too close without seeing it
-        // if one found if currentSize > goalSize -> RotateStrafe(90degrees, BuoyX)
-         
-        if(kb->BuoyGreeFound && kb->BuoyRedFound && kb->BuoyYellowFound)
-        {
-            kb->AttemptTask = true; 
-        }
-    }
-    */
+//   if(kb->BuoyGreeFound || kb->BuoyRedFound || kb->BuoyYellowFound)
+//    {
+//        //compareSize(); // in case we got too close without seeing it
+//        // if one found if currentSize > goalSize -> RotateStrafe(90degrees, BuoyX)
+//         
+//        if(kb->BuoyGreeFound && kb->BuoyRedFound && kb->BuoyYellowFound)
+//        {
+//            kb->AttemptTask = true; 
+//        }
+//    }
+//
 
-    //}
+    //}*/
     return 0;
 }
 
@@ -271,5 +272,7 @@ int Bins(KB *kb, IMAGE_KB *im)
 
 bool move(int x, int y, int z, int heading)
 {
+	bool result = false;
 
+	return result;
 }

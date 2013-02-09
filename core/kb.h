@@ -5,21 +5,13 @@
 
 class IMAGE_KB;
 
-namespace colors
-{
-    enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN}; 
-}
-namespace images
-{
-    enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
-}
+#include "types.h"
 
 class KB {
 
     public:
         KB(); // Constructor
         int updateKB(IMAGE_KB *im); 
-
         // Multiple Tasks
         bool startGateComplete;
         bool buoyTaskComplete;
@@ -52,9 +44,9 @@ class KB {
         bool buoy1Complete;
         bool buoy2Complete;
         bool buoy3Complete;
-        colors::colors buoy1Color;
-        colors::colors buoy2Color; 
-        colors::colors buoy3Color; 
+        colors buoy1Color;
+        colors buoy2Color;
+        colors buoy3Color;
         
         // Parking Obstacle
         bool horizBarFound;
@@ -117,15 +109,15 @@ class KB {
         
         // Predefined at competition time
         // Buoy Targets
-        colors::colors buoyPrimary;
+        colors buoyPrimary;
         
         // Torpedo Targets
-        colors::colors torpedoPrimary;
-        colors::colors torpedoSecondary;
+        colors torpedoPrimary;
+        colors torpedoSecondary;
 
         // Bin Targets
-        images::images binPrimary;
-        images::images binSecondary;
+        images binPrimary;
+        images binSecondary;
 
     private:
 

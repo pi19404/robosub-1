@@ -127,9 +127,9 @@ KB::KB()
 int KB::updateKB(IMAGE_KB *im)
 {
     // update found
-    if(im->pillar1Seen)
+    if(im->sgPillars[0].pillarSeen)
         pillar1Found = true;
-    if(im->pillar2Seen)
+    if(im->sgPillars[1].pillarSeen)
         pillar2Found = true;
 /*
     // Set Primary Buoy Target
@@ -313,7 +313,7 @@ int KB::updateKB(IMAGE_KB *im)
 //    if(im->binsSeen)
 //        binsFound = true;
 
-    if(im->swordSeen && binPrimary == SWORD)
+    if(im->bins[0].binSeen/*swordSeen*/ && binPrimary == SWORD)
     {
         binsPrimaryFound = true;
 
@@ -347,7 +347,7 @@ int KB::updateKB(IMAGE_KB *im)
         }
 
     }
-    if(im->shieldSeen && binPrimary == SHIELD)
+    if(im->bins[1].binSeen && binPrimary == SHIELD)
     {
         binsPrimaryFound = true;
         if(im->target1image == SHIELD)
@@ -380,7 +380,7 @@ int KB::updateKB(IMAGE_KB *im)
         }
 
     }
-    if(im->netSeen && binPrimary == NET)
+    if(im->bins[2].binSeen && binPrimary == NET)
     {
         binsPrimaryFound = true;
         if(im->target1image == NET)
@@ -413,7 +413,7 @@ int KB::updateKB(IMAGE_KB *im)
         }
 
     }
-    if(im->tridentSeen && binPrimary == TRIDENT)
+    if(im->bins[3].binSeen && binPrimary == TRIDENT)
     {
         binsPrimaryFound = true;
         if(im->target1image == TRIDENT)
@@ -450,7 +450,7 @@ int KB::updateKB(IMAGE_KB *im)
 
     if(binsPrimaryFound)
     {
-        if(im->swordSeen && binSecondary == SWORD)
+        if(im->bins[0].binSeen && binSecondary == SWORD)
         {
             binsSecondaryFound = true;
 
@@ -484,7 +484,7 @@ int KB::updateKB(IMAGE_KB *im)
             }
 
         }
-        if(im->shieldSeen && binSecondary == SHIELD)
+        if(im->bins[1].binSeen && binSecondary == SHIELD)
         {
             binsSecondaryFound = true;
             if(im->target1image == SHIELD)
@@ -517,7 +517,7 @@ int KB::updateKB(IMAGE_KB *im)
             }
 
         }
-        if(im->netSeen && binSecondary == NET)
+        if(im->bins[2].binSeen && binSecondary == NET)
         {
             binsSecondaryFound = true;
             if(im->target1image == NET)
@@ -550,7 +550,7 @@ int KB::updateKB(IMAGE_KB *im)
             }
 
         }
-        if(im->tridentSeen && binSecondary == TRIDENT)
+        if(im->bins[3].binSeen && binSecondary == TRIDENT)
         {
             binsSecondaryFound = true;
             if(im->target1image == TRIDENT)
@@ -583,4 +583,6 @@ int KB::updateKB(IMAGE_KB *im)
             }
         }
     }
+
+	return 1; // should it return this or something else?
 }

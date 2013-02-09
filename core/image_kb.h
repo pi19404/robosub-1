@@ -3,20 +3,56 @@
 #ifndef __IMAGE_KB__
 #define __IMAGE_KB__
 
-class KB;
+#include "types.h"
+
+//enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN};
+//enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
+
+typedef struct BUOY {
+	bool buoySeen;
+	int buoyX;
+	int buoyY;
+	int buoyZ;
+	colors buoyColor;
+}Buoy;
+
+typedef struct TORPEDO_TARGET {
+	bool targetSeen;
+	int targetX;
+	int targetY;
+	int targetZ;
+	colors targetColor;
+}TorpedoTarget;
+
+typedef struct BIN {
+	bool binSeen;
+	int binX;
+	int binY;
+	int binZ;
+	images binImage;
+}Bin;
+
+typedef struct OCTAGON {
+	bool octagonSeen;
+	int octagonX;
+	int octagonY;
+	int octagonZ;
+}Octagon;
+
+typedef struct SGPILLAR {
+	bool pillarSeen;
+	int pillarX;
+}SGPillar;
 
 class IMAGE_KB {
     public:
 
         IMAGE_KB();
-        enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN};
-        enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
 
         // Start Gate
-        bool pillar1Seen;
-        bool pillar2Seen;
-        int  pillar1X;
-        int  pillar2X;
+		SGPillar sgPillars[2];
+//        bool pillar1Seen, pillar2Seen;
+//        int  pillar1X, pillar2X;
 
         // Paths
         bool path1Seen;
@@ -29,24 +65,14 @@ class IMAGE_KB {
         bool twoPaths;
         int  leftPathX;
         int  rightPathX;
+		int  leftPathHeading;
+		int  rightPathHeading;
 
         // Buoys
-        bool buoy1Seen;
-        bool buoy2Seen;
-        bool buoy3Seen;
-        int  buoy1X;
-        int  buoy1Y;
-        int  buoy1Z;
-        int  buoy2X;
-        int  buoy2Y;
-        int  buoy2Z;
-        int  buoy3X;
-        int  buoy3Y;
-        int  buoy3Z;
-        
-        colors buoy1Color;
-        colors buoy2Color;
-        colors buoy3Color;
+		Buoy buoys[3];
+//        bool buoy1Seen, buoy2Seen, buoy3Seen;
+//        int  buoy1X, buoy1Y, buoy1Z, buoy2X, buoy2Y, buoy2Z, buoy3X, buoy3Y, buoy3Z;
+//        colors buoy1Color, buoy2Color, buoy3Color;
 
         // Parking Obastacle
         bool horizBarSeen;
@@ -66,44 +92,14 @@ class IMAGE_KB {
         // Torpedoes
         //bool primaryTorpedoTargetSeen;
         //bool secondaryTorpedoTargetSeen;
-        bool redTargetSeen;
-        bool greenTargetSeen;
-		bool purpleTargetSeen;
-        bool blueTargetSeen;
-
-        int  redTargetX;
-        int  redTargetY;
-        int  redTargetZ;
-        int  greenTargetX;
-        int  greenTargetY;
-        int  greenTargetZ;
-        int  purpleTargetX;
-        int  purpleTargetY;
-        int  purpleTargetZ;
-        int  blueTargetX;
-        int  blueTargetY;
-        int  blueTargetZ;
+		TorpedoTarget torpedoTargets[4];
+//        bool redTargetSeen, greenTargetSeen, purpleTargetSeen, blueTargetSeen;
+//        int  redTargetX,redTargetY, redTargetZ,greenTargetX, greenTargetY,greenTargetZ,purpleTargetX, purpleTargetY,purpleTargetZ, blueTargetX,blueTargetY,blueTargetZ;
 
         // Bins
-        //bool binsSeen;
-        bool swordSeen;
-        bool shieldSeen;
-        bool netSeen;
-        bool tridentSeen;
-        //bool primaryBinTargetSeen;
-        //bool secondaryBinTargetSeen;
-        int  swordX;
-        int  swordY;
-        int  swordZ;
-        int  shieldX;
-        int  shieldY;
-        int  shieldZ;
-        int  netX;
-        int  netY;
-        int  netZ;
-        int  tridentX;
-        int  tridentY;
-        int  tridentZ;
+		Bin bins[4];
+//        bool swordSeen, shieldSeen, netSeen, tridentSeen;
+//        int  swordX, swordY, swordZ, shieldX, shieldY, shieldZ, netX, netY, netZ, tridentX, tridentY, tridentZ;
 
         // Manipulation
         bool wheelSeen;
@@ -117,10 +113,10 @@ class IMAGE_KB {
         int  shiftZ;
 
         // Octagons
-        bool objectSeen;
-        int  objectX;  // object to pick up below the octagon
-        int  objectY;
-        int  objectZ;
+		Octagon octagons[1];
+//        bool objectSeen;
+//		  object to pick up below the octagon
+//        int  objectX, objectY, objectZ;
 	
         // Center point for target one
         int x1;  // pixels? 
@@ -158,5 +154,7 @@ class IMAGE_KB {
 
 
 };
+
+void initializeIM(IMAGE_KB *im);
 
 #endif
