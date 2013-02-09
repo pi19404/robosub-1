@@ -1,6 +1,7 @@
 /* Knowledge Base cpp */
 
 #include "kb.h"
+#include "image_kb.h"
 
 KB::KB()
 {
@@ -61,11 +62,11 @@ KB::KB()
         binDistance = false;
 
 		// Octaons
-        bool objectFound;
-        bool objectGrabbed;
-        int  objectDistance;
-        int  pingerDistance;
-        int  pingerHeading; 
+        objectFound = false;
+        objectGrabbed = false;
+        objectDistance = 0;
+        pingerDistance = 0;
+        pingerHeading = 0; 
 
 
 
@@ -123,16 +124,16 @@ KB::KB()
 }
 
 // update KB found based on image recognition
-KB::int updateKB(IMAGE_KB *im)
+int KB::updateKB(IMAGE_KB *im)
 {
     // update found
-    if(im->Pillar1Seen)
-        Pillar1Found = true;
-    if(im->Pillar2Seen)
-        Pillar2Found = true;
-
+    if(im->pillar1Seen)
+        pillar1Found = true;
+    if(im->pillar2Seen)
+        pillar2Found = true;
+/*
     // Set Primary Buoy Target
-    if(im->BuoyGreenSeen && buoyPrimary == GREEN)
+    if(im->buoyGreenSeen && buoyPrimary == GREEN)
     {
         buoyPrimaryFound = true;
         if(im->target1color == GREEN)
@@ -157,7 +158,7 @@ KB::int updateKB(IMAGE_KB *im)
             heading1 = im->heading3;
         }
     }
-    if(im->BuoyRedSeen && buoyPrimary == RED)
+    if(im->buoyRedSeen && buoyPrimary == RED)
     {
         buoyPrimaryFound = true;
         if(im->target1color == RED)
@@ -182,7 +183,7 @@ KB::int updateKB(IMAGE_KB *im)
             heading1 = im->heading3;
         }
     }
-    if(im->BuoyYellowSeen && buoyPrimary == YELLOW)
+    if(im->buoyYellowSeen && buoyPrimary == YELLOW)
     {
         buoyPrimaryFound = true;
         if(im->target1color == YELLOW)
@@ -210,7 +211,7 @@ KB::int updateKB(IMAGE_KB *im)
     // Set Secondary Target
     if(kb->buoyPrimaryComplete)
     {
-        if(im->BuoyGreenSeen && buoySecondary == GREEN)
+        if(im->buoyGreenSeen && buoySecondary == GREEN)
         {
             buoySecondaryFound = true;
             if(im->target1color == GREEN)
@@ -242,7 +243,7 @@ KB::int updateKB(IMAGE_KB *im)
                 heading2 = im->heading4;
             }
         }
-        if(im->BuoyRedSeen && buoySecondary == RED)
+        if(im->buoyRedSeen && buoySecondary == RED)
         {
             buoySecondaryFound = true;
             if(im->target1color == RED)
@@ -274,7 +275,7 @@ KB::int updateKB(IMAGE_KB *im)
                 heading2 = im->heading4;
             }
         }
-        if(im->BuoyYellowSeen && buoySecondary == YELLOW)
+        if(im->buoyYellowSeen && buoySecondary == YELLOW)
         {
             buoySecondaryFound = true;
             if(im->target1color == YELLOW)
@@ -307,14 +308,14 @@ KB::int updateKB(IMAGE_KB *im)
             }
         }
     }
-
+*/
     // Update Bins Found
-    if(im->BinsSeen)
-        BinsFound = true;
+//    if(im->binsSeen)
+//        binsFound = true;
 
     if(im->swordSeen && binPrimary == SWORD)
     {
-        BinsPrimaryFound = true;
+        binsPrimaryFound = true;
 
         if(im->target1image == SWORD)
         {
@@ -348,7 +349,7 @@ KB::int updateKB(IMAGE_KB *im)
     }
     if(im->shieldSeen && binPrimary == SHIELD)
     {
-        BinsPrimaryFound = true;
+        binsPrimaryFound = true;
         if(im->target1image == SHIELD)
         {
             x1 = im->x1;
@@ -381,7 +382,7 @@ KB::int updateKB(IMAGE_KB *im)
     }
     if(im->netSeen && binPrimary == NET)
     {
-        BinsPrimaryFound = true;
+        binsPrimaryFound = true;
         if(im->target1image == NET)
         {
             x1 = im->x1;
@@ -414,7 +415,7 @@ KB::int updateKB(IMAGE_KB *im)
     }
     if(im->tridentSeen && binPrimary == TRIDENT)
     {
-        BinsPrimaryFound = true;
+        binsPrimaryFound = true;
         if(im->target1image == TRIDENT)
         {
             x1 = im->x1;
@@ -447,11 +448,11 @@ KB::int updateKB(IMAGE_KB *im)
     }
 
 
-    if(kb->BinsPrimaryFound)
+    if(binsPrimaryFound)
     {
         if(im->swordSeen && binSecondary == SWORD)
         {
-            BinsSecondaryFound = true;
+            binsSecondaryFound = true;
 
             if(im->target1image == SWORD)
             {
@@ -485,7 +486,7 @@ KB::int updateKB(IMAGE_KB *im)
         }
         if(im->shieldSeen && binSecondary == SHIELD)
         {
-            BinsSecondaryFound = true;
+            binsSecondaryFound = true;
             if(im->target1image == SHIELD)
             {
                 x2 = im->x1;
@@ -518,7 +519,7 @@ KB::int updateKB(IMAGE_KB *im)
         }
         if(im->netSeen && binSecondary == NET)
         {
-            BinsSecondaryFound = true;
+            binsSecondaryFound = true;
             if(im->target1image == NET)
             {
                 x2 = im->x1;
@@ -551,7 +552,7 @@ KB::int updateKB(IMAGE_KB *im)
         }
         if(im->tridentSeen && binSecondary == TRIDENT)
         {
-            BinsSecondaryFound = true;
+            binsSecondaryFound = true;
             if(im->target1image == TRIDENT)
             {
                 x2 = im->x1;

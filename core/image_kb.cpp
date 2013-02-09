@@ -38,9 +38,9 @@ IMAGE_KB::IMAGE_KB()
     buoy3X     = 0;
     buoy3Y     = 0;
     buoy3Z     = 0;
-    buoy1Color = colors::DEFAULT;
-    buoy2Color = colors::DEFAULT;
-    buoy3Color = colors::DEFAULT;
+    buoy1Color = DEFAULT;
+    buoy2Color = DEFAULT;
+    buoy3Color = DEFAULT;
 
     // Parking Obastacle
     horizBarSeen = false;

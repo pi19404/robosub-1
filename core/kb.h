@@ -11,7 +11,6 @@ namespace colors
 }
 namespace images
 {
-
     enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
 }
 
@@ -53,9 +52,9 @@ class KB {
         bool buoy1Complete;
         bool buoy2Complete;
         bool buoy3Complete;
-        colors buoy1Color;
-        colors buoy2Color; 
-        colors buoy3Color; 
+        colors::colors buoy1Color;
+        colors::colors buoy2Color; 
+        colors::colors buoy3Color; 
         
         // Parking Obstacle
         bool horizBarFound;

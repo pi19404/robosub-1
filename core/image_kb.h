@@ -9,7 +9,7 @@ class IMAGE_KB {
     public:
 
         IMAGE_KB();
-        enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN}; 
+        enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN};
         enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
 
         // Start Gate
