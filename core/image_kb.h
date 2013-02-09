@@ -68,6 +68,7 @@ class IMAGE_KB {
         //bool secondaryTorpedoTargetSeen;
         bool redTargetSeen;
         bool greenTargetSeen;
+		bool purpleTargetSeen;
         bool blueTargetSeen;
 
         int  redTargetX;

@@ -29,31 +29,31 @@ int mainLoop(KB *kb, IMAGE_KB *im)
 {
     kb->updateKB(im);
 
-    if (!kb->StartGateComplete)
+    if (!kb->startGateComplete)
     {
         StartGate(kb, im);
     }
-    else if (!kb->BuoyTaskComplete)
+    else if (!kb->buoyTaskComplete)
     {
         Paths(kb, im);
         Buoys(kb, im);
     }
-    else if (!kb->ObstacleCourse1Complete)
+    else if (!kb->obstacleCourse1Complete)
     {
         Paths(kb, im);
         ObstacleCourse(kb);
     }
-    else if (!kb->TorpedoTaskComplete)
+    else if (!kb->torpedoTaskComplete)
     {
         Paths(kb, im);
         Torpedos(kb);
     }
-    else if (!kb->BinsTaskComplete)
+    else if (!kb->binsTaskComplete)
     {
         Paths(kb, im);
         Bins(kb, im);
     }
-    else if (!kb->ObstacleCourse2Complete)
+    else if (!kb->obstacleCourse2Complete)
     {
         Paths(kb, im);
         ObstacleCourse(kb);
@@ -64,15 +64,15 @@ int mainLoop(KB *kb, IMAGE_KB *im)
 
 int StartGate(KB *kb, IMAGE_KB *im)
 {
-    if(im->Pillar1Seen && !kb->Pillar1Found)
+    if(im->pillar1Seen && !kb->pillar1Found)
     {
-        kb->Pillar1Found = true;
+        kb->pillar1Found = true;
     }
-    if(im->Pillar2Seen && !kb->Pillar2Found)
+    if(im->pillar2Seen && !kb->pillar2Found)
     {
-        kb->Pillar2Found = true;
+        kb->pillar2Found = true;
     }
-    if(kb->Pillar1Found && kb->Pillar2Found && ( im->Pillar1Seen || im->Pillar2Seen))
+    if(kb->pillar1Found && kb->pillar2Found && ( im->pillar1Seen || im->pillar2Seen))
     {
         // don't need to rotate, so heading is 0
         // y is set to 1 to move forward
@@ -80,9 +80,9 @@ int StartGate(KB *kb, IMAGE_KB *im)
 
         move(kb->x1,kb->y1,kb->z1,kb->heading1);
     }
-    if(kb->Pillar1Found && kb->Pillar2Found && !im->Pillar1Seen && !im->Pillar2Seen)
+    if(kb->pillar1Found && kb->pillar2Found && !im->pillar1Seen && !im->pillar2Seen)
     {
-        kb->StartGateComplete = true;
+        kb->startGateComplete = true;
     }
     return 0;
 }
@@ -110,7 +110,7 @@ int Paths(KB *kb, IMAGE_KB *im)
 
 int Buoys(KB *kb, IMAGE_KB *im)
 {
-    if(kb->AttemptTask) // Buoys found and labeled, do the task now
+    if(kb->attemptTask) // Buoys found and labeled, do the task now
     {
         if(!(kb->buoy1Complete))
         {
@@ -177,7 +177,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
                     // TODO wait x time
                     // to guarantee running into the buoy
                     // Run tests to determine x
-                    kb->PrimaryBuoyComplete = true;
+                    kb->primaryBuoyComplete = true;
                     // Move backwards
                     move(0,-1,0, 0);
                     // Wait y amount of time
@@ -196,12 +196,12 @@ int Buoys(KB *kb, IMAGE_KB *im)
             if(kb->buoy2Found)
             {
                 move(kb->x2,kb->y2,kb->z2,im->heading2);
-                if(!im->BuoyGreenSeen && !im->BuoyRedSeen && !im->BuoyYellowSeen)
+                if(!im->buoyGreenSeen && !im->buoyRedSeen && !im->buoyYellowSeen)
                 {
                     // TODO wait x time
                     // to guarantee running into the buoy
                     // Run tests to determine x
-                    kb->SecondaryBuoyComplete = true;
+                    kb->secondaryBuoyComplete = true;
                     while(kb->depth < kb->minDepth)
                     {
                         // Move backwards and up
@@ -226,8 +226,8 @@ int Buoys(KB *kb, IMAGE_KB *im)
 
         if (kb->buoy1Complete && kb->buoy2Complete && kb->buoy3Complete)
         {
-            kb->BuoyTaskComplete = true;
-            kb->AttemptTask = false;
+            kb->buoyTaskComplete = true;
+            kb->attemptTask = false;
         }
     }
     
@@ -243,7 +243,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
     }
     */
 
-    }
+    //}
     return 0;
 }
 

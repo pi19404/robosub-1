@@ -19,7 +19,7 @@ IMAGE_KB::IMAGE_KB()
     path6Seen  = false;
     path7Seen  = false;
     twoPaths   = false;
-    leftPathX  = 0
+    leftPathX  = 0;
     rightPathX = 0;
 
     // Buoys
@@ -35,9 +35,9 @@ IMAGE_KB::IMAGE_KB()
     buoy3X     = 0;
     buoy3Y     = 0;
     buoy3Z     = 0;
-    buoy1Color = 0;
-    buoy2Color = 0;
-    buoy3Color = 0;
+    buoy1Color = colors::DEFAULT;
+    buoy2Color = colors::DEFAULT;
+    buoy3Color = colors::DEFAULT;
 
     // Parking Obastacle
     horizBarSeen = false;
