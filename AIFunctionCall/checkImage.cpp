@@ -4,6 +4,7 @@
 
 //#include "match.cpp"
 #include "gate.cpp"
+#include "buoys.cpp"
 
 using namespace std;
 
@@ -11,6 +12,8 @@ void updateKB(IMAGE_KB *kb)
 {
   Mat query;
   VideoCapture cap(0); // open the downward facing camera
+  Buoys buoys[3];
+  int numBuoys = 0;
 
   // make sure the cap opened
   if(!cap.isOpened())
@@ -19,27 +22,33 @@ void updateKB(IMAGE_KB *kb)
       return;
   }
 
-  // get an image from the camera
-  // query << cap;
-
   // Hold coordinates of images seen in the following image matching functions
   float leftPostX = 0, rightPostX = 0;
 
   // Find the gate
   if(checkGate(cap, &leftPostX, &rightPostX)){
-    kb->Pillar1Seen = true;
-    kb->Pillar2Seen = true;
-    kb->Pillar1X = leftPostX;
-    kb->Pillar2X = rightPostX;
+    // left and right pillar are seen
+    kb->sgPillar[0].pillarSeen = true; // left
+    kb->sgPillar[1].pillarSeen = true; // right
+
+    // set their X coordinates
+    kb->sgPillar[0].pillarX = leftPostX;
+    kb->sgPillar[1].pillarX = rightPostX;
   }
 
-  /*
-  if(match(query, "sword"))
-    kb->swordSeen = true;
+  // Find buoys
+  if(checkBuoys(cap, buoys, &numBuoys)){
+    for(int i = 0; i < numBuoys; i++)
+    {
+      kb->buoys[i].buoySeen = true;
+      kb->buoys[i].buoyX = buoys[i].buoyX;
+      kb->buoys[i].buoyY = buoys[i].buoyY;
+      kb->buoys[i].buoyZ = buoys[i].buoyZ;
+      kb->buoys[i].buoyColor = buoys[i].buoyColor;
+    }
+  }
 
-  if(match(query, "shield"))
-    kb->shieldSeen = true;
-    */
+  
 
 }
 

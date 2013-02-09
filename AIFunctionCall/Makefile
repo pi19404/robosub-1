@@ -9,3 +9,7 @@ checkImage.o: checkImage.cpp
 debug:
 	g++ -c -D DEBUG checkImage.cpp $(CFLAGS)
 	g++ checkImage.o -o checkImage $(CFLAGS)
+
+clean:
+	rm *.o
+	rm checkImage
