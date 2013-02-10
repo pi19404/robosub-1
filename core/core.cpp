@@ -7,7 +7,9 @@
 using namespace std;
 
 #define FORWARD 1  // Move forward at a constant speed
+#define REVERSE -1 // Move in reverse at a constant speed
 #define DEPTH   5  // Default depth, 5 ft
+#define HEADING_FORWARD 0 // Default forward heading
 
 int main(int argc, char* argv[])
 {
@@ -113,141 +115,89 @@ int Paths(KB *kb, IMAGE_KB *im)
 }
 
 int Buoys(KB *kb, IMAGE_KB *im)
-{/*
-    if(kb->attemptTask) // Buoys found and labeled, do the task now
+{ 
+    // Look for all buoys (want to see all three at once)
+
+    if ( !kb->buoy1Hit && !kb->buoy2Hit && !kb->buoy3Hit )   // buoy 1,2,3 haven't all been hit continue with buoy task
     {
-        if(!(kb->buoy1Complete))
+        if ( im->buoys[0].buoySeen && im->buoys[1].buoySeen && im->buoys[2].buoySeen )
         {
-            // move towards first buoy (left to right)
-            // get heading, x, y, z from image recognition
-            int buoyHeading = 0; // Should be zero, TODO verify with tests
-
-            //  if primary is found
-            if(im->buoys[0].buoySeen)
+            // Once all three are found: Pick the farthest left buoy not hit yet. 
+            if ( !kb->buoys[0].found )
             {
-                // Move close to buoy
-                if (im->buoys[0].buoyZ > 2 ) // if farther than 2 ft, move closer
+                // Move towards that buoy
+                move( im->buoys[0].buoyX, im->buoys[0].buoyY, im->buoys[0].buoyZ, HEADING_FORWARD );
+                // Once in range (about 2 ft away)
+                if ( im->buoyZ < 2 )
                 {
-                    move(im->buoys[0].buoyX, im->buoys[0].buoyY, im->buoys[0].buoyZ, buoyHeading);
-                }
-                else
-                {
-                    // Pause until goal color // TODO update with tests 
-                    // might need to stop forward momentum with a burst of reverse
-                    move(0,0,0,0);
-                    
-
-                    // Detect color of buoy, pre hit, go for goal color
-                    if(kb->buoy1Color == kb->buoyPrimary)
-                    { 
-                        // once changed to goal color
-                            // immediately move to hit 
-                        move(0,0,1,0); // move forward
-
-                        // TODO Set up some sort of timer (preferably non halting)
-//                        Possible option to look into: http://stackoverflow.com/questions/5773088/making-a-timer-in-c
-//                        #include <chrono>
-//                        #include <iostream>
-//
-//                        int main()
-//                        {
-//                            std::cout << "begin\n";
-//                            std::chrono::steady_clock::time_point tend = std::chrono::steady_clock::now()
-//                                                                       + std::chrono::minutes(1);
-//                            while (std::chrono::steady_clock::now() < tend)
-//                            {
-//                                // do your game
-//                            }
-//                            std::cout << "end\n";
-//                        }
-//                        
-//                    }
-                    // TODO set buoy1Complete = True; 
-                    // TODO Move back after hitting the buoy
-                       // Move to see both other buoys
-
-                }
-                // Record color hit
-
-                // TODO determine hit buoy // size or percentage of buoy on screen
-
-                // Once hit, reverse till all three are seen again
-
-
- 
-                // TODO fix this logic, doesn't look right
-                if(!im->buoys[0].buoySeen && !im->buoys[1].buoySeen && !im->buoys[2].buoySeen)
-                {
-                    // TODO wait x time
-                    // to guarantee running into the buoy
-                    // Run tests to determine x
-                    kb->primaryBuoyComplete = true;
-                    // Move backwards
-                    move(0,-1,0, 0);
-                    // Wait y amount of time
-                }
-            }
-            else
-            {
-                // continue following heading
-            }
-        }
-        else if(!(kb->buoy2Complete))
-        {
-            // Repeat with buoy 2 
-                // Hit when it's goal color
-            // move towards secondary
-            if(kb->buoy2Found)
-            {
-                move(kb->x2,kb->y2,kb->z2,im->heading2);
-                if(!im->buoyGreenSeen && !im->buoyRedSeen && !im->buoyYellowSeen)
-                {
-                    // TODO wait x time
-                    // to guarantee running into the buoy
-                    // Run tests to determine x
-                    kb->secondaryBuoyComplete = true;
-                    while(kb->depth < kb->minDepth)
+                    // Wait ( ie stop moving )
+                    move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
+                    // Check the color of the buoy, // learn the cycle? 
+                    if ( im->buoys[0].buoyColor == GOALCOLOR )
                     {
-                        // Move backwards and up
-                        move(0,-1,-1, 0);
+                        // As soon as the correct color appears, move forward to hit it
+                        move( im->buoys[0].buoyX, im->buoys[0].buoyY, FORWARD, HEADING_FORWARD );
+                        // TODO wait enough time for buoy to be hit
+                        
+                        // Once the buoy is hit, reverse
+                        move( im->buoys[0].buoyX, im->buoys[0].buoyY, REVERSE, HEADING_FORWARD );
                     }
-                    //Move Forward to look for path
-                    move(0,1,0,0);
                 }
             }
-            else
+            else if ( !kb->buoys[1].found )
             {
-                // continue following heading
+                // Move towards that buoy
+                move( im->buoys[1].buoyX, im->buoys[1].buoyY, im->buoys[1].buoyZ, HEADING_FORWARD );
+                // Once in range (about 2 ft away)
+                if ( im->buoyZ < 2 )
+                {
+                    // Wait ( ie stop moving )
+                    move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
+                    // Check the color of the buoy, // learn the cycle? 
+                    if ( im->buoys[1].buoyColor == GOALCOLOR )
+                    {
+                        // As soon as the correct color appears, move forward to hit it
+                        move( im->buoys[1].buoyX, im->buoys[1].buoyY, FORWARD, HEADING_FORWARD );
+                        // TODO wait enough time for buoy to be hit
+                        
+                        // Once the buoy is hit, reverse
+                        move( im->buoys[1].buoyX, im->buoys[1].buoyY, REVERSE, HEADING_FORWARD );
+                    }
+                }
             }
-
-        }
-        else if(!(kb->buoy3Complete))
-        {
-        // Repeat with buoy 3
-            // Hit when it's goal color
-
-        }
-
-        if (kb->buoy1Complete && kb->buoy2Complete && kb->buoy3Complete)
-        {
-            kb->buoyTaskComplete = true;
-            kb->attemptTask = false;
+            else if ( !kb->buoys[2].found )
+            {
+                // Move towards that buoy
+                move( im->buoys[2].buoyX, im->buoys[2].buoyY, im->buoys[2].buoyZ, HEADING_FORWARD );
+                // Once in range (about 2 ft away)
+                if ( im->buoyZ < 2 )
+                {
+                    // Wait ( ie stop moving )
+                    move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
+                    // Check the color of the buoy, // learn the cycle? 
+                    if ( im->buoys[2].buoyColor == GOALCOLOR )
+                    {
+                        // As soon as the correct color appears, move forward to hit it
+                        move( im->buoys[2].buoyX, im->buoys[2].buoyY, FORWARD, HEADING_FORWARD );
+                        // TODO wait enough time for buoy to be hit
+                        
+                        // Once the buoy is hit, reverse
+                        move( im->buoys[2].buoyX, im->buoys[2].buoyY, REVERSE, HEADING_FORWARD );
+                    }
+                }
+            }
         }
     }
-    
-//   if(kb->BuoyGreeFound || kb->BuoyRedFound || kb->BuoyYellowFound)
-//    {
-//        //compareSize(); // in case we got too close without seeing it
-//        // if one found if currentSize > goalSize -> RotateStrafe(90degrees, BuoyX)
-//         
-//        if(kb->BuoyGreeFound && kb->BuoyRedFound && kb->BuoyYellowFound)
-//        {
-//            kb->AttemptTask = true; 
-//        }
-//    }
-//
+    else // All three buoys hit
+    {
+        // Move back TODO add the timings in here
+        move( 0, 0, REVERSE, HEADING_FORWARD );
+        // Move up above the buoys
+        move( 0, UP, 0, HEADING_FORWARD ); 
+        // Move forward over the buoys
+        move( 0, 0, FORWARD, HEADING_FORWARD ); 
+    }
 
-    //}*/
     return 0;
 }
 
