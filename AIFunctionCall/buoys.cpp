@@ -155,6 +155,12 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
 
   // get an image and convert it to its hue saturation values
   cap >> frame;
+  printf("1");
+  namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
+  imshow("Camera Display", frame);
+  printf("2");
+  char dummy;
+  scanf("%c", &dummy);
   cvtColor( frame, hsv, CV_BGR2HSV );
 
   for(modeCount = 1; modeCount <= 3; modeCount++)
@@ -235,7 +241,12 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
           buoys[buoyCount].buoyColor = GREEN;
 
           // don't increment past the array bounds (would cause a seg fault)
-          buoyCount < 3 ? buoyCount++ : break;
+          if(buoyCount < 3){
+            buoyCount++;
+          }
+          else{
+            break;
+          }
         break;
         case 2: // red buoys
           buoys[buoyCount].buoySeen = true;
@@ -243,7 +254,12 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
           buoys[buoyCount].buoyY = tempCenterY;
           buoys[buoyCount].buoyZ = 0; // TODO: solve for z
           buoys[buoyCount].buoyColor = RED;
-          buoyCount < 3 ? buoyCount++ : break;
+          if(buoyCount < 3){
+            buoyCount++;
+          }
+          else{
+            break;
+          }
         break;
         case 3: // yellow buoys
           buoys[buoyCount].buoySeen = true;
@@ -251,7 +267,12 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
           buoys[buoyCount].buoyY = tempCenterY;
           buoys[buoyCount].buoyZ = 0; // TODO: solve for z
           buoys[buoyCount].buoyColor = YELLOW;
-          buoyCount < 3 ? buoyCount++ : break;
+          if(buoyCount < 3){
+            buoyCount++;
+          }
+          else{
+            break;
+          }
         break;
       }
     }

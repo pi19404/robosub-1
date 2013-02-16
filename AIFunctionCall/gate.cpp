@@ -21,21 +21,9 @@
 // DEFINES
 #define ABOVE_WATER false
 #define NUM_OF_COLORS 6 //this includes "vC_error"
-#define STATIC_DEBUG false
-#define STATIC_IMAGE "/home/ian/Desktop/gate_1.jpg"
-//#define STATIC_IMAGE "/home/ian/Desktop/greengate.JPG"
 #define VISUAL_DEBUG false
 
-#define TEXT_SCALE 1.5
-#define TEXT_X 15
-#define TEXT_Y 20
-#define TEXT_SPACE 15
 #define DILATE_ERODE_SCALE 3
-#define MEDIAN_BLUR_ODD_SCALE 7
-#define PRECONFIG_IS_AVAILABLE true
-#define BGRA_ANTI_TOLERANCE 30
-#define CHECKMARK_CH '@'
-#define CIRCLE_CH '('
 #define SQUARE_CH '['
 #define GREEN_SCALAR Scalar(0,255,0)
 #define RED_SCALAR Scalar(0,0,255)
@@ -55,7 +43,7 @@ typedef enum {red, green, blue, yellow, orange, vC_error} vColor; //for "verifie
 typedef enum {low, high} vLevel;						//for "varied level"
 std::string vColorStr[NUM_OF_COLORS] = {"red", "green", "blue", "yellow", "orange", "vC_error"};
 Scalar vColorBGR[NUM_OF_COLORS] = {RED_SCALAR, GREEN_SCALAR, BLUE_SCALAR, YELLOW_SCALAR, ORANGE_SCALAR, WHITE_SCALAR};
-typedef struct HARDDATA {
+typedef struct HARDDATA_GATE {
 	int hue[2][NUM_OF_COLORS];
 	int sat[2][NUM_OF_COLORS];
 	int value[2][NUM_OF_COLORS];
@@ -132,16 +120,6 @@ vColor validifyColor (std::string inputColor) { //requires global vColorStr
 	return vC_error;
 }
 
-//DEBUGGING FUNCTIONS
-std::ofstream global_logger;
-void echo(std::string message) {
-	if (VISUAL_DEBUG) std::cerr << message << std::endl;
-	else global_logger << message << std::endl;
-}
-void echo(std::string message, int number) {
-	if (VISUAL_DEBUG) std::cerr << message << ": " << number << std::endl;
-	else global_logger << message << std::endl;
-}
 
 //SORTING FUNCTIONS
 bool compareRectArea (Rect first, Rect second)
@@ -164,7 +142,6 @@ std::list<Rect> getSortedRectangles(Mat &fromBinaryImage) //adopted from David's
     fromBinaryImage.copyTo(imgCopy);
 
     findContours(imgCopy, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-	//echo("Number of contour arrays", contours.size());
 
     for (unsigned int i=0; i<contours.size(); i++) {
 		tempRect = boundingRect(Mat(contours[i]));
@@ -226,21 +203,10 @@ bool checkGate(VideoCapture cap, float *leftPostX, float *rightPostX)
 
   //VALIDIFY COLOR
   vColor lookForColor = orange;
-  //echo("Initializing... (orange post finder)");
 
   //INITIALIZE COLOR VALUES BASED ON VALIDIFIED NUMBER
   hardDataStruct hardData;
   initColorPresets(&hardData);
-
-#ifdef DEBUG
-  echo("hardData.hue[low][lookForColor]", hardData.hue[low][lookForColor]);
-  echo("hardData.hue[high][lookForColor]", hardData.hue[high][lookForColor]);
-  echo("hardData.sat[low][lookForColor]", hardData.sat[low][lookForColor]);
-  echo("hardData.sat[high][lookForColor]", hardData.sat[high][lookForColor]);
-  echo("hardData.value[low][lookForColor]", hardData.value[low][lookForColor]);
-  echo("hardData.value[high][lookForColor]", hardData.value[high][lookForColor]);
-#endif
-
 
   Mat frame; //Source frame
   Mat hsv;   //Converted to HSV
@@ -313,10 +279,6 @@ bool checkGate(VideoCapture cap, float *leftPostX, float *rightPostX)
   float xRad;
   float yScale;
 
-#ifdef DEBUG
-  echo("objRect.x",objRect.x);
-  echo("objRect2.x",objRect2.x);
-#endif
 
   if (objRect != objRect2) {
     if (objRect.x < objRect2.x) {
@@ -334,11 +296,6 @@ bool checkGate(VideoCapture cap, float *leftPostX, float *rightPostX)
       *rightPostX = objRect.x;
     }
       
-#ifdef DEBUG
-      echo("objRect", objRect.x);
-      echo("objPostBox.x",objPostBox.x);
-#endif
-
       // TODO
       // VERIFY BUOY_WIDTH IS WHAT SHOULD BE USED, I BELIEVE ITS A MISTAKE
       // FROM COPIED BUOY CODE
@@ -376,7 +333,6 @@ bool checkGate(VideoCapture cap, float *leftPostX, float *rightPostX)
       Point rectP2;
       rectP2.x = objPostBox.x + objPostBox.width;
       rectP2.y = objPostBox.y + objPostBox.height;
-      //echo("rectP1.x", rectP1.x);
       rectangle(frame, rectP1, rectP2, vColorBGR[lookForColor]+OFF_SCALAR, 2, 8, 0);
 
   printf("<post_target, %s, %lf, %lf, %lf, %c>\n",

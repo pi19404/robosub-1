@@ -11,8 +11,10 @@ using namespace std;
 void updateKB(IMAGE_KB *kb)
 {
   Mat query;
+  printf("here\n");
   VideoCapture cap(0); // open the downward facing camera
-  Buoys buoys[3];
+  printf("here2\n");
+  Buoy buoys[3];
   int numBuoys = 0;
 
   // make sure the cap opened
@@ -28,15 +30,16 @@ void updateKB(IMAGE_KB *kb)
   // Find the gate
   if(checkGate(cap, &leftPostX, &rightPostX)){
     // left and right pillar are seen
-    kb->sgPillar[0].pillarSeen = true; // left
-    kb->sgPillar[1].pillarSeen = true; // right
+    kb->sgPillars[0].pillarSeen = true; // left
+    kb->sgPillars[1].pillarSeen = true; // right
 
     // set their X coordinates
-    kb->sgPillar[0].pillarX = leftPostX;
-    kb->sgPillar[1].pillarX = rightPostX;
+    kb->sgPillars[0].pillarX = leftPostX;
+    kb->sgPillars[1].pillarX = rightPostX;
   }
 
   // Find buoys
+  printf("checking buoys\n");
   if(checkBuoys(cap, buoys, &numBuoys)){
     for(int i = 0; i < numBuoys; i++)
     {
@@ -47,6 +50,7 @@ void updateKB(IMAGE_KB *kb)
       kb->buoys[i].buoyColor = buoys[i].buoyColor;
     }
   }
+  printf("done checking buoys\n");
 
   
 
