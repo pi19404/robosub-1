@@ -11,24 +11,18 @@ using namespace std;
 void updateKB(IMAGE_KB *kb)
 {
   Mat query;
-  printf("here\n");
-  VideoCapture cap(0); // open the downward facing camera
-  printf("here2\n");
   Buoy buoys[3];
   int numBuoys = 0;
 
-  // make sure the cap opened
-  if(!cap.isOpened())
-  {
-      cout << "failed to open camera" << endl;
-      return;
-  }
+#ifdef DEBUG
+  printf("checking gate\n");
+#endif
 
   // Hold coordinates of images seen in the following image matching functions
   float leftPostX = 0, rightPostX = 0;
 
   // Find the gate
-  if(checkGate(cap, &leftPostX, &rightPostX)){
+  if(checkGate(&leftPostX, &rightPostX)){
     // left and right pillar are seen
     kb->sgPillars[0].pillarSeen = true; // left
     kb->sgPillars[1].pillarSeen = true; // right
@@ -39,8 +33,11 @@ void updateKB(IMAGE_KB *kb)
   }
 
   // Find buoys
+#ifdef DEBUG
   printf("checking buoys\n");
-  if(checkBuoys(cap, buoys, &numBuoys)){
+#endif
+
+  if(checkBuoys(buoys, &numBuoys)){
     for(int i = 0; i < numBuoys; i++)
     {
       kb->buoys[i].buoySeen = true;
@@ -50,10 +47,6 @@ void updateKB(IMAGE_KB *kb)
       kb->buoys[i].buoyColor = buoys[i].buoyColor;
     }
   }
-  printf("done checking buoys\n");
-
-  
-
 }
 
 /******************************************************************** 
@@ -69,7 +62,12 @@ int main()
   updateKB(knowledge);
 
   // compare results to expected results to determine correctness of test
+  if(knowledge->sgPillars[0].pillarSeen && knowledge->sgPillars[1].pillarSeen)
+    printf("Test 1 Passed!\n");
 
+  if(knowledge->buoys[0].buoySeen && knowledge->buoys[1].buoySeen &&
+     knowledge->buoys[0].buoyColor == RED && knowledge->buoys[1].buoyColor == YELLOW)
+    printf("Test 2 Passed!\n");
 
   return 0;
 }

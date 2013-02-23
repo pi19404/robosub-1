@@ -15,9 +15,15 @@
 #include <algorithm>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 
 #define DILATE_ERODE_SCALE 3
 #define USE_CONTROLS false
+
+using namespace cv;
+using namespace std;
 
 struct OFFSETDATA {
 	int greenHueHigh;
@@ -63,8 +69,9 @@ struct HARDDATA {
 
 using namespace cv;
 
-int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
+int checkBuoys(Buoy buoys[3], int *numFound)
 {
+  VideoCapture cap(0);
 
   // make sure the camera is functioning
   if(!cap.isOpened())
@@ -113,15 +120,6 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
 
 
 
-#ifdef DEBUG
-  // WINDOW OUTPUT
-  if (USE_CONTROLS) {
-    namedWindow("Controls", CV_WINDOW_AUTOSIZE);
-  }
-  namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
-  namedWindow("Mask", CV_WINDOW_AUTOSIZE);
-#endif
-
   int modeCount = 1;
   int midpointX = cap.get(CV_CAP_PROP_FRAME_WIDTH)/2;  //Precalculate midpoint
   int midpointY = cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2;
@@ -141,27 +139,19 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
   Mat nullMat;
   Point nullPoint(-1,-1);
 
-#ifdef DEBUG
-  // CONTROL SLIDERS
-  if (USE_CONTROLS) {
-      createTrackbar("Hue low", "Controls", &hueLow, 360);
-      createTrackbar("Hue high", "Controls", &hueHigh, 360);
-      createTrackbar("Sat low", "Controls", &satLow, 100);
-      createTrackbar("Sat high", "Controls", &satHigh, 100);
-      createTrackbar("Value low", "Controls", &valueLow, 100);
-      createTrackbar("Value high", "Controls", &valueHigh, 100);
-  }
-#endif
-
   // get an image and convert it to its hue saturation values
   cap >> frame;
-  printf("1");
+  cvtColor( frame, hsv, CV_BGR2HSV );
+
+#ifdef DEBUG
   namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
   imshow("Camera Display", frame);
-  printf("2");
-  char dummy;
-  scanf("%c", &dummy);
-  cvtColor( frame, hsv, CV_BGR2HSV );
+  waitKey(0);
+
+  // to display the mask later
+  namedWindow("mask", CV_WINDOW_AUTOSIZE);
+#endif
+
 
   for(modeCount = 1; modeCount <= 3; modeCount++)
   {
@@ -195,17 +185,6 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
       break;
     }
 
-#ifdef DEBUG
-    if (USE_CONTROLS) {
-      setTrackbarPos("Hue low", "Controls", hueLow);
-      setTrackbarPos("Hue high", "Controls", hueHigh);
-      setTrackbarPos("Sat low", "Controls", satLow);
-      setTrackbarPos("Sat high", "Controls", satHigh);
-      setTrackbarPos("Value low", "Controls", valueLow);
-      setTrackbarPos("Value high", "Controls", valueHigh);
-    }
-#endif
-
     // CREATE MASK
     inRange( hsv,
              Scalar((hueLow/360.0)*255, (satLow/100.0)*255, (valueLow/100.0)*255, 0),
@@ -213,6 +192,11 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
              mask );
     dilate(mask,mask,nullMat,nullPoint, DILATE_ERODE_SCALE);
     erode(mask,mask,nullMat,nullPoint, DILATE_ERODE_SCALE); 
+
+#ifdef DEBUG
+  imshow("mask", mask);
+  waitKey(0);
+#endif
 
     // INTERPRET MASK
     minMaxLoc(mask, &minVal, &maxVal, &minLoc, &maxLoc);
@@ -282,12 +266,7 @@ int checkBuoys(VideoCapture cap, Buoy buoys[3], int *numFound)
       break;
   }
 
-#ifdef DEBUG
-  // UPDATE WINDOWS
-  imshow("Camera Display", frame);
-  imshow("Mask", blurMask);
-#endif
-
+  cap.release();
   *numFound = buoyCount;
   return buoyCount;
 }
