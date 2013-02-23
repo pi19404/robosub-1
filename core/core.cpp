@@ -125,7 +125,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
         if ( im->buoys[0].buoySeen && im->buoys[1].buoySeen && im->buoys[2].buoySeen )
         {
             // Once all three are found: Pick the farthest left buoy not hit yet. 
-            if ( !kb->buoy1Found )
+            if ( !kb->buoy1Hit )
             {
                 // Move towards that buoy
                 move( im->buoys[0].buoyX, im->buoys[0].buoyY, im->buoys[0].buoyZ, HEADING_FORWARD );
@@ -140,13 +140,14 @@ int Buoys(KB *kb, IMAGE_KB *im)
                         // As soon as the correct color appears, move forward to hit it
                         move( im->buoys[0].buoyX, im->buoys[0].buoyY, FORWARD, HEADING_FORWARD );
                         // TODO wait enough time for buoy to be hit
-                        
+                        /*wait()*/
+						kb->buoy1Hit = true;
                         // Once the buoy is hit, reverse
                         move( im->buoys[0].buoyX, im->buoys[0].buoyY, REVERSE, HEADING_FORWARD );
                     }
                 }
             }
-            else if ( !kb->buoy2Found )
+            else if ( !kb->buoy2Hit )
             {
                 // Move towards that buoy
                 move( im->buoys[1].buoyX, im->buoys[1].buoyY, im->buoys[1].buoyZ, HEADING_FORWARD );
@@ -161,13 +162,14 @@ int Buoys(KB *kb, IMAGE_KB *im)
                         // As soon as the correct color appears, move forward to hit it
                         move( im->buoys[1].buoyX, im->buoys[1].buoyY, FORWARD, HEADING_FORWARD );
                         // TODO wait enough time for buoy to be hit
-                        
+                        /*wait()*/
+						kb->buoy2Hit = true;
                         // Once the buoy is hit, reverse
                         move( im->buoys[1].buoyX, im->buoys[1].buoyY, REVERSE, HEADING_FORWARD );
                     }
                 }
             }
-            else if ( !kb->buoy3Found )
+            else if ( !kb->buoy3Hit )
             {
                 // Move towards that buoy
                 move( im->buoys[2].buoyX, im->buoys[2].buoyY, im->buoys[2].buoyZ, HEADING_FORWARD );
@@ -182,22 +184,32 @@ int Buoys(KB *kb, IMAGE_KB *im)
                         // As soon as the correct color appears, move forward to hit it
                         move( im->buoys[2].buoyX, im->buoys[2].buoyY, FORWARD, HEADING_FORWARD );
                         // TODO wait enough time for buoy to be hit
-                        
+                        /*wait()*/
+						kb->buoy3Hit = true;
                         // Once the buoy is hit, reverse
                         move( im->buoys[2].buoyX, im->buoys[2].buoyY, REVERSE, HEADING_FORWARD );
                     }
                 }
             }
         }
+		else // all 3 not seen
+		{
+			// TODO add error handling for if, for example
+			// , we dont see all three: we see only 1 or we never see any
+		}
     }
     else // All three buoys hit
     {
+		kb->buoyTaskComplete = true;
         // Move back TODO add the timings in here
         move( 0, 0, REVERSE, HEADING_FORWARD );
+		/*wait()*/
         // Move up above the buoys
         move( 0, UP, 0, HEADING_FORWARD );
+		/*wait()*/
         // Move forward over the buoys
         move( 0, 0, FORWARD, HEADING_FORWARD );
+		/*wait()*/
     }
 
     return 0;
