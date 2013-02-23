@@ -51,6 +51,7 @@ class IMAGE_KB {
 
         // Start Gate
 		SGPillar sgPillars[2];
+		float startGateCenterDistance;
 //        bool pillar1Seen, pillar2Seen;
 //        int  pillar1X, pillar2X;
 

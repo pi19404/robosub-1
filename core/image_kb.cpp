@@ -4,6 +4,7 @@
 void initializeIM(IMAGE_KB *im)
 {
 	// Start Gate
+	im->startGateCenterDistance = -1.0;
     im->sgPillars[0].pillarSeen = false;
     im->sgPillars[1].pillarSeen = false;
     im->sgPillars[0].pillarX    = 0;

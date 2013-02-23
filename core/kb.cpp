@@ -40,6 +40,9 @@ KB::KB()
         buoy1Color = colors::DEFAULT;
         buoy2Color = colors::DEFAULT; 
         buoy3Color = colors::DEFAULT;
+		buoy1Hit = false;
+		buoy2Hit = false;
+		buoy3Hit = false;
         
         // Parking Obstacle
         horizBarFound = true;
@@ -110,7 +113,9 @@ KB::KB()
 		buoy2Found = false;
 		buoy3Complete = false;
 		buoy3Found = false;
-		buoyPrimary = colors::DEFAULT;
+		buoyGoalColor = colors::DEFAULT;	// Either: set this if we know what color we want
+											// to make the buoys or set it when we collide
+											// with the first buoy so the rest of the buoys match
         
         // Torpedo Targets
         torpedoPrimary   = colors::DEFAULT;
