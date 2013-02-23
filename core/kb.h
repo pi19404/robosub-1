@@ -47,6 +47,9 @@ class KB {
         colors buoy1Color;
         colors buoy2Color;
         colors buoy3Color;
+		bool buoy1Hit;
+		bool buoy2Hit;
+		bool buoy3Hit;
         
         // Parking Obstacle
         bool horizBarFound;
@@ -109,7 +112,7 @@ class KB {
         
         // Predefined at competition time
         // Buoy Targets
-        colors buoyPrimary;
+		colors buoyGoalColor;
         
         // Torpedo Targets
         colors torpedoPrimary;

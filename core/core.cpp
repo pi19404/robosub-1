@@ -6,9 +6,11 @@
 
 using namespace std;
 
-#define FORWARD 1  // Move forward at a constant speed
-#define REVERSE -1 // Move in reverse at a constant speed
-#define DEPTH   5  // Default depth, 5 ft
+#define FORWARD 1	// Move forward at a constant speed
+#define REVERSE -1	// Move in reverse at a constant speed
+#define UP 1		// Move up at a constant speed
+#define DOWN -1		// Move down at a constant speed
+#define DEPTH   5	// Default depth, 5 ft
 #define HEADING_FORWARD 0 // Default forward heading
 
 int main(int argc, char* argv[])
@@ -123,17 +125,17 @@ int Buoys(KB *kb, IMAGE_KB *im)
         if ( im->buoys[0].buoySeen && im->buoys[1].buoySeen && im->buoys[2].buoySeen )
         {
             // Once all three are found: Pick the farthest left buoy not hit yet. 
-            if ( !kb->buoys[0].found )
+            if ( !kb->buoy1Found )
             {
                 // Move towards that buoy
                 move( im->buoys[0].buoyX, im->buoys[0].buoyY, im->buoys[0].buoyZ, HEADING_FORWARD );
                 // Once in range (about 2 ft away)
-                if ( im->buoyZ < 2 )
+                if ( im->buoys[0].buoyZ < 2 )
                 {
                     // Wait ( ie stop moving )
                     move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
                     // Check the color of the buoy, // learn the cycle? 
-                    if ( im->buoys[0].buoyColor == GOALCOLOR )
+                    if ( im->buoys[0].buoyColor == kb->buoyGoalColor )
                     {
                         // As soon as the correct color appears, move forward to hit it
                         move( im->buoys[0].buoyX, im->buoys[0].buoyY, FORWARD, HEADING_FORWARD );
@@ -144,17 +146,17 @@ int Buoys(KB *kb, IMAGE_KB *im)
                     }
                 }
             }
-            else if ( !kb->buoys[1].found )
+            else if ( !kb->buoy2Found )
             {
                 // Move towards that buoy
                 move( im->buoys[1].buoyX, im->buoys[1].buoyY, im->buoys[1].buoyZ, HEADING_FORWARD );
                 // Once in range (about 2 ft away)
-                if ( im->buoyZ < 2 )
+                if ( im->buoys[1].buoyZ < 2 )
                 {
                     // Wait ( ie stop moving )
                     move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
                     // Check the color of the buoy, // learn the cycle? 
-                    if ( im->buoys[1].buoyColor == GOALCOLOR )
+                    if ( im->buoys[1].buoyColor == kb->buoyGoalColor )
                     {
                         // As soon as the correct color appears, move forward to hit it
                         move( im->buoys[1].buoyX, im->buoys[1].buoyY, FORWARD, HEADING_FORWARD );
@@ -165,17 +167,17 @@ int Buoys(KB *kb, IMAGE_KB *im)
                     }
                 }
             }
-            else if ( !kb->buoys[2].found )
+            else if ( !kb->buoy3Found )
             {
                 // Move towards that buoy
                 move( im->buoys[2].buoyX, im->buoys[2].buoyY, im->buoys[2].buoyZ, HEADING_FORWARD );
                 // Once in range (about 2 ft away)
-                if ( im->buoyZ < 2 )
+                if ( im->buoys[2].buoyZ < 2 )
                 {
                     // Wait ( ie stop moving )
                     move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
                     // Check the color of the buoy, // learn the cycle? 
-                    if ( im->buoys[2].buoyColor == GOALCOLOR )
+                    if ( im->buoys[2].buoyColor == kb->buoyGoalColor )
                     {
                         // As soon as the correct color appears, move forward to hit it
                         move( im->buoys[2].buoyX, im->buoys[2].buoyY, FORWARD, HEADING_FORWARD );
@@ -193,9 +195,9 @@ int Buoys(KB *kb, IMAGE_KB *im)
         // Move back TODO add the timings in here
         move( 0, 0, REVERSE, HEADING_FORWARD );
         // Move up above the buoys
-        move( 0, UP, 0, HEADING_FORWARD ); 
+        move( 0, UP, 0, HEADING_FORWARD );
         // Move forward over the buoys
-        move( 0, 0, FORWARD, HEADING_FORWARD ); 
+        move( 0, 0, FORWARD, HEADING_FORWARD );
     }
 
     return 0;
