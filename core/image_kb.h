@@ -71,6 +71,7 @@ class IMAGE_KB {
 
         // Buoys
 		Buoy buoys[3];
+		int numBuoysSeen;
 //        bool buoy1Seen, buoy2Seen, buoy3Seen;
 //        int  buoy1X, buoy1Y, buoy1Z, buoy2X, buoy2Y, buoy2Z, buoy3X, buoy3Y, buoy3Z;
 //        colors buoy1Color, buoy2Color, buoy3Color;

@@ -26,6 +26,7 @@ void initializeIM(IMAGE_KB *im)
 
 
     // Buoys
+	im->numBuoysSeen = 0;
     im->buoys[0].buoySeen  = false;
     im->buoys[1].buoySeen  = false;
     im->buoys[2].buoySeen  = false;
