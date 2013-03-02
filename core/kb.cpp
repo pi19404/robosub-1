@@ -21,13 +21,13 @@ KB::KB()
         pillar2Found = false;
 
         // Paths
-		path1found = true;
-        path2found = true;
-        path3found = true;
-        path4found = true;
-        path5found = true;
-        path6found = true;
-        path7found = true;
+		path1found = false;
+        path2found = false;
+        path3found = false;
+        path4found = false;
+        path5found = false;
+        path6found = false;
+        path7found = false;
 
         // Buoys
 		correctHeading = false;
@@ -45,9 +45,9 @@ KB::KB()
 		buoy3Hit = false;
         
         // Parking Obstacle
-        horizBarFound = true;
-        leftBarFound = true;
-        rightBarFound = true;
+        horizBarFound = false;
+        leftBarFound = false;
+        rightBarFound = false;
 
         // re use gate pillar booleans
 
