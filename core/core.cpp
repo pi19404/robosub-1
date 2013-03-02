@@ -1,8 +1,6 @@
 /* Core AI file */
 
 #include "core.h"
-#include "kb.h"
-#include "image_kb.h"
 
 using namespace std;
 
@@ -91,6 +89,8 @@ int StartGate(KB *kb, IMAGE_KB *im)
     if(kb->pillar1Found && kb->pillar2Found && !im->sgPillars[0].pillarSeen && !im->sgPillars[1].pillarSeen)
     {
         kb->startGateComplete = true;
+		// continue moving forward (to find the path) for a specified amount of time, maybe wait for a bit once we dont see the pillars anymore
+		/*wait()*/
     }
     return 0;
 }
