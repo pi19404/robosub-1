@@ -1,12 +1,11 @@
 #include "../core/image_kb.h"
 #include "../core/image_kb.cpp"
-#include <iostream>
-
 //#include "match.cpp"
+#include "headers.cpp"
+#include "rectangleUtils.cpp"
 #include "gate.cpp"
 #include "buoys.cpp"
-
-using namespace std;
+#include "path.cpp"
 
 void updateKB(IMAGE_KB *kb)
 {
@@ -19,10 +18,10 @@ void updateKB(IMAGE_KB *kb)
 #endif
 
   // Hold coordinates of images seen in the following image matching functions
-  float leftPostX = 0, rightPostX = 0;
+  float leftPostX = 0, rightPostX = 0, distance = 0;
 
   // Find the gate
-  if(checkGate(&leftPostX, &rightPostX)){
+  if(checkGate(&leftPostX, &rightPostX, &distance)){
     // left and right pillar are seen
     kb->sgPillars[0].pillarSeen = true; // left
     kb->sgPillars[1].pillarSeen = true; // right
@@ -30,6 +29,16 @@ void updateKB(IMAGE_KB *kb)
     // set their X coordinates
     kb->sgPillars[0].pillarX = leftPostX;
     kb->sgPillars[1].pillarX = rightPostX;
+
+    // set the distance
+    kb->startGateCenterDistance = distance;
+
+#ifdef DEBUG
+    printf("leftX = %f\n", leftPostX);
+    printf("rightX = %f\n", rightPostX);
+    printf("distance = %f\n", distance);
+#endif
+
   }
 
   // Find buoys
@@ -46,6 +55,13 @@ void updateKB(IMAGE_KB *kb)
       kb->buoys[i].buoyZ = buoys[i].buoyZ;
       kb->buoys[i].buoyColor = buoys[i].buoyColor;
     }
+    kb->numBuoysSeen = numBuoys;
+  }
+
+  double pathDegrees = 0;
+  if(checkPath(&pathDegrees))
+  {
+    kb->rightPathHeading = pathDegrees;
   }
 }
 

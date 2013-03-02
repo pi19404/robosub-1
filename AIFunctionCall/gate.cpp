@@ -7,17 +7,6 @@
    Postconditions: Return to orange guide rail.
 */
 
-#include <time.h>
-#include <cstdio>
-#include <algorithm>
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <math.h>
-#include <list>
-
 // DEFINES
 #define ABOVE_WATER true
 #define NUM_OF_COLORS 6 //this includes "vC_error"
@@ -32,8 +21,6 @@
 
 #define FOV 1.09 //radians
 #define GATE_WIDTH 10
-
-using namespace cv;
 
 //PRESET FUNCTIONS
 typedef enum {red, green, blue, yellow, orange, vC_error} vColor; //for "verified color"
@@ -99,6 +86,9 @@ void initColorPresets (hardDataStruct * hardData) {
 	}
 }
 
+
+//#include "rectangleUtils.cpp"
+
 float getPercentOfScreen(float frameWidth, float objectWidth) {
 	return objectWidth/frameWidth;
 }
@@ -110,37 +100,7 @@ float approxDistance(float percentOfScreen, float targetWidthCM)
 }
 
 
-//SORTING FUNCTIONS
-bool compareRectArea (Rect first, Rect second)
-{
-	if ((first.width * first.height) >
-		(second.width*second.height)) return true;
-	return false;
-}
-
-//BOUNDING FUNCTIONS
-std::list<Rect> getSortedRectangles(Mat &fromBinaryImage) //adopted from David's match program
-{
-    //Mat edgeDetect;
-    //Canny(fromImage, edgeDetect, 50, 200, 3);
-	std::list<Rect> rectangles;
-	Rect tempRect;
-    vector<vector<Point> > contours;
-    
-    Mat imgCopy;
-    fromBinaryImage.copyTo(imgCopy);
-
-    findContours(imgCopy, contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-
-    for (unsigned int i=0; i<contours.size(); i++) {
-		tempRect = boundingRect(Mat(contours[i]));
-		rectangles.push_front(tempRect);
-    }
-	rectangles.sort(compareRectArea);
-	return rectangles;    
-}
-
-bool checkGate(float *leftPostX, float *rightPostX)
+bool checkGate(float *leftPostX, float *rightPostX, float *z_distance)
 {
   VideoCapture cap(0);
 
@@ -168,7 +128,6 @@ bool checkGate(float *leftPostX, float *rightPostX)
   Point nullPoint(-1,-1);
 
   int midpointX = cap.get(CV_CAP_PROP_FRAME_WIDTH)/2;  //Precalculate midpoint
-  int midpointY = cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2;
 
   // CRITICAL OBJECT VARIABLES
   Rect objRect(0,0,0,0);
@@ -219,7 +178,7 @@ bool checkGate(float *leftPostX, float *rightPostX)
   std::list<Rect> rectangles = getSortedRectangles(blurMask);		
 
   // must have seen exactly two rectangles
-  if(rectangles.size() == 2){
+  if(rectangles.size() >= 2){
     objRect = rectangles.front();
     rectangles.pop_front();
     objRect2 = rectangles.front();
@@ -241,15 +200,11 @@ bool checkGate(float *leftPostX, float *rightPostX)
       *leftPostX  = objRect2.x;
       *rightPostX = objRect.x;
     }
-	int midpointX = cap.get(CV_CAP_PROP_FRAME_WIDTH)/2;  //Precalculate midpoint
     float percentOfScreen = getPercentOfScreen(midpointX*2, objPostBox.width/2);
-    float z_cm = approxDistance(percentOfScreen, GATE_WIDTH);
+    printf("width: %d\n", objPostBox.width);
+    *z_distance = approxDistance(percentOfScreen, /*GATE_WIDTH*/ objPostBox.width);
 	
     foundGate = true;
-      
-      // TODO
-      // VERIFY BUOY_WIDTH IS WHAT SHOULD BE USED, I BELIEVE ITS A MISTAKE
-      // FROM COPIED BUOY CODE
   }
   else
   {
