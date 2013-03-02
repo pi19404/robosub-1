@@ -49,6 +49,17 @@ class IMAGE_KB {
 
         IMAGE_KB();
 
+
+        // Current Obstacle
+        bool gateObstacle;
+        bool pathObstacle;
+        bool buoyObstacle;
+        bool parkingObstacle;
+        bool binsObstacle;
+        bool torpedoObstacle;
+        bool drivingObstacle;
+        bool sonarObstacle;
+        
         // Start Gate
 		SGPillar sgPillars[2];
 		float startGateCenterDistance;

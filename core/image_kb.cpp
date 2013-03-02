@@ -3,6 +3,16 @@
 #include "image_kb.h"
 void initializeIM(IMAGE_KB *im)
 {
+    // Current Obstacle
+    gateObstacle    = false;
+    pathObstacle    = false;
+    buoyObstacle    = false;
+    parkingObstacle = false;
+    binsObstacle    = false;
+    torpedoObstacle = false;
+    drivingObstacle = false;
+    sonarObstacle   = false;
+
 	// Start Gate
 	im->startGateCenterDistance = -1.0;
     im->sgPillars[0].pillarSeen = false;
