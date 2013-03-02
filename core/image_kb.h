@@ -66,8 +66,8 @@ class IMAGE_KB {
         bool twoPaths;
         int  leftPathX;
         int  rightPathX;
-		int  leftPathHeading;
-		int  rightPathHeading;
+		double  leftPathHeading;
+		double  rightPathHeading;
 
         // Buoys
 		Buoy buoys[3];

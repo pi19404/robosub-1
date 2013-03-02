@@ -40,9 +40,9 @@ KB::KB()
         buoy1Color = colors::DEFAULT;
         buoy2Color = colors::DEFAULT; 
         buoy3Color = colors::DEFAULT;
-		buoy1Hit = false;
-		buoy2Hit = false;
-		buoy3Hit = false;
+        buoy1Hit   = false;
+        buoy2Hit   = false;
+        buoy3Hit   = false;
         
         // Parking Obstacle
         horizBarFound = true;
