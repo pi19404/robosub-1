@@ -4,14 +4,14 @@
 void initializeIM(IMAGE_KB *im)
 {
     // Current Obstacle
-    gateObstacle    = false;
-    pathObstacle    = false;
-    buoyObstacle    = false;
-    parkingObstacle = false;
-    binsObstacle    = false;
-    torpedoObstacle = false;
-    drivingObstacle = false;
-    sonarObstacle   = false;
+    im->gateObstacle    = false;
+    im->pathObstacle    = false;
+    im->buoyObstacle    = false;
+    im->parkingObstacle = false;
+    im->binsObstacle    = false;
+    im->torpedoObstacle = false;
+    im->drivingObstacle = false;
+    im->sonarObstacle   = false;
 
 	// Start Gate
 	im->startGateCenterDistance = -1.0;
