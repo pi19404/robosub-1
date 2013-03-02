@@ -121,8 +121,6 @@ int checkBuoys(Buoy buoys[3], int *numFound)
 
 
   int modeCount = 1;
-  int midpointX = cap.get(CV_CAP_PROP_FRAME_WIDTH)/2;  //Precalculate midpoint
-  int midpointY = cap.get(CV_CAP_PROP_FRAME_HEIGHT)/2;
 
   // will be modified for each color preset
   int hueLow = 0, hueHigh = 0, satLow = 0, satHigh = 0, valueLow = 0, valueHigh = 0;
@@ -213,7 +211,6 @@ int checkBuoys(Buoy buoys[3], int *numFound)
       int tempCenterX = circles[i][0];
       int tempCenterY = circles[i][1];
       Point tempCenter(cvRound(circles[i][0]), cvRound(circles[i][1]));
-      int tempRadius = cvRound(circles[i][2]);
 
       switch (modeCount)
       {
