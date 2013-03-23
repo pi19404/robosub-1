@@ -1,4 +1,4 @@
 g++ core.cpp -o ai
 
 clean:
-    rm -rf *o all
+	rm -rf *.o

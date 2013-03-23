@@ -9,9 +9,6 @@
 
 void updateKB(IMAGE_KB *kb)
 {
-  Mat query;
-  Buoy buoys[3];
-  int numBuoys = 0;
 
 #ifdef DEBUG
   printf("checking gate\n");
@@ -21,7 +18,8 @@ void updateKB(IMAGE_KB *kb)
   float leftPostX = 0, rightPostX = 0, distance = 0;
 
   // Find the gate
-  if(checkGate(&leftPostX, &rightPostX, &distance)){
+  if(kb->gateObstacle && checkGate(&leftPostX, &rightPostX, &distance))
+  {
     // left and right pillar are seen
     kb->sgPillars[0].pillarSeen = true; // left
     kb->sgPillars[1].pillarSeen = true; // right
@@ -46,7 +44,10 @@ void updateKB(IMAGE_KB *kb)
   printf("checking buoys\n");
 #endif
 
-  if(checkBuoys(buoys, &numBuoys)){
+  Buoy buoys[3];
+  int numBuoys = 0;
+  if(kb->buoyObstacle && checkBuoys(buoys, &numBuoys))
+  {
     for(int i = 0; i < numBuoys; i++)
     {
       kb->buoys[i].buoySeen = true;
@@ -59,7 +60,7 @@ void updateKB(IMAGE_KB *kb)
   }
 
   double pathDegrees = 0;
-  if(checkPath(&pathDegrees))
+  if(kb->pathObstacle && checkPath(&pathDegrees))
   {
     kb->rightPathHeading = pathDegrees;
   }

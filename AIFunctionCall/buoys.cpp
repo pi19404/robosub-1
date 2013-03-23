@@ -9,16 +9,6 @@
    Postconditions: Return to orange guide rail.
 */
 
-
-#include <time.h>
-#include <cstdio>
-#include <algorithm>
-#include <opencv2/opencv.hpp>
-#include <iostream>
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-
 #define DILATE_ERODE_SCALE 3
 #define USE_CONTROLS false
 
@@ -66,8 +56,6 @@ struct HARDDATA {
 	int yellowValueHigh;
 	int yellowValueLow;		
 } hardData;
-
-using namespace cv;
 
 int checkBuoys(Buoy buoys[3], int *numFound)
 {
@@ -143,6 +131,7 @@ int checkBuoys(Buoy buoys[3], int *numFound)
 
 #ifdef DEBUG
   namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
+  moveWindow("Camera Display", 100, 100);
   imshow("Camera Display", frame);
   waitKey(0);
 

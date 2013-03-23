@@ -1,5 +1,10 @@
+/********************************************************************
+*   These functions are used to sort the rectangles found in a given
+*   image, and return a vector of the rectangles in order of largest
+*   to smallest.
+********************************************************************/    
 
-//SORTING FUNCTIONS
+// Utility function, defines how to sort the rectangles
 bool compareRectArea (Rect first, Rect second)
 {
 	if ((first.width * first.height) >
@@ -7,11 +12,11 @@ bool compareRectArea (Rect first, Rect second)
 	return false;
 }
 
-//BOUNDING FUNCTIONS
-std::list<Rect> getSortedRectangles(Mat &fromBinaryImage) //adopted from David's match program
+// This function accepts an image, and returns a vector of
+// rectangles found in the image. The rectangles are sorted using
+// the above function, causing them to be sorted from largest to smallest.
+std::list<Rect> getSortedRectangles(Mat &fromBinaryImage)
 {
-    //Mat edgeDetect;
-    //Canny(fromImage, edgeDetect, 50, 200, 3);
 	std::list<Rect> rectangles;
 	Rect tempRect;
     vector<vector<Point> > contours;
