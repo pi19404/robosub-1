@@ -67,17 +67,11 @@ class IMAGE_KB {
 //        int  pillar1X, pillar2X;
 
         // Paths
-        bool path1Seen;
-        bool path2Seen;
-        bool path3Seen;
-        bool path4Seen;
-        bool path5Seen;
-        bool path6Seen;
-        bool path7Seen;
-        bool twoPaths;
-        int  leftPathX;
+        bool pathSeen;
+        //bool twoPaths;
+        //int  leftPathX;
         int  rightPathX;
-		double  leftPathHeading;
+		//double  leftPathHeading;
 		double  rightPathHeading;
 
         // Buoys

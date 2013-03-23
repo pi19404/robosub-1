@@ -99,7 +99,7 @@ int Paths(KB *kb, IMAGE_KB *im)
 {
     // get all from image recognition
 
-    if (im->twoPaths)
+    /*if (im->twoPaths)
     {
         // follow the right one // Verify the right one is on the right
         if(im->leftPathX > im->rightPathX)
@@ -110,9 +110,12 @@ int Paths(KB *kb, IMAGE_KB *im)
         {
             move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
         }
-    }
+    }*/
     // else just follow path
-    move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
+    if (im->pathSeen)
+    {
+        move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
+    }
     return 0;
 }
 
@@ -178,7 +181,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
                 {
                     // Wait ( ie stop moving )
                     move( 0, 0, 0, 0 ); // Might need to shorty reverse to stop forward momentum
-                    // Check the color of the buoy, // learn the cycle? 
+                    // Check the color of the buoy, // learn the cycle?
                     if ( im->buoys[2].buoyColor == kb->buoyGoalColor )
                     {
                         // As soon as the correct color appears, move forward to hit it
@@ -196,6 +199,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
 		{
 			// TODO add error handling for if, for example
 			// , we dont see all three: we see only 1 or we never see any
+            // continue moving till we see all 3
 		}
     }
     else // All three buoys hit
@@ -237,6 +241,8 @@ int Bins(KB *kb, IMAGE_KB *im)
 bool move(int x, int y, int z, int heading)
 {
 	bool result = false;
+    cout << "X: " << x << " Y: " << y << " Z: " << z << " Heading: " << heading << endl;
+    // Send to controller code
 
 	return result;
 }

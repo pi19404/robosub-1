@@ -21,17 +21,11 @@ void initializeIM(IMAGE_KB *im)
     im->sgPillars[1].pillarX    = 0;
 
     // Paths
-    im->path1Seen        = false;
-    im->path2Seen        = false;
-    im->path3Seen        = false;
-    im->path4Seen        = false;
-    im->path5Seen        = false;
-    im->path6Seen        = false;
-    im->path7Seen        = false;
-    im->twoPaths         = false;
-    im->leftPathX        = 0;
+    im->pathSeen        = false;
+    //im->twoPaths         = false;
+    //im->leftPathX        = 0;
     im->rightPathX       = 0; // if only one path use the right path variable
-    im->leftPathHeading  = 0;
+    //im->leftPathHeading  = 0;
     im->rightPathHeading = 0; // if only one path use the right path variable
 
 
