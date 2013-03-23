@@ -1,11 +1,11 @@
 #include "../core/image_kb.h"
 #include "../core/image_kb.cpp"
 //#include "match.cpp"
-#include "headers.cpp"
-#include "rectangleUtils.cpp"
-#include "gate.cpp"
-#include "buoys.cpp"
-#include "path.cpp"
+#include "utilities/headers.cpp"
+#include "utilities/rectangleUtils.cpp"
+#include "obstacleFunctions/gate.cpp"
+#include "obstacleFunctions/buoys.cpp"
+#include "obstacleFunctions/path.cpp"
 
 void updateKB(IMAGE_KB *kb)
 {
@@ -15,6 +15,7 @@ void updateKB(IMAGE_KB *kb)
 #endif
 
   // Hold coordinates of images seen in the following image matching functions
+  // X coordinates are the pixel values
   float leftPostX = 0, rightPostX = 0, distance = 0;
 
   // Find the gate
