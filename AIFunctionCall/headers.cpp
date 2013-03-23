@@ -1,3 +1,6 @@
+// All of the common files that are included in most image
+// recognition functions.
+
 #include <time.h>
 #include <cstdio>
 #include <algorithm>
