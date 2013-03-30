@@ -1,4 +1,5 @@
-g++ core.cpp -o ai
+all:
+	clang core.cpp -o ai
 
 clean:
 	rm -rf *.o

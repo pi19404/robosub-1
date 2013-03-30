@@ -1,6 +1,7 @@
 /* Core AI file */
 
 #include "core.h"
+#include "../AIFunctionCall/checkImage.cpp"
 
 using namespace std;
 
@@ -25,12 +26,12 @@ int main(int argc, char* argv[])
     
     // add error handling
     while(1)
-        mainLoop(kb, im);
+        aiMainLoop(kb, im);
 
     return 1;
 }
 
-int mainLoop(KB *kb, IMAGE_KB *im)
+int aiMainLoop(KB *kb, IMAGE_KB *im)
 {
 	initializeIM(im);	// reset the Image KB
     kb->updateKB(im);
@@ -48,6 +49,7 @@ int mainLoop(KB *kb, IMAGE_KB *im)
     {
         Paths(kb, im);
         ObstacleCourse(kb);
+
     }
     else if (!kb->torpedoTaskComplete)
     {
@@ -238,11 +240,11 @@ int Bins(KB *kb, IMAGE_KB *im)
     return 0;
 }
 
-bool move(int x, int y, int z, int heading)
+bool move(int x, int y, int z, double heading)
 {
 	bool result = false;
     cout << "X: " << x << " Y: " << y << " Z: " << z << " Heading: " << heading << endl;
-    // Send to controller code
+    // TODO Send to controller code
 
 	return result;
 }

@@ -18,6 +18,6 @@ int ObstacleCourse(KB *kb);
 int Torpedos(KB *kb);
 int Bins(KB *kb, IMAGE_KB *im);
 
-bool move(int x, int y, int z, int heading);
+bool move(int x, int y, int z, double heading);
 
 #endif

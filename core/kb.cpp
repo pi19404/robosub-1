@@ -591,3 +591,106 @@ int KB::updateKB(IMAGE_KB *im)
 
 	return 1; // should it return this or something else?
 }
+
+void KB::printKB(KB *kb)
+{
+    file = fopen("kb.txt", 'w');
+
+    file << "Start Gate Complete: " << startGateComplete << endl;
+    file << "Buoy Task Complete:  " << buoyTaskComplete << endl; 
+    file << "Obstacle Course 1 Complete: " << obstacleCourse1Complete << endl;
+    file << "Torpedo Task Complete: " << torpedoTaskComplete << endl;
+    file << "Bins Task Complete: " << binsTaskComplete << endl;
+    file << "Obstacle Course 2 Complete: " << obstacleCourse2Complete << endl;
+    file << "Target In Range: " << targetInRange << endl;
+    file << "Attempt Task: " << attemptTask << endl;
+    file << "pillar1Found: " << pillar1Found << endl;
+    file << "pillar2Found: " << pillar2Found << endl;
+    file << "path1found: " << path1found << endl;
+    file << "path2found: " << path2found << endl;
+    file << "path3found: " << path3found << endl;
+    file << "path4found: " << path4found << endl;
+    file << "path5found: " << path5found << endl;
+    file << "path6found: " << path6found << endl;
+    file << "path7found: " << path7found << endl;
+    file << "correctHeading: " << correctHeading << endl;
+    file << "buoy1Found: " << buoy1Found << endl;
+    file << "buoy2Found: " << buoy2Found << endl;
+    file << "buoy3Found: " << buoy3Found << endl;
+    file << "buoy1Complete: " << buoy1Complete << endl;
+    file << "buoy2Complete: " << buoy2Complete << endl;
+    file << "buoy3Complete: " << buoy3Complete << endl;
+    file << "buoy1Color: " << buoy1Color << endl;
+    file << "buoy2Color: " << buoy2Color << endl;
+    file << "buoy3Color: " << buoy3Color << endl;
+    file << "buoy1Hit: " << buoy1Hit << endl;
+    file << "buoy2Hit: " << buoy2Hit << endl;
+    file << "buoy3Hit: " << buoy3Hit << endl;
+    file << "horizBarFound: " << horizBarFound << endl;
+    file << "leftBarFound: " << leftBarFound << endl;
+    file << "rightBarFound: " << rightBarFound << endl;
+    file << "primaryTorpedoTargetComplete: " << primaryTorpedoTargetComplete << endl;
+    file << "secondaryTorpedoTargetComplete: " << secondaryTorpedoTargetComplete << endl;
+    file << "torpedoDistance: " << torpedoDistance << endl;
+    file << "binsFound: " << bindFound << endl;
+    file << "binsPrimaryFound: " << binsPrimaryFound << endl; 
+    file << "binsSecondaryFound: " << binsSecondaryFound << endl;
+    file << "primaryBinTargetComplete: " << primaryBinTargetComplete << endl;
+    file << "secondaryBinTargetComplete: " << secondaryBinTargetComplete << endl;
+    file << "binDistance: " << binDistance << endl;
+    file << "objectFound: " << objectFound << endl;
+    file << "objectGrabbed: " << objectGrabbed << endl;
+    file << "objectDistance: " << objectDistance << endl;
+    file << "pingerDistance: " << pingerDistance << endl;
+    file << "pingerHeading: " << pingerheading << endl;
+    file << "x1: " << x1 << endl;
+    file << "y1: " << y1 << endl;
+    file << "z1: " << z1 << endl;
+    file << "heading1: " << heading1 << endl;
+    file << "x2: " << x2 << endl;
+    file << "y2: " << y2 << endl;
+    file << "z2: " << z2 << endl;
+    file << "heading2: " << heading2 << endl;
+    file << "x3: " << x3 << endl;
+    file << "y3: " << y3 << endl;
+    file << "z3: " << z3 << endl;
+    file << "heading3: " << heading3 << endl;
+    file << "x4: " << x4 << endl;
+    file << "y4: " << y4 << endl;
+    file << "z4: " << z4 << endl;
+    file << "heading4: " << heading4 << endl;
+
+    file << "depth: " << depth << endl;
+    file << "minDepth: " << minDepth << endl;
+
+    file << "buoy1Complete: " << buoy1Complete << endl;
+    file << "buoy1Found: " << buoy1Found << endl;
+    file << "buoy2Complete: " << buoy2Complete << endl;
+    file << "buoy2Found: " << buoy2Found << endl;
+    file << "buoy3Complete: " << buoy3Complete << endl;
+
+
+        // If needed can add other variable for storage
+            // buoys and bins might need more
+        
+        // TODO LIVE MISSION PLAN UPDATE
+        // Buoy Targets
+		buoy1Complete = false;
+		buoy1Found = false;
+		buoy2Complete = false;
+		buoy2Found = false;
+		buoy3Complete = false;
+		buoy3Found = false;
+		buoyGoalColor = colors::DEFAULT;	// Either: set this if we know what color we want
+											// to make the buoys or set it when we collide
+											// with the first buoy so the rest of the buoys match
+        
+        // Torpedo Targets
+        torpedoPrimary   = colors::DEFAULT;
+        torpedoSecondary = colors::DEFAULT;
+
+        // Bin Targets
+        binPrimary   = images::UNKNOWN;
+        binSecondary = images::UNKNOWN;
+}
+
