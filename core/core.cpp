@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
 int aiMainLoop(KB *kb, IMAGE_KB *im)
 {
-	initializeIM(im);	// reset the Image KB
+	im->initializeIM(im);	// reset the Image KB
     kb->updateKB(im);
 
     if (!kb->startGateComplete)

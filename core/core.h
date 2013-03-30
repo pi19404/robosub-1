@@ -10,7 +10,7 @@
 #include "image_kb.h"
 
 
-int mainLoop(KB *kb, IMAGE_KB *im);
+int aiMainLoop(KB *kb, IMAGE_KB *im);
 int StartGate(KB *kb, IMAGE_KB *im);
 int Paths(KB *kb, IMAGE_KB *im);
 int Buoys(KB *kb, IMAGE_KB *im);

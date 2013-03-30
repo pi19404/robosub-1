@@ -2,6 +2,7 @@
 
 #ifndef __TYPES__
 #define __TYPES__
+using namespace std;
 
 //namespace colors
 //{

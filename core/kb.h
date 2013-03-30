@@ -6,12 +6,15 @@
 class IMAGE_KB;
 
 #include "types.h"
+#include <iostream>
+#include <fstream>
 
 class KB {
 
     public:
         KB(); // Constructor
         int updateKB(IMAGE_KB *im); 
+        void printKB(KB *kb);
         // Multiple Tasks
         bool startGateComplete;
         bool buoyTaskComplete;

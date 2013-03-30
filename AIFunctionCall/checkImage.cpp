@@ -1,5 +1,11 @@
 #include "../core/image_kb.h"
+
+// only need this when testing
+#ifdef TEST
 #include "../core/image_kb.cpp"
+#endif
+
+
 //#include "match.cpp"
 #include "utilities/headers.cpp"
 #include "utilities/rectangleUtils.cpp"

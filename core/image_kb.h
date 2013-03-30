@@ -47,6 +47,7 @@ typedef struct SGPILLAR {
 class IMAGE_KB {
     public:
 
+        void initializeIM(IMAGE_KB *im);
         IMAGE_KB();
 
 
@@ -162,6 +163,5 @@ class IMAGE_KB {
 
 };
 
-void initializeIM(IMAGE_KB *im);
 
 #endif

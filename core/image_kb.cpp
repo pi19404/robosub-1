@@ -1,7 +1,10 @@
 /* Image Recognition Knowledge Base Class */
 
 #include "image_kb.h"
-void initializeIM(IMAGE_KB *im)
+
+
+
+void IMAGE_KB::initializeIM(IMAGE_KB *im)
 {
     // Current Obstacle
     im->gateObstacle    = false;
@@ -155,4 +158,5 @@ void initializeIM(IMAGE_KB *im)
 IMAGE_KB::IMAGE_KB()
 {
 	initializeIM(this);
+    
 }

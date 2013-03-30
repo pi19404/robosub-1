@@ -37,9 +37,9 @@ KB::KB()
         buoy1Complete = false;
         buoy2Complete = false;
         buoy3Complete = false;
-        buoy1Color = colors::DEFAULT;
-        buoy2Color = colors::DEFAULT; 
-        buoy3Color = colors::DEFAULT;
+        buoy1Color = DEFAULT;
+        buoy2Color = DEFAULT; 
+        buoy3Color = DEFAULT;
         buoy1Hit   = false;
         buoy2Hit   = false;
         buoy3Hit   = false;
@@ -113,17 +113,17 @@ KB::KB()
 		buoy2Found = false;
 		buoy3Complete = false;
 		buoy3Found = false;
-		buoyGoalColor = colors::DEFAULT;	// Either: set this if we know what color we want
+		buoyGoalColor = DEFAULT;	// Either: set this if we know what color we want
 											// to make the buoys or set it when we collide
 											// with the first buoy so the rest of the buoys match
         
         // Torpedo Targets
-        torpedoPrimary   = colors::DEFAULT;
-        torpedoSecondary = colors::DEFAULT;
+        torpedoPrimary   = DEFAULT;
+        torpedoSecondary = DEFAULT;
 
         // Bin Targets
-        binPrimary   = images::UNKNOWN;
-        binSecondary = images::UNKNOWN;
+        binPrimary   = UNKNOWN;
+        binSecondary = UNKNOWN;
 
 //        return this;
 }
@@ -594,7 +594,9 @@ int KB::updateKB(IMAGE_KB *im)
 
 void KB::printKB(KB *kb)
 {
-    file = fopen("kb.txt", 'w');
+    //file = fopen("kb.txt", 'w');
+    fstream file;
+    file.open("kb.txt");
 
     file << "Start Gate Complete: " << startGateComplete << endl;
     file << "Buoy Task Complete:  " << buoyTaskComplete << endl; 
@@ -632,7 +634,7 @@ void KB::printKB(KB *kb)
     file << "primaryTorpedoTargetComplete: " << primaryTorpedoTargetComplete << endl;
     file << "secondaryTorpedoTargetComplete: " << secondaryTorpedoTargetComplete << endl;
     file << "torpedoDistance: " << torpedoDistance << endl;
-    file << "binsFound: " << bindFound << endl;
+    file << "binsFound: " << binsFound << endl;
     file << "binsPrimaryFound: " << binsPrimaryFound << endl; 
     file << "binsSecondaryFound: " << binsSecondaryFound << endl;
     file << "primaryBinTargetComplete: " << primaryBinTargetComplete << endl;
@@ -642,7 +644,7 @@ void KB::printKB(KB *kb)
     file << "objectGrabbed: " << objectGrabbed << endl;
     file << "objectDistance: " << objectDistance << endl;
     file << "pingerDistance: " << pingerDistance << endl;
-    file << "pingerHeading: " << pingerheading << endl;
+    file << "pingerHeading: " << pingerHeading << endl;
     file << "x1: " << x1 << endl;
     file << "y1: " << y1 << endl;
     file << "z1: " << z1 << endl;
@@ -681,16 +683,17 @@ void KB::printKB(KB *kb)
 		buoy2Found = false;
 		buoy3Complete = false;
 		buoy3Found = false;
-		buoyGoalColor = colors::DEFAULT;	// Either: set this if we know what color we want
+		buoyGoalColor = DEFAULT;	// Either: set this if we know what color we want
 											// to make the buoys or set it when we collide
 											// with the first buoy so the rest of the buoys match
         
         // Torpedo Targets
-        torpedoPrimary   = colors::DEFAULT;
-        torpedoSecondary = colors::DEFAULT;
+        torpedoPrimary   = DEFAULT;
+        torpedoSecondary = DEFAULT;
 
         // Bin Targets
-        binPrimary   = images::UNKNOWN;
-        binSecondary = images::UNKNOWN;
+        binPrimary   = UNKNOWN;
+        binSecondary = UNKNOWN;
+        file.close();
 }
 
