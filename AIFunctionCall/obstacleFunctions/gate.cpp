@@ -1,13 +1,24 @@
-/* Ian Meharg
-   Round Object Searching for AUS device
-   Goal: Identify an object of given color (text),
-		 and track the roundest of the bunch.
-   Preconditions: Related task starts.
-   Exit condition: Killed by main AI.
-   Postconditions: Return to orange guide rail.
+/* Kenneth Perrault
+ * This file contains the function checkGate().
+ * checkGate() is used to identify whether or not the gate obstacle
+ * is in the cameras field of vision.
+ *
+ * Parameters:
+ * - float *leftPostX
+ * - float *rightPostX
+ * - float *z_distance
+ *
+ * Return value:
+ * Bool
+ *
+ * Description:
+ * If the gate obstacle is identified, the input parameters are all
+ * modified to indicate the position of the gate and true is returned.
+ * If the gate is not seen, the input parameters are not modified and
+ * false is returned.
+ *
 */
 
-// DEFINES
 #define ABOVE_WATER true
 #define NUM_OF_COLORS 6 //this includes "vC_error"
 
@@ -87,8 +98,7 @@ void initColorPresets (hardDataStruct * hardData) {
 }
 
 
-//#include "rectangleUtils.cpp"
-
+// used to calculate distance
 float getPercentOfScreen(float frameWidth, float objectWidth) {
 	return objectWidth/frameWidth;
 }

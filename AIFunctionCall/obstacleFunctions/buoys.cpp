@@ -1,12 +1,25 @@
 /* Kenneth Perrault
-   Buoy targeting for AUS device
-   Goal: capture and image and scan it for different color circles.
-         modify an array of buoys (passed by reference) to indicate the
-         location and color of buoys.
-         return the number of buoys found and also save the number of buoys
-         found in an integer passed by reference.
-   Preconditions: Buoy bump task starts.
-   Postconditions: Return to orange guide rail.
+ * This file contains the function checkBuoys().
+ * checkBuoys() is used to identify whether or not the buoy obstacle
+ * is in the cameras field of vision.
+ *
+ * Parameters:
+ * - Buoy buoys[3]
+ * - int *numFound
+ *
+ * Return value:
+ * Bool
+ *
+ * Description:
+ * Each color buoy is searched for: green, red, yellow.
+ * For each buoy identified in the scan, the buoy[3] array is modified
+ * with details about the buoys location and color. The first buoy found
+ * will be in buoy[0], second in buoy[1], third in buoy[2]. The numFound
+ * parameter is also modified to indicate how many buoys were seen.
+ *
+ * If no buoys are seen, numFound is set to 0 and false is returned.
+ * Otherwise, numFound will be non-zero and true is returned.
+ *
 */
 
 #define DILATE_ERODE_SCALE 3
@@ -131,7 +144,7 @@ int checkBuoys(Buoy buoys[3], int *numFound)
 
 #ifdef DEBUG
   namedWindow("Camera Display", CV_WINDOW_AUTOSIZE);
-  moveWindow("Camera Display", 100, 100);
+  cvMoveWindow("Camera Display", 100, 100);
   imshow("Camera Display", frame);
   waitKey(0);
 

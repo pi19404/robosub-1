@@ -1,22 +1,30 @@
-/* This program is a test built around the following orange strips of tape on 
-   the floor of the pool. We will need to identify the orange strips and find
-   the angle of the strip realative to the sub.
-
-   Based on example here:
-   http://wiki.elphel.com/index.php?title=OpenCV_Tennis_balls_recognizing_tutorial
-
-   * Convert the image from BGR to HSV.
-   * Create a mask of pixels that are orange.
-   * Fill in gaps in mask
-   * Edge detection
-   * Look for lines
-*/
-
-/********************************************************************
+/* Kenneth Perrault
+ * This file contains the function checkPath().
+ * checkPath() is used to identify whether or not orange path markers
+ * are visible to the downward facing camera.
+ *
+ * Parameters:
+ * - double *angleDegrees
+ *
+ * Return value:
+ * Bool
+ *
+ * Description:
+ * Axis - visualize a line going from the bottom of the image to
+ *        top of the image, and passing through the center of the image.
+ *
+ * If one path marker is visible to the downward facing camera, its
+ * angle relative to the image axis is returned. Positive values indicate
+ * the path is to the right of the axis, negative is to the left. 
+ *
  * IF THERE ARE TWO PATHS, THIS FUNCTION CHOOSES TO ONLY FOCUS ON
  * THE RIGHT PATH. FOR THE SPRING 2013 TEAM, WE DID NOT ATTEMPT THE
  * OBSTACLE AT THE END OF THE LEFT PATH. SO WE ALWAYS GO RIGHT.
-********************************************************************/ 
+ *
+ * If no paths are seen, false is returned. Otherwise true is returned.
+ *
+*/
+
 int hueLow = 10;
 int hueHigh = 25;
 int satLow = 43;

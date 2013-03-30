@@ -67,6 +67,9 @@ void updateKB(IMAGE_KB *kb)
   }
 }
 
+// only need a main function when testing, otherwise the AI just includes
+// this file and calls the function
+#ifdef TEST
 /******************************************************************** 
  * For testing.
  * 1. Hold an image in front of the camera.
@@ -89,3 +92,4 @@ int main()
 
   return 0;
 }
+#endif

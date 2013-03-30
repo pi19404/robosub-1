@@ -4,11 +4,11 @@ checkImage: checkImage.o
 	clang checkImage.o -ggdb -o checkImage $(CFLAGS)
 
 checkImage.o: checkImage.cpp
-	clang -ggdb -c checkImage.cpp $(CFLAGS)
+	clang -ggdb -c -D TEST checkImage.cpp $(CFLAGS)
 
 debug:
-	g++ -c -D DEBUG checkImage.cpp $(CFLAGS)
-	g++ checkImage.o -o checkImage $(CFLAGS)
+	clang -c -D TEST -D DEBUG checkImage.cpp $(CFLAGS)
+	clang checkImage.o -o checkImage $(CFLAGS)
 
 clean:
 	rm *.o
