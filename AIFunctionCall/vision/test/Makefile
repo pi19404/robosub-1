@@ -25,7 +25,7 @@ CXXFLAGS += -g -Wall -Wextra
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = check_gtest_exists vision_tests
+TESTS = vision_tests.out
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
@@ -42,7 +42,7 @@ LIBS += `pkg-config --libs opencv`
 #CXX = /usr/bin/colorgcc
 CXX = /usr/bin/g++
 
-all : $(TESTS)
+all : check_gtest_exists $(TESTS)
 
 check_gtest_exists:
 ifeq ($(GTEST_DIR),)
@@ -82,6 +82,6 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-vision_tests: $(OBJS) gtest_main.a
+vision_tests.out: $(OBJS) gtest_main.a
 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) -pthread $^ -o $@ $(LIBS)
 

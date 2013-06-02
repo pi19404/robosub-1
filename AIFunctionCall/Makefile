@@ -1,7 +1,7 @@
 CFLAGS = `pkg-config opencv --libs --cflags` -Wall -g
 
 checkImage: checkImage.o
-	clang checkImage.o -ggdb -o checkImage $(CFLAGS)
+	clang checkImage.o -ggdb -o checkImage.out $(CFLAGS)
 
 checkImage.o: checkImage.cpp
 	clang -ggdb -c -D TEST checkImage.cpp $(CFLAGS)

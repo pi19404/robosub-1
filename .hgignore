@@ -6,4 +6,5 @@ syntax: regexp
 .*\.o$
 .*\.a$
 .*\.orig$
+.*\.out$
 
