@@ -34,8 +34,6 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 OBJS = ../detect_hexagon.o unittest.o
 
-# wget http://googletest.googlecode.com/files/gtest-1.6.0.zip
-
 all : $(TESTS)
 
 check_gtest_exists:
