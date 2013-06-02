@@ -44,7 +44,7 @@ ifeq ($(GTEST_DIR),)
 endif
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o
+	rm -f $(TESTS) $(OBJS) gtest.a gtest_main.a *.o
 
 # Builds gtest.a and gtest_main.a.
 
