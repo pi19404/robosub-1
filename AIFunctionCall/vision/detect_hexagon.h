@@ -1,0 +1,7 @@
+#ifndef AI_AIFUNCTIONCALL_VISION_H_
+#define AI_AIFUNCTIONCALL_VISION_H_
+
+int testing_gtest();
+
+#endif  // AI_AIFUNCTIONCALL_VISION_H_
+

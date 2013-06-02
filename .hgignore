@@ -1,6 +1,9 @@
-# use glob syntax.
-syntax: glob
+syntax: regexp
+.*\.pyc$
+.*\.sw[op]$
+.*~$
+.*vision_tests.*
+.*\.o$
+.*\.a$
+.*\.orig$
 
-*.swp
-*.o
-*~
