@@ -15,6 +15,8 @@
 # Where to find user code.
 USER_DIR = ..
 
+CPPFLAGS += `pkg-config --cflags opencv`
+
 # Flags passed to the preprocessor.
 CPPFLAGS += -I$(GTEST_DIR)/include
 
@@ -33,6 +35,8 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 # House-keeping build targets.
 
 OBJS = ../detect_hexagon.o unittest.o
+
+LIBS += `pkg-config --libs opencv`
 
 all : $(TESTS)
 
@@ -75,5 +79,5 @@ gtest_main.a : gtest-all.o gtest_main.o
 # function.
 
 vision_tests: $(OBJS) gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -pthread $^ -o $@
+	$(CXX) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) -pthread $^ -o $@ $(LIBS)
 
