@@ -56,13 +56,22 @@ TEST(misc_tests, confirm_paths_work) {
 // We should be able to get a string of length 4, and all 4 color chars
 // should be in that string.
 TEST_F(VisionTest, test_get_color_pattern) {
+  long unsigned int locSmall, locLarge;
   for (vector<string>::iterator it = s_image_names->begin();
        it != s_image_names->end(); ++it) {
     EXPECT_EQ(get_color_pattern(*it).size(), 4U);
-    EXPECT_NE(get_color_pattern(*it).find("b"), string::npos);
-    EXPECT_NE(get_color_pattern(*it).find("g"), string::npos);
-    EXPECT_NE(get_color_pattern(*it).find("r"), string::npos);
-    EXPECT_NE(get_color_pattern(*it).find("p"), string::npos);
+    locSmall = get_color_pattern(*it).find("b");
+    locLarge = get_color_pattern(*it).find("B");
+    EXPECT_TRUE(locSmall != string::npos || locLarge != string::npos);
+    locSmall = get_color_pattern(*it).find("g");
+    locLarge = get_color_pattern(*it).find("G");
+    EXPECT_TRUE(locSmall != string::npos || locLarge != string::npos);
+    locSmall = get_color_pattern(*it).find("r");
+    locLarge = get_color_pattern(*it).find("R");
+    EXPECT_TRUE(locSmall != string::npos || locLarge != string::npos);
+    locSmall = get_color_pattern(*it).find("p");
+    locLarge = get_color_pattern(*it).find("P");
+    EXPECT_TRUE(locSmall != string::npos || locLarge != string::npos);
   }
 }
 

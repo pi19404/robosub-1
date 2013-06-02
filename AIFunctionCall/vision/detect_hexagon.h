@@ -21,12 +21,14 @@ using namespace cv;
     ~TollboothDetector();
 
     bool can_see_tollbooth();
-
     vector<vector<Point> >* get_tollbooth_bounding_box(Mat frame);
     Rect get_tollbooth_flattened_rect(Mat frame, vector<vector<Point> > box);
-    vector<Rect> get_tollbooth_windows(Mat frame, Rect rect);
+    vector<Rect>* get_tollbooth_windows(Mat frame, Rect rect);
     color_t get_tollbooth_window_color(Mat frame, Rect tollbooth_window);
-    Point get_tollbooth_window_hex_center(Mat frame, Rect toolbooth_window);
+    Point get_tollbooth_window_large_hex_center(Mat frame,
+                                                Rect toolbooth_window);
+    Point get_tollbooth_window_small_hex_center(Mat frame,
+                                                Rect toolbooth_window);
   };
 }
 

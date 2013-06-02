@@ -38,6 +38,10 @@ OBJS = ../detect_hexagon.o unittest.o
 
 LIBS += `pkg-config --libs opencv`
 
+# Oddly, this errors out.
+#CXX = /usr/bin/colorgcc
+CXX = /usr/bin/g++
+
 all : $(TESTS)
 
 check_gtest_exists:
