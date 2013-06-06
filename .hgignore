@@ -1,0 +1,9 @@
+syntax: glob
+*.o
+*.a
+*.tar
+*.tar.gz
+joytest/joytest
+joytest/data/*
+robosub_joystick/auv/auv
+robosub_joystick/client/client
