@@ -9,6 +9,7 @@
 //
 // Major Changes:
 // 01-Jun-2013      JS      Created File.
+// 06-Jun-2013      JS      Fixed Scaling.
 ///////////////////////////////////////////////////////////////////////////////
 #include "robosub_control_data.h"
 
@@ -91,11 +92,18 @@ RoboSubControlData::RoboSubControlData( const RoboSubCommand& cmd )
         double r = sqrt( x*x + y*y );
         double theta = atan2(y,x);
 
-        // Compute some math constants we need
+        // Precompute some math constants we need
         // making these static const so we can tie them to this
         // method, and only have to compute them once.
         static const double qtr_pi       = 1. *  atan(1.);
         static const double three_qtr_pi = 3. * atan(1.);
+
+        // We want to map the X-Y plane onto a circle that is circumscribed
+        // by the plane. However, the process below would make the unit circle
+        // the process below will make the circle enclose the plnae, (which is
+        // the opposite of what we want). Therefore, use a scale factor to
+        // make the circle smaller.
+        static const double scale = 2./sqrt(2.);
 
         // Use the assigned angles for each thruser
         // (these are static because we only need to
@@ -106,11 +114,18 @@ RoboSubControlData::RoboSubControlData( const RoboSubCommand& cmd )
                                          three_qtr_pi };    /* Aft Right  */
 
         // Compute the thruster components from the direction vector
+        // Since the heading command is presently the
+        // magnitude of power for turning, it points along
+        // the thrusters. For thrusters fore_l and aft_l the rotation
+        // is the same direction as the heading, and for the other two it
+        // is the opposite. Adjust accordingly.
         const double headings[] = {  h,   /* Fore Left  */
                                     -h,   /* Fore Right */
                                      h,   /* Aft Left   */
                                     -h }; /* Aft Right  */
 
+        // Get a ptr to each
+        // thruster data member so we can iterate over them.
         int32_t* thrusters[] = { &(Data.Thruster_Fore_L),
                                  &(Data.Thruster_Fore_R),
                                  &(Data.Thruster_Aft_L ),
@@ -118,12 +133,14 @@ RoboSubControlData::RoboSubControlData( const RoboSubCommand& cmd )
 
         for( unsigned int i=0; i < sizeof(thrusters)/sizeof(int32_t*); ++i )
         {
-            // Since the heading command is presently the
-            // magnitude of power for turning, it points along
-            // the thrusters. For thrusters fore_l and aft_l the rotation
-            // is the same direction as the heading, and for the other two it
-            // is the opposite. Adjust accordingly.
-            double val   = r * cos( theta - angles[i] ) + headings[i];
+            // Map the X-Y plane to the circle
+            double val   = r * cos( theta - angles[i] ) * scale;
+            
+            // add in the heading power (which adjusts the 
+            // raw pwms, no transformations here
+            val +=  headings[i];
+
+            // update the thruster data
             *(thrusters[i]) = static_cast<int32_t>(val);
 
             // Scale the thruster values

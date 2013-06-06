@@ -3,6 +3,8 @@ syntax: glob
 *.a
 *.tar
 *.tar.gz
+bin/*
+lib/*
 joystick_data
 joytest/joytest
 robosub_joystick/auv/auv

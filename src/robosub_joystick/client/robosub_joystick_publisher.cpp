@@ -9,12 +9,55 @@
 //
 // Major Changes:
 // 26-May-2013      JS      Created File.
+// 06-Jun-2013      JC      Bug Fix to prevent overloading Arduino bus. 
 ///////////////////////////////////////////////////////////////////////////////
 #include "robosub_joystick_publisher.h"
 
 #include <iostream>
 #include <exception>
 #include <cassert>
+#include <ctime>
+
+#define CLOCKS_PER_MSEC (CLOCKS_PER_SEC / 1000)
+
+unsigned int getStartTime(void)
+{
+    clock_t clockGetVal;
+    clockGetVal = clock();
+    if ((clock_t)(-1) != clockGetVal)
+    {
+        return (clockGetVal / CLOCKS_PER_MSEC);
+    }
+    else
+    {
+        // CPU time not available or cannot be represented; return 0
+        return 0;
+    }
+}
+
+void delayUntil(unsigned int start, unsigned int msToDelay)
+{
+    clock_t clockGetVal;
+    unsigned int end;
+
+    while(1)
+    {
+        clockGetVal = clock();
+        if ((clock_t)(-1) != clockGetVal)
+        {
+            end = clockGetVal / CLOCKS_PER_MSEC;
+            if (end >= start + msToDelay)
+            {
+                break;
+            }
+        }
+        else
+        {
+            // CPU time not available or cannot be represented; just return
+            return;
+        }
+    }
+}
 
 RoboSubJoystickPublisher::RoboSubJoystickPublisher( Av8r& joystick, 
                                                     std::string& outfile )
@@ -59,12 +102,16 @@ RoboSubJoystickPublisher::~RoboSubJoystickPublisher()
 
 void RoboSubJoystickPublisher::Run()
 {
+    unsigned int start;
+
     // Do initial publish
     UpdateJoystickData();
     PublishJoystickData();
 
     while(true)
     {
+        start = getStartTime();
+
         RoboSubCommand old = _Command;
         UpdateJoystickData();
 
@@ -73,6 +120,8 @@ void RoboSubJoystickPublisher::Run()
         {
             PublishJoystickData();
         }
+
+        delayUntil(start, 100);
     }
 }
 

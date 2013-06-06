@@ -10,7 +10,7 @@ SRC=joytest.cpp
 OBJ=$(SRC:.cpp=.o)
 LIB_OBJ=libav8r.a
 
-all: $(SRC) $(TARGET) $(LIB_OBJ)
+all: $(LIB_OBJ) $(SRC) $(TARGET) 
 
 debug:
 	$(MAKE) $(MAKEFILE) DEBUG="-ggdb"
