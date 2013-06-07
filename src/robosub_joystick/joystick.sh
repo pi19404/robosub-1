@@ -84,7 +84,7 @@ function run_auv() {
 	auv_pid_0=$!
 
     # spawn the auv terminal
-    auv_args="$AUV_DIR/$AUV_EXEC -i $AUV_DIR/pipe -s $ARDUINO_DEV -b $ARDUINO_DEV"
+    auv_args="$AUV_DIR/$AUV_EXEC -i $AUV_DIR/pipe -s $ARDUINO_DEV -b $ARDUINO_BAUD"
     auv_str="ssh $AUV_USER@$AUV_IP \"$auv_args\""
     ( gnome-terminal --title="AUV" -x /bin/bash -c "$auv_str" ) &
 	auv_pid_1=$!
