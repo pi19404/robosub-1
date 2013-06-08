@@ -108,10 +108,10 @@ RoboSubControlData::RoboSubControlData( const RoboSubCommand& cmd )
         // Use the assigned angles for each thruser
         // (these are static because we only need to
         //  compute them once )
-        static const double angles[] = { qtr_pi,            /* Fore Left  */
-                                         three_qtr_pi,      /* Fore Right */
-                                         qtr_pi,            /* Aft Left   */
-                                         three_qtr_pi };    /* Aft Right  */
+        static const double angles[] = { qtr_pi,       /* Fore Left  */
+                                         three_qtr_pi, /* Fore Right */
+                                         three_qtr_pi, /* Aft Left   */
+                                         qtr_pi };     /* Aft Right  */
 
         // Compute the thruster components from the direction vector
         // Since the heading command is presently the
