@@ -7,4 +7,5 @@ syntax: regexp
 .*\.a$
 .*\.orig$
 .*\.out$
+.*\.pdf$
 
