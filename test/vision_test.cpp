@@ -13,23 +13,23 @@ class VisionTest : public ::testing::Test {
  protected:
   static void SetUpTestCase() {
     s_image_names = new vector<string>();
-    s_image_names->push_back("old_bright_bgrp.jpg");
-    s_image_names->push_back("old_bright_gbpr.jpg");
-    s_image_names->push_back("old_bright_rpbg.jpg");
-    s_image_names->push_back("old_dim_brgp.jpg");
-    s_image_names->push_back("old_dim_prgb.jpg");
-    s_image_names->push_back("old_norm_bgrp.jpg");
-    s_image_names->push_back("old_norm_gbpr.jpg");
-    s_image_names->push_back("old_norm_rpbg.jpg");
-    s_image_names->push_back("old_perspective_white_back_rpbg.jpg");
-    s_image_names->push_back("old_bright_brgp.jpg");
-    s_image_names->push_back("old_bright_prgb.jpg");
-    s_image_names->push_back("old_dim_bgrp.jpg");
-    s_image_names->push_back("old_dim_gbpr.jpg");
-    s_image_names->push_back("old_dim_rpbg.jpg");
-    s_image_names->push_back("old_norm_brgp.jpg");
-    s_image_names->push_back("old_norm_prgb.jpg");
-    s_image_names->push_back("old_perspective_grey_back_rpbg.jpg");
+    s_image_names->push_back("old_images/old_bright_bgrp.jpg");
+    s_image_names->push_back("old_images/old_bright_gbpr.jpg");
+    s_image_names->push_back("old_images/old_bright_rpbg.jpg");
+    s_image_names->push_back("old_images/old_dim_brgp.jpg");
+    s_image_names->push_back("old_images/old_dim_prgb.jpg");
+    s_image_names->push_back("old_images/old_norm_bgrp.jpg");
+    s_image_names->push_back("old_images/old_norm_gbpr.jpg");
+    s_image_names->push_back("old_images/old_norm_rpbg.jpg");
+    s_image_names->push_back("old_images/old_perspective_white_back_rpbg.jpg");
+    s_image_names->push_back("old_images/old_bright_brgp.jpg");
+    s_image_names->push_back("old_images/old_bright_prgb.jpg");
+    s_image_names->push_back("old_images/old_dim_bgrp.jpg");
+    s_image_names->push_back("old_images/old_dim_gbpr.jpg");
+    s_image_names->push_back("old_images/old_dim_rpbg.jpg");
+    s_image_names->push_back("old_images/old_norm_brgp.jpg");
+    s_image_names->push_back("old_images/old_norm_prgb.jpg");
+    s_image_names->push_back("old_images/old_perspective_grey_back_rpbg.jpg");
   }
 
   static void TearDownTestCase() {
