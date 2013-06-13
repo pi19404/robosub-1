@@ -7,7 +7,7 @@ CXXFLAGS += $(shell echo $(ROBOSUB_CXXFLAGS))
 
 CXX = g++
 
-SRC = .
+SRC = $(CURDIR)
 LIB_DECISION = $(SRC)/decision
 LIB_MOVEMENT = $(SRC)/movement
 LIB_STATE_MACHINE = $(SRC)/state_machine
@@ -24,9 +24,11 @@ $(foreach dir,$(MY_TARGET_FOLDERS),$(eval LIBS += -L$(dir));)
 CPPFLAGS += $(shell echo `pkg-config --cflags opencv`)
 # Add the paths so that we can use #include "file.h" instead of
 # #include "../path/to/file.h"
-$(foreach dir,$(MY_TARGET_FOLDERS),$(eval CPPFLAGS += -I$(dir));)
+ROBOSUB_INCLUDES =
+$(foreach dir,$(MY_TARGET_FOLDERS),$(eval ROBOSUB_INCLUDES += -I$(dir));)
+CPPFLAGS += $(ROBOSUB_INCLUDES)
 
-OBJS += image_kb.o kb.o core.o
+OBJS += main.o
 
 .PHONY: all set_cascade_target_all set_cascade_target_clean $(MY_TARGET_FOLDERS) clean find_robosub_objs
 
@@ -56,5 +58,7 @@ print-%:
 	@echo '$($*)'
 
 $(MY_TARGET_FOLDERS):
-	@$(MAKE) -C $@ $(CASCADE_TARGET);
+	@echo THIS
+	@echo $(ROBOSUB_INCLUDES)
+	@$(MAKE) -C $@ $(CASCADE_TARGET) ROBOSUB_INCLUDES="$(ROBOSUB_INCLUDES)";
 

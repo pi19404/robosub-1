@@ -9,6 +9,7 @@ CXXFLAGS += -Wall -Wextra
 CXXFLAGS += $(shell echo $(ROBOSUB_CXXFLAGS))
 
 LIBS += $(shell echo `pkg-config --libs opencv`)
+LIBS += -I/usr/include/boost
 CXX = g++
 
 OBJS = fuzzy_sets.o

@@ -8,25 +8,28 @@ using ::std::string;
 using ::cv::imread;
 
 namespace vision {
-  TollboothDetector::TollboothDetector(string filename) {
+  TollboothEye::TollboothEye(string filename) {
     m_frame = imread(filename);
   }
 
-  TollboothDetector::TollboothDetector(Mat frame) {
-    m_frame = frame;
+  TollboothEye::TollboothEye() {
   }
 
-  TollboothDetector::~TollboothDetector() {
+  TollboothEye::~TollboothEye() {
     m_frame.release();
   }
 
   // TODO(LPE): Implement
-  bool TollboothDetector::can_see_tollbooth() {
+  bool TollboothEye::can_see_tollbooth() {
     return false;
   }
 
+  void TollboothEye::update_frame(cv::VideoCapture& vidcap) {
+    vidcap >> m_frame;
+  }
+
   // TODO(LPE): Implement
-  vector<vector<Point> >* TollboothDetector::get_tollbooth_bounding_box(
+  vector<vector<Point> >* TollboothEye::get_tollbooth_bounding_box(
       Mat frame) {
     using ::cv::Point;
     double x = angle(Point(0, 0), Point(0, 0), Point(0, 0));
@@ -34,32 +37,32 @@ namespace vision {
   }
 
   // TODO(LPE): Implement
-  Rect TollboothDetector::get_tollbooth_flattened_rect(
+  Rect TollboothEye::get_tollbooth_flattened_rect(
       Mat frame, vector<vector<Point> > box) {
     cv::Rect ret;
     return ret;
   }
 
   // TODO(LPE): Implement
-  vector<Rect>* TollboothDetector::get_tollbooth_windows(Mat frame, Rect rect) {
+  vector<Rect>* TollboothEye::get_tollbooth_windows(Mat frame, Rect rect) {
     return NULL;
   }
 
   // TODO(LPE): Implement
-  color_t TollboothDetector::get_tollbooth_window_color(
+  color_t TollboothEye::get_tollbooth_window_color(
       Mat frame, Rect tollbooth_window) {
     return red;
   }
 
   // TODO(LPE): Implement
-  Point TollboothDetector::get_tollbooth_window_large_hex_center(
+  Point TollboothEye::get_tollbooth_window_large_hex_center(
       Mat frame, Rect toolbooth_window) {
     cv::Point ret;
     return ret;
   }
 
   // TODO(LPE): Implement
-  Point TollboothDetector::get_tollbooth_window_small_hex_center(
+  Point TollboothEye::get_tollbooth_window_small_hex_center(
       Mat frame, Rect toolbooth_window) {
     cv::Point ret;
     return ret;

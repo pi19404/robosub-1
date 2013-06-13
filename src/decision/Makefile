@@ -8,6 +8,9 @@ CXXFLAGS += -Wall -Wextra
 #ROBOSUB_CXXFLAGS := -g
 CXXFLAGS += $(shell echo $(ROBOSUB_CXXFLAGS))
 
+ROBOSUB_INCLUDES =
+CPPFLAGS += $(ROBOSUB_INCLUDES)
+
 LIBS += $(shell echo `pkg-config --libs opencv`)
 CXX = g++
 
@@ -23,6 +26,8 @@ objects: $(OBJS)
 	@echo "Objects made: $(OBJS)"
 
 clean:
+	@echo THAT
+	@echo $(ROBOSUB_INCLUDES)
 	$(RM) *.o
 	$(RM) *.out
 
