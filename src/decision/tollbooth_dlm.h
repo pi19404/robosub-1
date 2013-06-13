@@ -14,7 +14,7 @@ namespace decision {
     vision::TollboothEye *m_downward_eye;
 
    public:
-    TollboothDLM(FuzzySet fuzzy_sub_state,
+    TollboothDLM(movement::FuzzySets *fuzzy_sub_state,
                  cv::VideoCapture forward_vidcap,
                  cv::VideoCapture downward_vidcap)
     : DecisionLogicModule(fuzzy_sub_state, forward_vidcap, downward_vidcap) {

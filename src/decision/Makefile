@@ -26,8 +26,6 @@ objects: $(OBJS)
 	@echo "Objects made: $(OBJS)"
 
 clean:
-	@echo THAT
-	@echo $(ROBOSUB_INCLUDES)
 	$(RM) *.o
 	$(RM) *.out
 

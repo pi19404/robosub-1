@@ -58,7 +58,5 @@ print-%:
 	@echo '$($*)'
 
 $(MY_TARGET_FOLDERS):
-	@echo THIS
-	@echo $(ROBOSUB_INCLUDES)
 	@$(MAKE) -C $@ $(CASCADE_TARGET) ROBOSUB_INCLUDES="$(ROBOSUB_INCLUDES)";
 

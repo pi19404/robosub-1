@@ -21,10 +21,7 @@ namespace movement {
     void set_sub_is(fuzzy_t category, double value);
     double get_sub_is(fuzzy_t category);
 
-    boost::mutex& accessor_mut(int n) {
-      static boost::mutex mut[NUM_SETS];
-      return mut[n];
-    }
+    boost::mutex& accessor_mut(int n);
   };
 
   string can_call_fuzzy_sets();

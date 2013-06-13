@@ -1,4 +1,4 @@
-#include "./fuzzy_sets.h"
+#include "fuzzy_sets.h"
 
 #include <string>
 #include <boost/thread/mutex.hpp>
@@ -23,7 +23,7 @@ namespace movement {
     return m_membership[category];
   }
 
-  boost::mutex& accessor_mut(int n) {
+  boost::mutex& FuzzySets::accessor_mut(int n) {
     static boost::mutex mut[NUM_SETS];
     return mut[n];
   }

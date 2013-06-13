@@ -4,17 +4,18 @@
 #include <cv.h>
 #include <highgui.h>
 #include <string>
+#include "fuzzy_sets.h"
+
 using ::std::string;
 
 namespace decision {
   class DecisionLogicModule {
    protected:
-    FuzzySet *fuzzy_sub_state;
+    movement::FuzzySets *m_fuzzy_sub_state;
     cv::VideoCapture m_forward_vidcap;
     cv::VideoCapture m_downward_vidcap;
-    // FuzzySetMembership *m_membership;
    public:
-    DecisionLogicModule(FuzzySet *fuzzy_sub_state,
+    DecisionLogicModule(movement::FuzzySets *fuzzy_sub_state,
                         cv::VideoCapture forward_vidcap,
                         cv::VideoCapture downward_vidcap) {
       m_fuzzy_sub_state = fuzzy_sub_state;
