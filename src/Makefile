@@ -17,8 +17,6 @@ MY_TARGET_FOLDERS = $(LIB_DECISION) $(LIB_MOVEMENT) \
                     $(LIB_STATE_MACHINE) $(LIB_VISION)
 
 LIBS += $(shell echo `pkg-config --libs opencv`)
-# Add locations to look for .o files.
-$(foreach dir,$(MY_TARGET_FOLDERS),$(eval LIBS += -L$(dir));)
 
 # Flags passed to the preprocessor.
 CPPFLAGS += $(shell echo `pkg-config --cflags opencv`)
@@ -37,6 +35,8 @@ all: robosub.out
 find_robosub_objs:
 	$(foreach dir,$(MY_TARGET_FOLDERS),$(eval OBJS += $(shell ls $(dir)/*.o)))
 
+# From the commandline, this is roughly equivalent to
+# g++ `pkg-config --cflags opencv` -Wall `ls ./*/*.o` main.o -o robosub.out `pkg-config --libs opencv`
 robosub.out: set_cascade_target_objects $(MY_TARGET_FOLDERS) \
              find_robosub_objs $(OBJS)
 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(OBJS) -o $@ $(LIBS)

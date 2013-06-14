@@ -79,11 +79,11 @@ TEST_F(VisionTest, test_get_color_pattern) {
 // When a TollboothDetector is instantiated with a Mat that has a
 // tollbooth image, it should claim that it can see it.
 // TODO: Add some negative tests.
-TEST_F(VisionTest, test_can_see_tollbooth) {
+TEST_F(VisionTest, test_can_see_target) {
   for (vector<string>::iterator it = s_image_names->begin();
        it != s_image_names->end(); ++it) {
-    vision::TollboothDetector *uut = new vision::TollboothDetector(*it);
-    ASSERT_TRUE(uut->can_see_tollbooth())
+    vision::TollboothEye *uut = new vision::TollboothEye(*it);
+    ASSERT_TRUE(uut->can_see_target())
         << "Failed on filename: " << *it << endl;
     delete uut;
   }

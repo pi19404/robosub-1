@@ -13,7 +13,7 @@
 # but shouldn't modify.
 
 # Where to find user code.
-USER_DIR = ../src
+USER_DIR = $(CURDIR)/../src
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra
@@ -41,7 +41,10 @@ OBJS += vision_test.o can_call.o
 CPPFLAGS += $(shell echo `pkg-config --cflags opencv`)
 CPPFLAGS += -I$(GTEST_DIR)/include
 CPPFLAGS += -I$(LIB_DECISION)/tollbooth
-$(foreach dir,$(MY_TARGET_FOLDERS),$(eval CPPFLAGS += -I$(dir));)
+
+ROBOSUB_INCLUDES =
+$(foreach dir,$(MY_TARGET_FOLDERS),$(eval ROBOSUB_INCLUDES += -I$(dir));)
+CPPFLAGS += $(ROBOSUB_INCLUDES)
 
 LIBS += $(shell echo `pkg-config --libs opencv`)
 $(foreach dir,$(MY_TARGET_FOLDERS),$(eval LIBS += -L./$(dir));)
@@ -104,5 +107,5 @@ print-%:
 that: $(MY_TARGET_FOLDERS)
 
 $(MY_TARGET_FOLDERS):
-	@$(MAKE) -C $@ objects;
+	@$(MAKE) -C $@ objects ROBOSUB_INCLUDES="$(ROBOSUB_INCLUDES)";
 
