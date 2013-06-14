@@ -8,10 +8,13 @@ CXXFLAGS += -Wall -Wextra
 #ROBOSUB_CXXFLAGS := -g
 CXXFLAGS += $(shell echo $(ROBOSUB_CXXFLAGS))
 
+ROBOSUB_INCLUDES =
+CPPFLAGS += $(ROBOSUB_INCLUDES)
+
 LIBS += $(shell echo `pkg-config --libs opencv`)
 CXX = g++
 
-OBJS = vision_utilities.o tollbooth_eye.o
+OBJS = base_eye.o vision_utilities.o tollbooth_eye.o
 
 all: $(OBJS)
 

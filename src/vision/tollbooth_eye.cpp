@@ -1,31 +1,32 @@
-#include "tollbooth_eye.h"
-
 #include <cv.h>
 #include <highgui.h>
 #include <string>
+#include <vector>
+
+#include "base_eye.h"
+#include "tollbooth_eye.h"
+#include "vision_utilities.h"
 
 using ::std::string;
 using ::cv::imread;
 
 namespace vision {
-  TollboothEye::TollboothEye(string filename) {
+  TollboothEye::TollboothEye(cv::VideoCapture vidcap)
+  : BaseEye(vidcap) {
+  }
+
+  TollboothEye::TollboothEye(string filename)
+  : BaseEye() {
     m_frame = imread(filename);
   }
 
-  TollboothEye::TollboothEye() {
-  }
-
-  TollboothEye::~TollboothEye() {
-    m_frame.release();
-  }
+//TollboothEye::~TollboothEye() {
+//  m_frame.release();
+//}
 
   // TODO(LPE): Implement
-  bool TollboothEye::can_see_tollbooth() {
+  bool TollboothEye::can_see_target() {
     return false;
-  }
-
-  void TollboothEye::update_frame(cv::VideoCapture& vidcap) {
-    vidcap >> m_frame;
   }
 
   // TODO(LPE): Implement

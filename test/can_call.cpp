@@ -10,6 +10,7 @@
 #include "fuzzy_sets.h"
 // src/state_machine
 // src/vision
+#include "base_eye.h"
 #include "vision_utilities.h"
 #include "tollbooth_eye.h"
 
@@ -42,6 +43,9 @@ TEST(CanCallTests, fuzzy_sets) {
 //////////////////
 // vision files //
 //////////////////
+TEST(CanCallTests, base_eye) {
+  ASSERT_EQ(vision::can_call_base_eye(), string("can_call_base_eye"));
+}
 
 TEST(CanCallTests, vision_utilities) {
   ASSERT_EQ(vision::can_call_vision_utilities(), string("can_call_vision_utilities"));

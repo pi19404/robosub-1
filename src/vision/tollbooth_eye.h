@@ -4,7 +4,9 @@
 #include <cv.h>
 #include <highgui.h>
 #include <vector>
+#include <string>
 
+#include "base_eye.h"
 #include "vision_utilities.h"
 
 using ::std::vector;
@@ -16,18 +18,13 @@ using ::cv::Point;
 namespace vision {
   enum color_t {green, blue, pink, red};
 
-  class TollboothEye {
-   protected:
-    Mat m_frame;
-
+  class TollboothEye : public BaseEye {
    public:
-    TollboothEye();
+    explicit TollboothEye(cv::VideoCapture vidcap);
     // For testing.
-    TollboothEye(string filename);
-    ~TollboothEye();
-
-    bool can_see_tollbooth();
-    void update_frame(cv::VideoCapture& vidcap);
+    explicit TollboothEye(string filename);
+  //~TollboothEye();
+    virtual bool can_see_target();
     vector<vector<Point> >* get_tollbooth_bounding_box(Mat frame);
     Rect get_tollbooth_flattened_rect(Mat frame, vector<vector<Point> > box);
     vector<Rect>* get_tollbooth_windows(Mat frame, Rect rect);

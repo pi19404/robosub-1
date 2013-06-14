@@ -1,5 +1,5 @@
-#ifndef AIFUNCTIONCALL_VISION_VISION_UTILITIES_H_
-#define AIFUNCTIONCALL_VISION_VISION_UTILITIES_H_
+#ifndef SRC_VISION_VISION_UTILITIES_H_
+#define SRC_VISION_VISION_UTILITIES_H_
 
 #include <math.h>
 #include <cv.h>
@@ -14,5 +14,5 @@ namespace vision {
   string can_call_vision_utilities();
 }  // namespace vision
 
-#endif  // AIFUNCTIONCALL_VISION_VISION_UTILITIES_H_
+#endif  // SRC_VISION_VISION_UTILITIES_H_
 
