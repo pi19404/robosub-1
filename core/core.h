@@ -20,4 +20,7 @@ int Bins(KB *kb, IMAGE_KB *im);
 
 bool move(int x, int y, int z, double heading);
 
+extern KB *kb;
+extern IMAGE_KB *im;
+
 #endif
