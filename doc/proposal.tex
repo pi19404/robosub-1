@@ -1,0 +1,177 @@
+\documentclass[11pt]{scrartcl}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{url}
+
+
+\title{\textbf{Robosub design}}
+\subtitle{\textbf{Proposals}}
+\author{Logan Evans}
+
+\begin{document}
+\maketitle
+
+\section{AI Structure}
+  Currently, the ai uses a state machine to decide which task to pursue. At a high level, I think this is a good approach. However, I do not believe that the knowledge base approach is a good way to organize the code.
+
+  Instead, I propose that we modularize the code and standardize how we interface the decision logic needed for each of the tasks with the movement logic. The Decision Logic Modules (DLMs) should not know anything about how to move the robosub, but using fuzzy logic, it is possible for the DLMs to communicate at a high level what the robosub should do, and for a Movement Logic Module (MLM) to defuzzify the high level communication into commands to send to the arduino.
+
+\section{Module Structure}
+  \subsection{State Machine}
+  A state-machine needs to identify the current task. The tasks are as follows:
+
+  \begin{itemize}
+    \item {\bf Pathing}
+
+      Follow the orange markers to the next path
+
+    \item {\bf Start Gate}
+
+      Pass the sub through a gate.
+
+    \item {\bf Traffic Light}
+
+      Bump two color-rotating buoys.
+
+    \item {\bf Parking}
+
+      Move the sub close to some buoys.
+
+    \item {\bf Speed Trap}
+
+      Drop markers in bins.
+
+    \item {\bf Toll Booth}
+
+      Shoot torpedoes into holes.
+
+    \item {\bf Driving}
+
+      Rotate a steering wheel and move a shifter.
+
+    \item {\bf Pizza Delivery}
+
+      Grab a pizza box and do things to it.
+
+  \end{itemize}
+
+  The state machine can identify what the current state is and what the next state should be. Typically, Pathing is either the current state or the next state.
+
+  \subsection{Sensors}
+    As far as I'm aware, the only sensors used to make decisions are the cameras and the sonar. The sonar is not strictly necessary to complete the Pizza Delivery task. If the camera can identify pizza boxes, the submarine can guess which one to pick up. Guessing the incorrect pizza box is worth fewer points than identifying the correct one.
+
+    In order to grab an image from one of the cameras, a module will need read access to a VideoCapture object. The two VideoCapture objects will need to be initialized at startup and the DLMs will need to have access to them.
+
+  \subsection{Movement Logic Module}
+    The MLM will defuzzify the high level commands of the DLMs with the commands to send to the arduino. To simplify things, the MLM should keep the sub level. Since the DLMs can assume that the sub is level, they will only need to charactarize the robosub's membership in 8 fuzzy sets:
+
+    \begin{enumerate}
+      \item {\bf sub\_is\_high}
+      \item {\bf sub\_is\_low}
+      \item {\bf sub\_is\_left}
+      \item {\bf sub\_is\_right}
+      \item {\bf sub\_is\_too\_far\_backward}
+      \item {\bf sub\_is\_too\_far\_forward}
+      \item {\bf sub\_is\_rotated\_left}
+      \item {\bf sub\_is\_rotated\_right}
+    \end{enumerate}
+
+    The semantics behind these sets reflects the idea that the DLMs can identify what the current state is and what its goal is. The MLM can look at the membership value of the robosub in one of the 8 fuzzy sets (the membership value will be between 0 and 1) and can set the motors appropriately.
+
+    The MLM will probably want to identify the robosub's membership in a few other fuzzy sets:
+
+    \begin{enumerate}
+      \item {\bf sub\_is\_tilted\_up}
+      \item {\bf sub\_is\_tilted\_down}
+      \item {\bf sub\_is\_rolled\_left}
+      \item {\bf sub\_is\_rolled\_right}
+    \end{enumerate}
+
+    I will need to know more about the motors to be able to comment on the defuzzification step.
+
+  \subsection{Decision Logic Modules}
+    A DLM will need to have ac
+    cess to the cameras. The tollbooth module and the speed trap module will need to be able to release torpedoes and markers respectively. Several of the tasks require movement of the arm manipulator.
+
+    In order to simplify all of the DLMs, a base class should be created. This base class will mandate that all DLMs have the following functionality:
+
+    \begin{itemize}
+      \item {\bf Can see target}
+
+        The state machine knows what the current task is and what the next task is. To transition between tasks, the state machine needs to know if the DLM is capable capable of taking control of the submarine. If the DLM can see its target, it is capable of taking control.
+
+      \item {\bf set\_sub\_fuzzy\_states}
+
+        The MLM will be operating concurrently to the DLM. The only communication between the modules is that the DLM sets 8 of the fuzzy states, and the MLM can read those 8 fuzzy states.
+
+        Here are some rough examples of how the fuzzy states should work:
+
+        \begin{itemize}
+          \item
+            If the DLM wants to move forward, it will set the sub\_is\_too\_far\_backward state to some value greater than 0.
+
+          \item
+            If the DLM sees a distant object, such as the toll booth, that is to its left, it will set non-zero membership values in sub\_is\_too\_far\_backward, sub\_is\_rotated\_right, and sub\_is\_left.
+
+           \item
+             If the DLM is at an apropriate distance from the toll booth, but it's at an angle, then it can set sub\_is\_too\_far\_right. As soon as the sub begins to move to the left, the DLM will likely identify that it needs to set some small (but non-zero) membership in sub\_is\_too\_far\_backward and sub\_is\_rotated\_left. The net effect is that the sub should slide around the face of the toll booth until it is lined up with its face.
+         \end{itemize}
+
+      \item {\bf Task is complete}
+
+        This will allow the state machine to decide if it should continue to query whether a DLM can take control.
+
+      \item {\bf Control loop}
+
+        This will be the entry point for a DLM.
+    \end{itemize}
+
+  \section{Coding issues}
+    \subsection{Makefile conventions}
+      If a Makefile creates an executable, the executable's name should end with ".out". This will simplify omitting the executable in the hg repository.
+
+      Also, if a by-product of a rule in the make process creates files that we do not want to track with hg, but which are not yet ignored in the .hgignore, then do one of two things:
+
+      \begin{itemize}
+        \item Have the rule clean up the offending files.
+        \item Add a line to the .hgignore file that ignores the offending files.
+      \end{itemize}
+
+    \subsection{Code style}
+      Since several people will be modifying code, we should maintain a uniform coding style. An easy one to adhere to for C++ is the Google C++ coding standard. The easiest way to make sure that the style is (close to being) standard, we should run cpplint.py over our files periodically. I see the use of a coding standard as more of a friendly curtesy than as a necessary convention.
+
+    \subsection{Folder layout}
+      I personally find it a little awkward, considering how small the code base is, to track the ai and the arduino code separately. I would suggest a general layout like this:
+
+      \begin{verbatim}
++-- doc
++-- src
+    +-- arduino
+    +-- decision_modules
+    +-- initialize_robosub.cpp
+    +-- movement_module
+    +-- state_machine
+    +-- vision
+        +-- test
+      \end{verbatim}
+      All legacy code should be deleted. It will still be in the repository, but it shouldn't be visible in the current revision.
+
+    \subsection{Class structure}
+      In order to compartmentalize code, I'm in favor of abusing the multiple inheritance feature of C++. The DLMs should all inherit from a base DLM object that defines some abstract methods that
+
+      \begin{enumerate}
+        \item update the FuzzyState
+
+        \item can answer the state machine about whether the DLM can take over control
+
+        \item etc.
+      \end{enumerate}
+
+      The DLMs are decision logic modules. However, they rely heavily on vision in order to make those decisions. Instead of mixing up the decision logic and the vision logic, I like the idea of having classes in the src/vision folder that are dedicated to analyzing images. The DLMs can inherit from the apropriate vision object.
+
+      The benefit of this convention is mostly to keep the code cleanly focused on its task. By doing this, it should be easier for multiple engineers to code various pieces of the project.
+
+\end{document}
+
