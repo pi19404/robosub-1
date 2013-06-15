@@ -2,6 +2,7 @@
 
 #include <RoboSubController/RoboSubController.h>
 #include <Jay's_Serial_Data/robosub_control_data.h>
+#include <Jay's_Serial_Data/arduino_data.h>
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 

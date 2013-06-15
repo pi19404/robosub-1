@@ -12,7 +12,7 @@
 // 16-Jun-2013       JS      Created File.
 ///////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
-#include <serializable.h>
+#include "serializable.h"
 
 struct ArduinoStatus : public Serializable
 {
@@ -45,12 +45,12 @@ struct ArduinoStatus : public Serializable
 
         // Accelerometer and Gyroscope
         uint32_t sz = sizeof(float);
-        _Serialize( Acl_X,Data.Acl_X, sz, Acl_X,str2 );
-        _Serialize( Acl_Y,Data.Acl_Y, sz, Acl_Y,str2 );
-        _Serialize( Acl_Z,Data.Acl_Z, sz, Acl_Z,str2 );
-        _Serialize( Gyro_X,Data.Gyro_X, sz, Gyro_X,str2 );
-        _Serialize( Gyro_Y,Data.Gyro_Y, sz, Gyro_Y,str2 );
-        _Serialize( Gyro_Z,Data.Gyro_Z, sz, Gyro_Z,str2 );
+        _Serialize( &Data.Acl_X , sz, &str2 );
+        _Serialize( &Data.Acl_Y , sz, &str2 );
+        _Serialize( &Data.Acl_Z , sz, &str2 );
+        _Serialize( &Data.Gyro_X, sz, &str2 );
+        _Serialize( &Data.Gyro_Y, sz, &str2 );
+        _Serialize( &Data.Gyro_Z, sz, &str2 );
 
         // Depth Sensor
         sz = sizeof(uint32_t);
@@ -74,12 +74,12 @@ struct ArduinoStatus : public Serializable
 
         // Accelerometer and Gyroscope
         uint32_t sz = sizeof(float);
-        _Deserialize( Acl_X,Data.Acl_X, sz, Acl_X,str2 );
-        _Deserialize( Acl_Y,Data.Acl_Y, sz, Acl_Y,str2 );
-        _Deserialize( Acl_Z,Data.Acl_Z, sz, Acl_Z,str2 );
-        _Deserialize( Gyro_X,Data.Gyro_X, sz, Gyro_X,str2 );
-        _Deserialize( Gyro_Y,Data.Gyro_Y, sz, Gyro_Y,str2 );
-        _Deserialize( Gyro_Z,Data.Gyro_Z, sz, Gyro_Z,str2 );
+        _Deserialize( &Data.Acl_X , sz, &str2 );
+        _Deserialize( &Data.Acl_Y , sz, &str2 );
+        _Deserialize( &Data.Acl_Z , sz, &str2 );
+        _Deserialize( &Data.Gyro_X, sz, &str2 );
+        _Deserialize( &Data.Gyro_Y, sz, &str2 );
+        _Deserialize( &Data.Gyro_Z, sz, &str2 );
 
         // Depth Sensor
         sz = sizeof(uint32_t);
@@ -90,13 +90,13 @@ struct ArduinoStatus : public Serializable
     {
         DATA()
             :
-            Acl_X,
-            Acl_Y,
-            Acl_Z,
-            Gyro_X,
-            Gyro_Y,
-            Gyro_Z,
-            Depth
+            Acl_X(0.0),
+            Acl_Y(0.0),
+            Acl_Z(0.0),
+            Gyro_X(0.0),
+            Gyro_Y(0.0),
+            Gyro_Z(0.0),
+            Depth(0)
         { }
 
         float Acl_X,  // Accelerometer X-axis value
