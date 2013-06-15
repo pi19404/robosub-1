@@ -1,9 +1,10 @@
-#ifndef SRC_DECISION_DLM_BASE_H_
-#define SRC_DECISION_DLM_BASE_H_
+#ifndef SRC_DECISION_BASE_DLM_H_
+#define SRC_DECISION_BASE_DLM_H_
 
 #include <cv.h>
 #include <highgui.h>
 #include <string>
+
 #include "fuzzy_sets.h"
 
 using ::std::string;
@@ -36,5 +37,5 @@ namespace decision {
   string can_call_base_dlm();
 }  // namespace decision
 
-#endif  // SRC_DECISION_DLM_BASE_H_
+#endif  // SRC_DECISION_BASE_DLM_H_
 

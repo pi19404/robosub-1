@@ -2,6 +2,7 @@
 #define SRC_DECISION_TOLLBOOTH_DLM_H_
 
 #include "base_dlm.h"
+#include "fuzzy_sets.h"
 #include "tollbooth_eye.h"
 
 #include <cv.h>

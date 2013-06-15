@@ -4,6 +4,7 @@
 #include <cv.h>
 #include <highgui.h>
 #include <string>
+
 using ::std::string;
 
 namespace vision {

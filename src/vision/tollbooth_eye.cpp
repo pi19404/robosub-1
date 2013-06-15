@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include "base_eye.h"
 #include "tollbooth_eye.h"
 #include "vision_utilities.h"
 

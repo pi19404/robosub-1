@@ -3,14 +3,14 @@
 
 #include <string>
 #include <boost/thread/mutex.hpp>
+
 using ::std::string;
 
 namespace movement {
-  // Keep NUM_SUB_IS_VALUES as the last element.
-  enum fuzzy_t {high, low, left, right, too_far_backward,
-                too_far_forward, rotated_left, rotated_right, tilted_up,
-                tilted_down, rolled_left, rolled_right,
-                NUM_SETS};
+  enum sub_wants_t {move_down, move_up, move_right, move_left, move_forward,
+                    move_downward, rotate_right, rotate_left, tilt_down,
+                    tilt_up, roll_right, roll_left,
+                    NUM_SETS};
 
   class FuzzySets {
    protected:
@@ -18,14 +18,14 @@ namespace movement {
 
    public:
     FuzzySets();
-    void set_sub_is(fuzzy_t category, double value);
-    double get_sub_is(fuzzy_t category);
+    void set_sub_wants_to(sub_wants_t category, double value);
+    double get_sub_wants_to(sub_wants_t category);
 
     boost::mutex& accessor_mut(int n);
   };
 
   string can_call_fuzzy_sets();
-}  // namespace decision
+}  // namespace movement
 
 #endif  // SRC_MOVEMENT_FUZZY_SETS_H_
 
