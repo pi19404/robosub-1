@@ -5,7 +5,7 @@ L_DIR=$(R_DIR)/lib
 B_DIR=$(R_DIR)/bin
 CFLAGS=-c -O0 -Wall $(DEBUG) -I$(I_DIR) -I./
 LDFLAGS=-static -L$(L_DIR) 
-SOURCES=main.cpp robosub_control_data.cpp robosub_controller.cpp
+SOURCES=main.cpp robosub_control_data.cpp arduino_data.cpp robosub_controller.cpp
 LIBS=-pthread -lboost_regex -lboost_system -lboost_program_options 
 EXECUTABLE=auv
 

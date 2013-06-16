@@ -19,6 +19,8 @@ template <class From, class To>
 class AdapterFunctor
 {
 public:
+    AdapterFunctor(){ }
+    virtual ~AdapterFunctor(){ }
     virtual To operator()(From val) = 0;
 };
 

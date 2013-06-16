@@ -12,6 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "robosub_controller.h"
 #include "robosub_control_data.h"
+#include "arduino_data.h"
 
 #include <exception>
 #include <cstdlib>
@@ -88,7 +89,9 @@ void RoboSubController::Run()
     bool first_read = true;
     RoboSubCommand command;
     RoboSubControlData controlData;
+    ArduinoData   arduinoData;
     char *sendBuffer = new char[RoboSubControlData::SIZE];
+    char *recvBuffer = new char[ArduinoData::SIZE];
     while(_InputStream.good())
     {
         // Read Command message from input stream
@@ -121,6 +124,15 @@ void RoboSubController::Run()
         namespace ba = boost::asio;
         controlData.SerializeToString(sendBuffer);
         write( _ArduinoPort, ba::buffer( sendBuffer, RoboSubControlData::SIZE ) ) ;
+
+        // Get status from arduino
+        read( _ArduinoPort, ba::buffer( recvBuffer, ArduinoData::SIZE ) );
+        arduinoData.DeserializeFromString(recvBuffer);
+
+        // Write info to stdout
+        cout << "\nReceived Status: " << endl;
+        cout << arduinoData << endl;
     }
     delete [] sendBuffer;
+    delete [] recvBuffer;
 }
