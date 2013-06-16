@@ -5,7 +5,7 @@ find_package(OpenCV REQUIRED)
 target_link_libraries(robosub ${OpenCV_LIBS} )
 # The version number.
 set (ROBOSUB_VERSION_MAJOR 0)
-set (ROBOSUB_VERSION_MINOR 5)
+set (ROBOSUB_VERSION_MINOR 1)
  
 # configure a header file to pass some of the CMake settings
 # to the source code
