@@ -12,4 +12,5 @@ robosub$
 .*CMakeFiles/.*
 .*\.cmake$
 CMakeCache.txt
+^build/.*
 
