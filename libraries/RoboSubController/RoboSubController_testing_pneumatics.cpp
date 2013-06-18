@@ -6,10 +6,7 @@
 
 RoboSubController::RoboSubController( ComPort &comPort, float loopFrequency )
     :
-    mComPort(comPort),
-    mLinearPWM(),
-    mAngularPWM(),
-    mLoopDelay( (loopFrequency) ? (unsigned long)(1000/loopFrequency) : 0 )
+    mComPort(comPort)
 { 
     LogManager& mLogInstance = LogManager::GetInstance();
     mLogInstance.LogStr("RoboSubController::RoboSubController(ComPort, \

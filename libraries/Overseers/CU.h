@@ -40,7 +40,6 @@ public:
 	virtual bool clawOpen();
 
 	virtual uint8_t thrusterNState(uint8_t thrusterNum);
-//    virtual void updateThrusters(int16_t *pwmThrusterInfo);
     virtual void setThrusters(int *dutyCycles, int *motorDirections);
     virtual void stopThrusters();
 

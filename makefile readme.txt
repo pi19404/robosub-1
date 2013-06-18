@@ -30,6 +30,7 @@ Global definitions in Makefile (the make file in 'john_arduino' directory):
         compass in use.
 
     COMPASS_MODEL='chip model in single quotes'
+        Current value: 'HMC6343'
         Defines the model number (not the make) of the compass being used and
         enables the source code for that model.
         As of this writing, the HMC6343 is the only compass we have, but there 
@@ -42,6 +43,7 @@ Global definitions in Makefile (the make file in 'john_arduino' directory):
         gyroscope in use.
 
     GYRO_MODEL='chip model in single quotes'
+        Current value: 'L3G4200D'
         Defines the model number (not the make) of the gyroscope being used and
         enables the source code for that model.
         As of this writing, the L3G4200D is the only gyroscope we have, but 
@@ -54,6 +56,7 @@ Global definitions in Makefile (the make file in 'john_arduino' directory):
         accelerometer in use.
 
     ACCEL_MODEL='chip model in single quotes'
+        Current value: 'ADXL345'
         Defines the model number (not the make) of the accelerometer being 
         used and enables the source code for that model.
         As of this writing, the ADXL345 is the only accelerometer we have, but 

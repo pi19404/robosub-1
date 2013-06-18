@@ -36,23 +36,32 @@ accel::accel()
     // read the power control register, set the mode bit from standby to 
     // measure, then write back the modified register
 
+    // start up a local instance of the log manager
+    LogManager& mLogInstance = LogManager::GetInstance();
+
+    mLogInstance.LogStr("accel::accel - begin reading pwr ctrl reg");
     readDeviceRegister((uint8_t)ACL_BASE, (uint8_t)ACL_PWR_CTRL, &dataByte);
+    mLogInstance.LogStrHex("accel::accel - done reading pwr ctrl reg: ", (int)dataByte);
     dataByte |= 0x08;
+    mLogInstance.LogStrHex("accel::accel - begin writing back pwr ctrl reg: ", (int)dataByte);
     writeDeviceRegister((uint8_t)ACL_BASE, (uint8_t)ACL_PWR_CTRL, dataByte);
+    mLogInstance.LogStr("accel::accel - done writing back pwr ctrl reg");
 }
 
 void accel::readDeviceRegister
     (uint8_t devAddr, uint8_t regAddr, uint8_t *dataByte)
 {
-    // start up a local instance of the log manager
     LogManager& mLogInstance = LogManager::GetInstance();
 
+    mLogInstance.LogStr("accel::readDeviceRegister - begin");
     Wire.beginTransmission(devAddr);
     Wire.send(regAddr);
     Wire.endTransmission();
 
+    mLogInstance.LogStr("accel::readDeviceRegister - requesting data");
     Wire.requestFrom(devAddr, (uint8_t)1);
 
+    mLogInstance.LogStr("accel::readDeviceRegister - wait for data");
     Wire.beginTransmission(devAddr);
     while(!Wire.available());
     while(Wire.available())
@@ -60,6 +69,8 @@ void accel::readDeviceRegister
         *dataByte = Wire.receive();
     }
     Wire.endTransmission();
+
+    mLogInstance.LogStrHex("accel::readDeviceRegister - got data: ", (int)dataByte);
 }
 
 void accel::writeDeviceRegister
@@ -68,10 +79,12 @@ void accel::writeDeviceRegister
     // start up a local instance of the log manager
     LogManager& mLogInstance = LogManager::GetInstance();
 
+    mLogInstance.LogStrHex("accel::writeDeviceRegister - begin writing ", (int)dataByte);
     Wire.beginTransmission(devAddr);
     Wire.send(regAddr);
     Wire.send(dataByte);
     Wire.endTransmission();
+    mLogInstance.LogStr("accel::writeDeviceRegister - done");
 }
 
 void accel::readAllAxes(ACCEL_DATA *putDataHere)

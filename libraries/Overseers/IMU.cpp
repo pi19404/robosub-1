@@ -7,24 +7,39 @@ IMU::IMU()
     // called by the compiler when they are declared as member objects (as 
     // opposed to pointers or references), and the depth sensor just requires
     // an analog reading, so no initialization necessary there
+    LogManager& mLogInstance = LogManager::GetInstance();
+
+    mLogInstance.LogStr("IMU::IMU - IMU initialized");
 }
 
 void IMU::getAccelAll(ACCEL_DATA *putHere)
 {
     // read and return all accelerometer handler data
+    LogManager& mLogInstance = LogManager::GetInstance();
+
+    mLogInstance.LogStr("IMU::getAccelAll(...) - start reading accel data");
     mAccel.readAllAxes(putHere);
+    mLogInstance.LogStr("IMU::getAccelAll(...) - done accel data");
 }
 
 void IMU::getCompassAll(COMPASS_DATA *putHere)
 {
     // read and return all compass handler data
+    LogManager& mLogInstance = LogManager::GetInstance();
+
+    mLogInstance.LogStr("IMU::getCompassAll(...) - start reading compass data");
     mCompass.readAllAxes(putHere);
+    mLogInstance.LogStr("IMU::getCompassAll(...) - done reading compass data");
 }
 
 void IMU::getGyroAll(GYRO_DATA *putHere)
 {
     // read and retrieve all gyro handler data
+    LogManager& mLogInstance = LogManager::GetInstance();
+
+    mLogInstance.LogStr("IMU::getGyroAll(...) - start reading gyro data");
     mGyro.readAllAxes(putHere);
+    mLogInstance.LogStr("IMU::getGyroAll(...) - done reading gyro data");
 }
 
 uint16_t IMU::readDepth(void)
@@ -102,6 +117,7 @@ uint16_t IMU::readDepth(void)
     LogManager& mLogInstance = LogManager::GetInstance();
 
     // read directly from the pin connecting to the depth sensor;
+    mLogInstance.LogStrHex("IMU::readDepth - start reading = ", mDepthDataIn);
     depthDigital = analogRead(DEPTH_PIN);
     mLogInstance.LogStrHex("IMU::readDepth - depth data = ", mDepthDataIn);
 

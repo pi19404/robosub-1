@@ -38,9 +38,13 @@ gyro::gyro()
     // read control register 1, set the mode bit from standby to measure, then 
     // write back the modified register
 
+    mLogInstance.LogStr("gyro::gyro - begin reading ctrl reg 1");
     readDeviceRegister((uint8_t)GYRO_BASE, (uint8_t)GYRO_CTRL_REG1, &dataByte);
+    mLogInstance.LogStrHex("gyro::gyro - done reading ctrl reg 1: ", (int)dataByte);
     dataByte |= 0x08;
+    mLogInstance.LogStrHex("gyro::gyro - begin writing back ctrl reg 1: ", (int)dataByte);
     writeDeviceRegister((uint8_t)GYRO_BASE, (uint8_t)GYRO_CTRL_REG1, dataByte);
+    mLogInstance.LogStr("gyro::gyro - done writing back ctrl reg 1");
 }
 
 void gyro::readDeviceRegister
@@ -49,12 +53,15 @@ void gyro::readDeviceRegister
     // start up a local instance of the log manager
     LogManager& mLogInstance = LogManager::GetInstance();
 
+    mLogInstance.LogStr("gyro::readDeviceRegister - begin");
     Wire.beginTransmission(devAddr);
     Wire.send(regAddr);
     Wire.endTransmission();
 
+    mLogInstance.LogStr("gyro::readDeviceRegister - requesting data");
     Wire.requestFrom(devAddr, (uint8_t)1);
 
+    mLogInstance.LogStr("gyro::readDeviceRegister - wait for data");
     Wire.beginTransmission(devAddr);
     while(!Wire.available());
     while(Wire.available())
@@ -62,6 +69,7 @@ void gyro::readDeviceRegister
         *dataByte = Wire.receive();
     }
     Wire.endTransmission();
+    mLogInstance.LogStrHex("gyro::readDeviceRegister - got data: ", (int)dataByte);
 }
 
 void gyro::writeDeviceRegister
@@ -70,10 +78,12 @@ void gyro::writeDeviceRegister
     // start up a local instance of the log manager
     LogManager& mLogInstance = LogManager::GetInstance();
 
+    mLogInstance.LogStrHex("gyro::writeDeviceRegister - begin writing ", (int)dataByte);
     Wire.beginTransmission(devAddr);
     Wire.send(regAddr);
     Wire.send(dataByte);
     Wire.endTransmission();
+    mLogInstance.LogStr("accel::writeDeviceRegister - done");
 }
 
 void gyro::readAllAxes(GYRO_DATA *putDataHere)

@@ -25,6 +25,8 @@ void RoboSubController::Run()
     int i = 0;
 
     int tempThrusterData;
+    bool tempPneumaticData;
+    uint16_t depthInches;
 
     int thrusterDutyCycleBuf[NUM_THRUSTERS];
     int thrusterDirBuf[NUM_THRUSTERS];
@@ -77,115 +79,141 @@ void RoboSubController::Run()
         // port fore thruster
         tempThrusterData = cmd.Data.Thruster_Fore_L;
         _lm.LogStrInt("port fore thruster: ", tempThrusterData);
-/*
-        if (0 > tempThrusterData)
-        {
-            // positive duty cycle requested
-            thrusterDutyCycleBuf[0] = tempThrusterData;
-            thrusterDirBuf[0] = 1;
-        }
-        else
+        if (tempThrusterData < 0)
         {
             // negative duty cycle requested
             thrusterDutyCycleBuf[0] = tempThrusterData * (-1);
             thrusterDirBuf[0] = -1;
         }
-*/
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[0] = tempThrusterData;
+            thrusterDirBuf[0] = 1;
+        }
+
 
         // port aft thruster
         tempThrusterData = cmd.Data.Thruster_Aft_L;
         _lm.LogStrInt("port aft thruster: ", tempThrusterData);
-/*
-        if (0 > tempThrusterData)
-        {
-            // positive duty cycle requested
-            thrusterDutyCycleBuf[1] = tempThrusterData;
-            thrusterDirBuf[1] = 1;
-        }
-        else
+        if (tempThrusterData < 0)
         {
             // negative duty cycle requested
             thrusterDutyCycleBuf[1] = tempThrusterData * (-1);
             thrusterDirBuf[1] = -1;
         }
-*/
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[1] = tempThrusterData;
+            thrusterDirBuf[1] = 1;
+        }
+
 
         // starboard fore thruster
         tempThrusterData = cmd.Data.Thruster_Fore_R;
         _lm.LogStrInt("starboard fore thruster: ", tempThrusterData);
-/*
-        if (0 > tempThrusterData)
-        {
-            // positive duty cycle requested
-            thrusterDutyCycleBuf[2] = tempThrusterData;
-            thrusterDirBuf[2] = 1;
-        }
-        else
+        if (tempThrusterData < 0)
         {
             // negative duty cycle requested
             thrusterDutyCycleBuf[2] = tempThrusterData * (-1);
             thrusterDirBuf[2] = -1;
         }
-*/
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[2] = tempThrusterData;
+            thrusterDirBuf[2] = 1;
+        }
+
 
         // starboard aft thruster
         tempThrusterData = cmd.Data.Thruster_Aft_R;
         _lm.LogStrInt("starboard aft thruster: ", tempThrusterData);
-/*
-        if (0 > tempThrusterData)
-        {
-            // positive duty cycle requested
-            thrusterDutyCycleBuf[3] = tempThrusterData;
-            thrusterDirBuf[3] = 1;
-        }
-        else
+        if (tempThrusterData < 0)
         {
             // negative duty cycle requested
             thrusterDutyCycleBuf[3] = tempThrusterData * (-1);
             thrusterDirBuf[3] = -1;
         }
-*/
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[3] = tempThrusterData;
+            thrusterDirBuf[3] = 1;
+        }
+
 
         // port roll thruster
         tempThrusterData = cmd.Data.Thruster_Roll_L;
         _lm.LogStrInt("port roll thruster: ", tempThrusterData);
-/*
-        if (0 > tempThrusterData)
-        {
-            // positive duty cycle requested
-            thrusterDutyCycleBuf[4] = tempThrusterData;
-            thrusterDirBuf[4] = 1;
-        }
-        else
+        if (tempThrusterData < 0)
         {
             // negative duty cycle requested
             thrusterDutyCycleBuf[4] = tempThrusterData * (-1);
             thrusterDirBuf[4] = -1;
         }
-*/
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[4] = tempThrusterData;
+            thrusterDirBuf[4] = 1;
+        }
+
 
         // starboard roll thruster
         tempThrusterData = cmd.Data.Thruster_Roll_R;
         _lm.LogStrInt("starboard roll thruster: ", tempThrusterData);
-/*
-        if (0 > tempThrusterData)
-        {
-            // positive duty cycle requested
-            thrusterDutyCycleBuf[5] = tempThrusterData;
-            thrusterDirBuf[5] = 1;
-        }
-        else
+        if (tempThrusterData < 0)
         {
             // negative duty cycle requested
             thrusterDutyCycleBuf[5] = tempThrusterData * (-1);
             thrusterDirBuf[5] = -1;
         }
-*/
-//        setThrusters(thrusterDutyCycleBuf, thrusterDirBuf);
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[5] = tempThrusterData;
+            thrusterDirBuf[5] = 1;
+        }
 
-        // "Pretty" print the object to
-        // the serial line to ensure the data
-        // was sent correctly.
+        // send the duty cycles and directions to the h bridges
+        CU.setThrusters(thrusterDutyCycleBuf, thrusterDirBuf);
+
+
+        // check torpedo commands
+        tempPneumaticData = Torpedo1_Fire;
+        if (tempPneumaticData)
+        {
+            CU.fireTorpedoN(1);
+        }
+
+        tempPneumaticData = Torpedo2_Fire;
+        if (tempPneumaticData)
+        {
+            CU.fireTorpedoN(2);
+        }
+
+
+        // check marker dropper commands
+        tempPneumaticData = Marker1_Drop
+        if (tempPneumaticData)
+        {
+            CU.dropMarkerN(1);
+        }
+
+        tempPneumaticData = Marker2_Drop;
+        if (tempPneumaticData)
+        {
+            CU.dropMarkerN(1);
+        }
+
+        // read the depth sensor
+        depthInches = IMU.readDepth();
+
+
+        // "Pretty" print the joystick commands back to the serial line to 
+        // ensure the data was sent correctly.
         String toPrint;
         cmd.ToString(toPrint);
         Serial.print(toPrint);

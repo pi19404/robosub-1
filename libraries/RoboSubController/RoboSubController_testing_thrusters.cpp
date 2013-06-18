@@ -30,6 +30,7 @@ void RoboSubController::Run()
     // pause for a moment before beginning
     delay(2000);
 
+/*
     // set all drive thrusters to drive forward at 50% duty cycle
     for (i = 0; i < 4; i++)
     {
@@ -45,20 +46,21 @@ void RoboSubController::Run()
 
     _lm.LogStr("starting up drive thrusters at 50% and roll at 0");
     mCU.setThrusters(dutyCycles, motorDirections);
+*/
 
     while( true )
     {
         _lm.LogStr("turning roll thrusters on");
 
-        // periodically turn the roll thrusters on and off
-        dutyCycles[4] = 20;
-        dutyCycles[5] = 20;
+        // periodically turn the starboard thrusters on and off
+        dutyCycles[2] = 20;
+        dutyCycles[3] = 20;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(2000);
 
-        _lm.LogStr("turning roll thrusters off");
-        dutyCycles[4] = 0;
-        dutyCycles[5] = 0;
+        _lm.LogStr("turning starboard thrusters off");
+        dutyCycles[2] = 0;
+        dutyCycles[3] = 0;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(5000);
     }

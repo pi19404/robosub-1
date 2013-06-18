@@ -45,15 +45,16 @@ void thrusterPair::setMotor(int motorNum, int dutyCycle, int direction)
         We decided that we did not want the h bridges to run at 100% duty cycle
         because, even in water, the thrusters  will burn up in a couple minutes 
         due to the strain of that much current going through them.  So 
-        constrain the h bridges to a maximum of 85% duty cycle.
+        constrain the h bridges to a maximum of 85% duty cycle in the final 
+        release.
     */
-    if (0 > dutyCycle)
+    if (dutyCycle < 0)
     {
         dutyCycle = 0;
     } 
-    else if (85 < dutyCycle)
+    else if (dutyCycle > 25)
     {
-        dutyCycle = 85;
+        dutyCycle = 25;
     }
 
     // set command based on motor number and direction
