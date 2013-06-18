@@ -12,20 +12,33 @@
 // 2-Jun-2013       JS      Created File.
 ///////////////////////////////////////////////////////////////////////////////
 #include <stdint.h>
+#include "serializable.h"
 
-struct RoboSubControlCommand
+struct RoboSubControlCommand : public Serializable
 {
+    // Constructor.
     RoboSubControlCommand()
         :
+        Serializable(),
         Data()
     {
 
     }
+   
+    // Destructor.
+    ~RoboSubControlCommand(){ }
 
+    
+    // SerializeToString
+    // \brief Interface for serializing the object
+    // \param str - the output string
+    // \pre str must have enough storage space.
+    // \post str will contain the serialized version of the object.
     void SerializeToString( char *str )
     {
         if( !str ){ return; }
-        
+     
+        // Write magic number   
         char *str2 = str;
         *str2 = MAGIC;
         ++str2;
@@ -48,9 +61,14 @@ struct RoboSubControlCommand
         _Serialize( &Data.Claw_Latch, sz, &str2 );
     }
 
+    // DeserializeFromString
+    // \brief Interface for deserializing the object
+    // \param str - the source string
+    // \pre str must conatain the serialized version of the object.
+    // \post the object will contain the deserialized data from str.
     void DeserializeFromString( const char *str )
     {
-
+        // Check magic number
         const char * str2 = str;
         if( str && (*str != MAGIC) )
         { 
@@ -75,33 +93,6 @@ struct RoboSubControlCommand
         _Deserialize( &Data.Marker2_Drop, sz, &str2 );
         _Deserialize( &Data.Claw_Latch, sz, &str2 );
     }
-
-    void _Serialize( void *data, uint32_t sz, char **sp )
-    {
-        char *dptr = static_cast<char*>(data);
-        while( sz )
-        {
-            **sp = *dptr;
-
-            ++dptr;
-            ++(*sp);
-            --sz;
-        }
-    }
-
-    void _Deserialize( void *data, uint32_t sz, const char **sp )
-    {
-        char *dptr = static_cast<char*>(data);
-        while( sz )
-        {
-            *dptr = **sp;
-
-            ++dptr;
-            ++(*sp);
-            --sz;
-        }
-    }
-
 
     struct DATA 
     {
@@ -136,7 +127,6 @@ struct RoboSubControlCommand
 
     static const char MAGIC = 0x22;
     static const uint32_t SIZE = sizeof(DATA);
-  
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__
