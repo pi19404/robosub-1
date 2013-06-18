@@ -37,8 +37,6 @@ SYS_INCLUDES += $(patsubst %,-I%,$(USER_LIB_PATH))
 ## is active ##
 CPPFLAGS +=             \
 -DLOGGING='1'           \
--DROBOSUBCONTROLLER_TESTING_GYRO   \
--DHAVE_GYRO             \
--DGYRO_MODEL='L3G4200D'
+-DROBOSUBCONTROLLER_TESTING_JOYSTICK_RUN   \
 
 

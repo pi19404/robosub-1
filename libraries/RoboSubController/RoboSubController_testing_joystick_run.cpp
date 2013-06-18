@@ -6,8 +6,6 @@
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
-RoboSubControlData cmd;
-char pcDataBuffer[RoboSubControlData::SIZE];
 
 RoboSubController::RoboSubController( ComPort &comPort, float loopFrequency )
     :
@@ -28,9 +26,35 @@ void RoboSubController::Run()
     int tempThrusterData;
     bool tempPneumaticData;
     uint16_t depthInches;
+    ACCEL_DATA myAccelData;
+    GYRO_DATA myGyroData;
 
+    // this buffer stores incoming data from the sub's PC, which tell the sub 
+    // what to do
+    char pcCmdDataBuffer[RoboSubControlData::SIZE];
+
+    // this buffer stores a serialized version of a bunch of sensor data so 
+    // that it can be sent over the serial port to the sub's pc
+    char subSensorDataBuffer[ArduinoData::SIZE];
+
+    // this structure will store the non-serialized command data and has the 
+    // functions to deserialize a serialized buffer of command data into 
+    // non-serialized command data and store those commands in itself and (if 
+    // necessary) serialize its own command data back into serialized char 
+    // buffer
+    RoboSubControlData pcCmdData;
+
+    // this structure will store the non-serialized sensor data and has the 
+    // functions to serialize this data into a serialized character buffer and 
+    // (if necessary) deserialize a serialized buffer of sensor data back into 
+    // non-serialized sensor data and store that data in itself
+    ArduinoData subSensorData;
+
+    // these buffers store duty cycles and directions that are retrieved from
+    // the deserialized command data sent from the sub's PC
     int thrusterDutyCycleBuf[NUM_THRUSTERS];
     int thrusterDirBuf[NUM_THRUSTERS];
+
 //    char clsBuffer[20];
 
     // this is the CLS pmod that stuff can be printed to
@@ -39,7 +63,7 @@ void RoboSubController::Run()
     // a local instance of the log manager
     LogManager& _lm = LogManager::GetInstance();
 
-    memset(pcDataBuffer, 0, RoboSubControlData::SIZE);
+    memset(pcCmdDataBuffer, 0, RoboSubControlData::SIZE);
     memset(thrusterDutyCycleBuf, 0, sizeof(thrusterDutyCycleBuf));
     memset(thrusterDirBuf, 0, sizeof(thrusterDirBuf));
 //    memset(clsBuffer, 0, sizeof(clsBuffer));
@@ -67,18 +91,18 @@ void RoboSubController::Run()
         for(i = 0; i < RoboSubControlData::SIZE; ++i)
         {
             int c = Serial.read();
-            pcDataBuffer[i] = static_cast<char>(c);
+            pcCmdDataBuffer[i] = static_cast<char>(c);
         }
 
         // Deserialize the read in bytes into
         // the command objec
         _lm.LogStr("deserializing string");
-        cmd.DeserializeFromString(pcDataBuffer);
+        pcCmdData.DeserializeFromString(pcCmdDataBuffer);
 
         // access the individual items in the serialized data structure
 
         // port fore thruster
-        tempThrusterData = cmd.Data.Thruster_Fore_L;
+        tempThrusterData = pcCmdData.Data.Thruster_Fore_L;
         _lm.LogStrInt("port fore thruster: ", tempThrusterData);
         if (tempThrusterData < 0)
         {
@@ -95,7 +119,7 @@ void RoboSubController::Run()
 
 
         // port aft thruster
-        tempThrusterData = cmd.Data.Thruster_Aft_L;
+        tempThrusterData = pcCmdData.Data.Thruster_Aft_L;
         _lm.LogStrInt("port aft thruster: ", tempThrusterData);
         if (tempThrusterData < 0)
         {
@@ -112,7 +136,7 @@ void RoboSubController::Run()
 
 
         // starboard fore thruster
-        tempThrusterData = cmd.Data.Thruster_Fore_R;
+        tempThrusterData = pcCmdData.Data.Thruster_Fore_R;
         _lm.LogStrInt("starboard fore thruster: ", tempThrusterData);
         if (tempThrusterData < 0)
         {
@@ -129,7 +153,7 @@ void RoboSubController::Run()
 
 
         // starboard aft thruster
-        tempThrusterData = cmd.Data.Thruster_Aft_R;
+        tempThrusterData = pcCmdData.Data.Thruster_Aft_R;
         _lm.LogStrInt("starboard aft thruster: ", tempThrusterData);
         if (tempThrusterData < 0)
         {
@@ -146,7 +170,7 @@ void RoboSubController::Run()
 
 
         // port roll thruster
-        tempThrusterData = cmd.Data.Thruster_Roll_L;
+        tempThrusterData = pcCmdData.Data.Thruster_Roll_L;
         _lm.LogStrInt("port roll thruster: ", tempThrusterData);
         if (tempThrusterData < 0)
         {
@@ -163,7 +187,7 @@ void RoboSubController::Run()
 
 
         // starboard roll thruster
-        tempThrusterData = cmd.Data.Thruster_Roll_R;
+        tempThrusterData = pcCmdData.Data.Thruster_Roll_R;
         _lm.LogStrInt("starboard roll thruster: ", tempThrusterData);
         if (tempThrusterData < 0)
         {
@@ -179,44 +203,71 @@ void RoboSubController::Run()
         }
 
         // send the duty cycles and directions to the h bridges
-        CU.setThrusters(thrusterDutyCycleBuf, thrusterDirBuf);
+        mCU.setThrusters(thrusterDutyCycleBuf, thrusterDirBuf);
 
 
         // check torpedo commands
-        tempPneumaticData = Torpedo1_Fire;
+        tempPneumaticData = pcCmdData.Data.Torpedo1_Fire;
         if (tempPneumaticData)
         {
-            CU.fireTorpedoN(1);
+            mCU.fireTorpedoN(1);
         }
 
-        tempPneumaticData = Torpedo2_Fire;
+        tempPneumaticData = pcCmdData.Data.Torpedo2_Fire;
         if (tempPneumaticData)
         {
-            CU.fireTorpedoN(2);
+            mCU.fireTorpedoN(2);
         }
 
 
         // check marker dropper commands
-        tempPneumaticData = Marker1_Drop
+        tempPneumaticData = pcCmdData.Data.Marker1_Drop;
         if (tempPneumaticData)
         {
-            CU.dropMarkerN(1);
+            mCU.dropMarkerN(1);
         }
 
-        tempPneumaticData = Marker2_Drop;
+        tempPneumaticData = pcCmdData.Data.Marker2_Drop;
         if (tempPneumaticData)
         {
-            CU.dropMarkerN(1);
+            mCU.dropMarkerN(1);
         }
 
         // read the depth sensor
-        depthInches = IMU.readDepth();
+        depthInches = mIMU.readDepth();
 
+        // read the accelerometer
+        myAccelData.X = 1.1;
+        myAccelData.Y = 2.2;
+        myAccelData.Z = -3.3;
+
+        // read the gyroscope
+        myGyroData.X = 4.4;
+        myGyroData.Y = -5.5;
+        myGyroData.Z = 6.6;
+
+
+        // serialize the sensor data and send it back to the sub's PC
+        String toSubPC;
+        subSensorData.Data.Acl_X = myAccelData.X;
+        subSensorData.Data.Acl_Y = myAccelData.Y;
+        subSensorData.Data.Acl_Z = myAccelData.Z;
+        subSensorData.Data.Gyro_X = myGyroData.X;
+        subSensorData.Data.Gyro_Y = myGyroData.Y;
+        subSensorData.Data.Gyro_Z = myGyroData.Z;
+        subSensorData.Data.Depth = depthInches;
+        subSensorData.SerializeToString(subSensorDataBuffer);
+
+        // the arduino Serial write(buf, len) function requires a uint8_t* for
+        // the buffer pointer, but Jay's serialization code requires char*, so
+        // I decided to declare the buffer as char* and then cast it to 
+        // uint8_t* here
+        Serial.write((uint8_t *)subSensorDataBuffer, ArduinoData::SIZE);
 
         // "Pretty" print the joystick commands back to the serial line to 
         // ensure the data was sent correctly.
         String toPrint;
-        cmd.ToString(toPrint);
+        pcCmdData.ToString(toPrint);
         Serial.print(toPrint);
 
         delay(100);
