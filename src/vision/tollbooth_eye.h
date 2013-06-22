@@ -1,26 +1,29 @@
-#ifndef AI_AIFUNCTIONCALL_VISION_H_
-#define AI_AIFUNCTIONCALL_VISION_H_
+#ifndef SRC_VISION_TOLLBOOTH_EYE_H_
+#define SRC_VISION_TOLLBOOTH_EYE_H_
 
-#include <vector>
 #include <cv.h>
 #include <highgui.h>
+#include <vector>
+#include <string>
+
+#include "base_eye.h"
 
 using ::std::vector;
+using ::std::string;
+using ::cv::Mat;
+using ::cv::Rect;
+using ::cv::Point;
 
 namespace vision {
-using namespace cv;
   enum color_t {green, blue, pink, red};
 
-  class TollboothDetector {
-   protected:
-    Mat m_frame;
-
+  class TollboothEye : public BaseEye {
    public:
-    TollboothDetector(string filename);
-    TollboothDetector(Mat frame);
-    ~TollboothDetector();
-
-    bool can_see_tollbooth();
+    explicit TollboothEye(cv::VideoCapture vidcap);
+    // For testing.
+    explicit TollboothEye(string filename);
+  //~TollboothEye();
+    virtual bool can_see_target();
     vector<vector<Point> >* get_tollbooth_bounding_box(Mat frame);
     Rect get_tollbooth_flattened_rect(Mat frame, vector<vector<Point> > box);
     vector<Rect>* get_tollbooth_windows(Mat frame, Rect rect);
@@ -30,9 +33,9 @@ using namespace cv;
     Point get_tollbooth_window_small_hex_center(Mat frame,
                                                 Rect toolbooth_window);
   };
+
+  string can_call_tollbooth_eye();
 }
 
-int testing_gtest();
-
-#endif  // AI_AIFUNCTIONCALL_VISION_H_
+#endif  // SRC_VISION_TOLLBOOTH_EYE_H_
 
