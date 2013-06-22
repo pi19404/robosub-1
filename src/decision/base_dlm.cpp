@@ -1,4 +1,4 @@
-#include "./base_dlm.h"
+#include "base_dlm.h"
 
 #include <string>
 using ::std::string;

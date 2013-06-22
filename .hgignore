@@ -8,4 +8,9 @@ syntax: regexp
 .*\.orig$
 .*\.out$
 .*\.pdf$
+robosub$
+.*CMakeFiles/.*
+.*\.cmake$
+CMakeCache.txt
+^build/.*
 

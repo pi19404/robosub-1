@@ -7,7 +7,6 @@
 #include <string>
 
 #include "base_eye.h"
-#include "vision_utilities.h"
 
 using ::std::vector;
 using ::std::string;

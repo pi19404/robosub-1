@@ -1,4 +1,4 @@
-#include "./tollbooth_dlm.h"
+#include "tollbooth_dlm.h"
 
 #include <cv.h>
 #include <highgui.h>
