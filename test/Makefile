@@ -13,36 +13,50 @@
 # but shouldn't modify.
 
 # Where to find user code.
-USER_DIR = ..
-
-CPPFLAGS += `pkg-config --cflags opencv`
-
-# Flags passed to the preprocessor.
-CPPFLAGS += -I$(GTEST_DIR)/include
+USER_DIR = $(CURDIR)/../src
 
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
-TESTS = vision_tests.out
+TESTS = robosub_tests.out
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
 
-# House-keeping build targets.
+LIB_DECISION = $(USER_DIR)/decision
+LIB_MOVEMENT = $(USER_DIR)/movement
+LIB_STATE_MACHINE = $(USER_DIR)/state_machine
+LIB_VISION = $(USER_DIR)/vision
 
-OBJS = ../detect_hexagon.o unittest.o
+MY_TARGET_FOLDERS = $(LIB_DECISION) $(LIB_MOVEMENT) \
+                    $(LIB_STATE_MACHINE) $(LIB_VISION)
 
-LIBS += `pkg-config --libs opencv`
+OBJS += vision_test.o can_call.o
 
-# Oddly, this errors out.
-#CXX = /usr/bin/colorgcc
+# Flags passed to the preprocessor.
+CPPFLAGS += $(shell echo `pkg-config --cflags opencv`)
+CPPFLAGS += -I$(GTEST_DIR)/include
+CPPFLAGS += -I$(LIB_DECISION)/tollbooth
+
+ROBOSUB_INCLUDES =
+$(foreach dir,$(MY_TARGET_FOLDERS),$(eval ROBOSUB_INCLUDES += -I$(dir));)
+CPPFLAGS += $(ROBOSUB_INCLUDES)
+
+LIBS += $(shell echo `pkg-config --libs opencv`)
+$(foreach dir,$(MY_TARGET_FOLDERS),$(eval LIBS += -L./$(dir));)
+
 CXX = /usr/bin/g++
 
 all : check_gtest_exists $(TESTS)
+
+.PHONY: all clean find_robosub_obs $(MY_TARGET_FOLDERS)
+
+print-%:
+	@echo '$($*)'
 
 check_gtest_exists:
 ifeq ($(GTEST_DIR),)
@@ -52,7 +66,8 @@ ifeq ($(GTEST_DIR),)
 endif
 
 clean :
-	rm -f $(TESTS) $(OBJS) gtest.a gtest_main.a *.o
+	$(RM) $(TESTS) $(OBJS) gtest.a gtest_main.a *.o
+	make -C $(USER_DIR) clean
 
 # Builds gtest.a and gtest_main.a.
 
@@ -65,12 +80,10 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 # conservative and not optimized.  This is fine as Google Test
 # compiles fast and for ordinary users its source rarely changes.
 gtest-all.o : $(GTEST_SRCS_)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest-all.cc
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c $(GTEST_DIR)/src/gtest-all.cc
 
 gtest_main.o : $(GTEST_SRCS_)
-	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest_main.cc
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c $(GTEST_DIR)/src/gtest_main.cc
 
 gtest.a : gtest-all.o
 	$(AR) $(ARFLAGS) $@ $^
@@ -81,7 +94,18 @@ gtest_main.a : gtest-all.o gtest_main.o
 # Builds a sample test.  A test should link with either gtest.a or
 # gtest_main.a, depending on whether it defines its own main()
 # function.
+robosub_tests.out: $(MY_TARGET_FOLDERS) find_robosub_objs $(OBJS) gtest_main.a
+	$(CXX) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) -pthread $(OBJS) gtest_main.a -o $@ $(LIBS)
 
-vision_tests.out: $(OBJS) gtest_main.a
-	$(CXX) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) -pthread $^ -o $@ $(LIBS)
+find_robosub_objs:
+	$(foreach dir,$(MY_TARGET_FOLDERS),$(eval OBJS += $(shell ls $(dir)/*.o)))
+
+# Print out a variable from the commandline. E.g., "make print-CPPFLAGS"
+print-%:
+	@echo '$($*)'
+
+that: $(MY_TARGET_FOLDERS)
+
+$(MY_TARGET_FOLDERS):
+	@$(MAKE) -C $@ objects ROBOSUB_INCLUDES="$(ROBOSUB_INCLUDES)";
 
