@@ -1,2 +1,1 @@
-add_library(base_dlm base_dlm.cpp)
-add_library(tollbooth_dlm tollbooth_dlm.cpp)
+add_library(decision_libs base_dlm.cpp tollbooth_dlm.cpp)

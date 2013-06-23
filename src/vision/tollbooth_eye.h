@@ -23,7 +23,8 @@ namespace vision {
     explicit TollboothEye(cv::VideoCapture vidcap);
     // For testing.
     explicit TollboothEye(string filename);
-    ~TollboothEye();
+    virtual ~TollboothEye();
+
     virtual bool can_see_target();
     vector<vector<Point> >* get_tollbooth_bounding_box(Mat frame);
     Rect get_tollbooth_flattened_rect(Mat frame, vector<vector<Point> > box);

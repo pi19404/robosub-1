@@ -26,24 +26,9 @@ add_subdirectory (vision)
 
 target_link_libraries(robosub_pre_exe
   ${OpenCV_LIBS}
-# decision
-  base_dlm
-  tollbooth_dlm
-# movement
-  fuzzy_sets
-# vision
-  base_eye
-  tollbooth_eye
-  vision_utilities
+  decision_libs
+  movement_libs
+  state_machine_libs
+  vision_libs
 )
-
-# decision
-# target_link_libraries (robosub base_dlm) 
-# target_link_libraries (robosub tollbooth_dlm) 
-# movement
-# target_link_libraries (robosub fuzzy_sets) 
-# vision
-# target_link_libraries (robosub base_eye) 
-# target_link_libraries (robosub tollbooth_eye) 
-# target_link_libraries (robosub vision_utilities) 
 

@@ -1,15 +1,17 @@
 // Copyright 2013 Robosub Club of the Palouse
 
+#include "vision/base_eye.h"
 #include <cv.h>
 #include <highgui.h>
 #include <string>
-
-#include "vision/base_eye.h"
 
 using ::std::string;
 
 namespace vision {
   BaseEye::BaseEye() {
+  }
+
+  BaseEye::~BaseEye() {
   }
 
   BaseEye::BaseEye(cv::VideoCapture vidcap) {

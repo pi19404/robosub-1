@@ -1,3 +1,2 @@
-add_library(base_eye base_eye.cpp)
-add_library(tollbooth_eye tollbooth_eye.cpp)
-add_library(vision_utilities vision_utilities.cpp)
+add_library(vision_libs base_eye.cpp tollbooth_eye.cpp vision_utilities.cpp)
+target_link_libraries(vision_libs ${OpenCV_LIBS})

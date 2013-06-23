@@ -7,8 +7,12 @@
 #include <vector>
 #include "vision/vision_utilities.h"
 
+using ::std::vector;
 using ::std::string;
 using ::cv::imread;
+using ::cv::Mat;
+using ::cv::Rect;
+using ::cv::Point;
 
 namespace vision {
   TollboothEye::TollboothEye(cv::VideoCapture vidcap)

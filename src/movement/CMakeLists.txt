@@ -1,1 +1,1 @@
-add_library(fuzzy_sets fuzzy_sets.cpp)
+add_library(movement_libs fuzzy_sets.cpp)
