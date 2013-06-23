@@ -17,7 +17,9 @@ include_directories($ENV{GTEST_ROOT}/include $ENV{GTEST_ROOT})
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories(${ROBOSUB_SOURCE_DIR})
 
-add_executable(robosub_tests vision_test.cpp can_call.cpp)
+add_executable(robosub_tests
+  decision_tests.cpp movement_tests.cpp vision_tests.cpp
+  state_machine_tests.cpp can_call.cpp)
 
 target_link_libraries(robosub_tests robosub_pre_exe)
 target_link_libraries(robosub_tests gtest gtest_main)

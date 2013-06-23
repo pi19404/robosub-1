@@ -17,13 +17,12 @@ namespace movement {
   class FuzzySets {
    protected:
     double m_membership[NUM_SETS];
+    boost::mutex& accessor_mut(int n);
 
    public:
     FuzzySets();
     void set_sub_wants_to(sub_wants_t category, double value);
     double get_sub_wants_to(sub_wants_t category);
-
-    boost::mutex& accessor_mut(int n);
   };
 
   string can_call_fuzzy_sets();
