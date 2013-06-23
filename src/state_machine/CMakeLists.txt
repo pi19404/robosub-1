@@ -1,1 +1,0 @@
-add_library(state_machine_libs state_machine.cpp)
