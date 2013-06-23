@@ -21,14 +21,14 @@ include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
 add_subdirectory (decision) 
 add_subdirectory (movement) 
-add_subdirectory (state_machine) 
+add_subdirectory (state) 
 add_subdirectory (vision) 
 
 target_link_libraries(robosub_pre_exe
   ${OpenCV_LIBS}
   decision_libs
   movement_libs
-  state_machine_libs
+  state_libs
   vision_libs
 )
 
