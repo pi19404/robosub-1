@@ -1,17 +1,27 @@
+// Copyright 2013 Robosub Club of the Palouse
+
+#include "vision/base_eye.h"
 #include <cv.h>
 #include <highgui.h>
 #include <string>
-
-#include "base_eye.h"
+#include "utility/DebugLog.hpp"
 
 using ::std::string;
 
 namespace vision {
   BaseEye::BaseEye() {
+    DEBUG_METHOD();
+  }
+
+  BaseEye::~BaseEye() {
   }
 
   BaseEye::BaseEye(cv::VideoCapture vidcap) {
     m_vidcap = vidcap;
+  }
+
+  bool BaseEye::can_see_target() {
+    return false;
   }
 
   void BaseEye::blink() {

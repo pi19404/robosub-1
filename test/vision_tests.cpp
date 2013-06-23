@@ -1,15 +1,17 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #include <string>
 #include <iostream>
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "tollbooth_eye.h"
+#include "vision/tollbooth_eye.h"
 
 using ::std::endl;
 using ::std::vector;
 using ::std::string;
 
-class VisionTest : public ::testing::Test {
+class VisionTests : public ::testing::Test {
  protected:
   static void SetUpTestCase() {
     s_image_names = new vector<string>();
@@ -40,7 +42,7 @@ class VisionTest : public ::testing::Test {
   static vector<string>* s_image_names;
 };
 
-vector<string>* VisionTest::s_image_names = NULL;
+vector<string>* VisionTests::s_image_names = NULL;
 
 // File names are expected to end in ABCD.jpg, where ABCD is
 // some color code. If the leter is capitolized, the large hex
@@ -56,7 +58,7 @@ string get_color_pattern(string filename) {
 
 // We should be able to get a string of length 4, and all 4 color chars
 // should be in that string.
-TEST_F(VisionTest, test_get_color_pattern) {
+TEST_F(VisionTests, test_get_color_pattern) {
   long unsigned int locSmall, locLarge;
   for (vector<string>::iterator it = s_image_names->begin();
        it != s_image_names->end(); ++it) {
@@ -79,7 +81,7 @@ TEST_F(VisionTest, test_get_color_pattern) {
 // When a TollboothDetector is instantiated with a Mat that has a
 // tollbooth image, it should claim that it can see it.
 // TODO: Add some negative tests.
-TEST_F(VisionTest, test_can_see_target) {
+TEST_F(VisionTests, test_can_see_target) {
   for (vector<string>::iterator it = s_image_names->begin();
        it != s_image_names->end(); ++it) {
     vision::TollboothEye *uut = new vision::TollboothEye(*it);
@@ -89,23 +91,23 @@ TEST_F(VisionTest, test_can_see_target) {
   }
 }
 
-TEST_F(VisionTest, test_get_tollbooth_bounding_box) {
+TEST_F(VisionTests, test_get_tollbooth_bounding_box) {
   FAIL() << "Not implemented." << endl;
 }
 
-TEST_F(VisionTest, test_get_tollbooth_flattened_rect) {
+TEST_F(VisionTests, test_get_tollbooth_flattened_rect) {
   FAIL() << "Not implemented." << endl;
 }
 
-TEST_F(VisionTest, test_get_tollbooth_windows) {
+TEST_F(VisionTests, test_get_tollbooth_windows) {
   FAIL() << "Not implemented." << endl;
 }
 
-TEST_F(VisionTest, test_get_tollbooth_window_color) {
+TEST_F(VisionTests, test_get_tollbooth_window_color) {
   FAIL() << "Not implemented." << endl;
 }
 
-TEST_F(VisionTest, test_get_tollbooth_window_hex_center) {
+TEST_F(VisionTests, test_get_tollbooth_window_hex_center) {
   FAIL() << "Not implemented." << endl;
 }
 

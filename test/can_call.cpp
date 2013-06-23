@@ -1,18 +1,16 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #include <string>
 #include <iostream>
 #include <vector>
 
 #include "gtest/gtest.h"
-// src/decision
-#include "base_dlm.h"
-#include "tollbooth_dlm.h"
-// src/movement
-#include "fuzzy_sets.h"
-// src/state_machine
-// src/vision
-#include "base_eye.h"
-#include "vision_utilities.h"
-#include "tollbooth_eye.h"
+#include "decision/base_dlm.h"
+#include "decision/tollbooth_dlm.h"
+#include "movement/fuzzy_sets.h"
+#include "vision/base_eye.h"
+#include "vision/vision_utilities.h"
+#include "vision/tollbooth_eye.h"
 
 using ::std::string;
 

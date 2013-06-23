@@ -1,27 +1,35 @@
+// Copyright 2013 Robosub Club of the Palouse
+
+#include "vision/tollbooth_eye.h"
 #include <cv.h>
 #include <highgui.h>
 #include <string>
 #include <vector>
+#include "vision/vision_utilities.h"
+#include "utility/DebugLog.hpp"
 
-#include "tollbooth_eye.h"
-#include "vision_utilities.h"
-
+using ::std::vector;
 using ::std::string;
 using ::cv::imread;
+using ::cv::Mat;
+using ::cv::Rect;
+using ::cv::Point;
 
 namespace vision {
   TollboothEye::TollboothEye(cv::VideoCapture vidcap)
   : BaseEye(vidcap) {
+    DEBUG_METHOD();
   }
 
   TollboothEye::TollboothEye(string filename)
   : BaseEye() {
+    DEBUG_METHOD();
     m_frame = imread(filename);
   }
 
-//TollboothEye::~TollboothEye() {
-//  m_frame.release();
-//}
+  TollboothEye::~TollboothEye() {
+    m_frame.release();
+  }
 
   // TODO(LPE): Implement
   bool TollboothEye::can_see_target() {
@@ -47,7 +55,6 @@ namespace vision {
   vector<Rect>* TollboothEye::get_tollbooth_windows(Mat frame, Rect rect) {
     return NULL;
   }
-
   // TODO(LPE): Implement
   color_t TollboothEye::get_tollbooth_window_color(
       Mat frame, Rect tollbooth_window) {

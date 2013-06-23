@@ -1,3 +1,5 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #ifndef SRC_VISION_VISION_UTILITIES_H_
 #define SRC_VISION_VISION_UTILITIES_H_
 

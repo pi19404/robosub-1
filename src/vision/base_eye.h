@@ -1,3 +1,5 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #ifndef SRC_VISION_BASE_EYE_H_
 #define SRC_VISION_BASE_EYE_H_
 
@@ -15,8 +17,9 @@ namespace vision {
 
    public:
     BaseEye();
-    BaseEye(cv::VideoCapture vidcap);
-    virtual bool can_see_target()=0;
+    explicit BaseEye(cv::VideoCapture vidcap);
+    virtual ~BaseEye();
+    virtual bool can_see_target();
     virtual void blink();
   };
 

@@ -1,3 +1,5 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #ifndef SRC_VISION_TOLLBOOTH_EYE_H_
 #define SRC_VISION_TOLLBOOTH_EYE_H_
 
@@ -5,8 +7,7 @@
 #include <highgui.h>
 #include <vector>
 #include <string>
-
-#include "base_eye.h"
+#include "vision/base_eye.h"
 
 using ::std::vector;
 using ::std::string;
@@ -22,7 +23,8 @@ namespace vision {
     explicit TollboothEye(cv::VideoCapture vidcap);
     // For testing.
     explicit TollboothEye(string filename);
-  //~TollboothEye();
+    virtual ~TollboothEye();
+
     virtual bool can_see_target();
     vector<vector<Point> >* get_tollbooth_bounding_box(Mat frame);
     Rect get_tollbooth_flattened_rect(Mat frame, vector<vector<Point> > box);
@@ -35,7 +37,7 @@ namespace vision {
   };
 
   string can_call_tollbooth_eye();
-}
+}  // namespace vision
 
 #endif  // SRC_VISION_TOLLBOOTH_EYE_H_
 

@@ -1,6 +1,7 @@
-#include <string>
+// Copyright 2013 Robosub Club of the Palouse
 
-#include "vision_utilities.h"
+#include <string>
+#include "vision/vision_utilities.h"
 
 using ::std::string;
 

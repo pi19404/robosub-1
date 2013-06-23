@@ -1,10 +1,14 @@
-#include "base_dlm.h"
+// Copyright 2013 Robosub Club of the Palouse
 
+#include "decision/base_dlm.h"
 #include <string>
+#include "utility/DebugLog.hpp"
+
 using ::std::string;
 
 namespace decision {
   void DecisionLogicModule::set_mission_accomplished(bool setting) {
+    DEBUG_METHOD();
     m_mission_accomplished = setting;
   }
 
@@ -15,6 +19,7 @@ namespace decision {
   // This function exists to make sure we can call functions
   // in this file from the testing dir. Don't remove.
   string can_call_base_dlm() {
+    DEBUG_METHOD();
     return string("can_call_base_dlm");
   }
 }  // namespace decision
