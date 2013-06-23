@@ -18,6 +18,10 @@ namespace vision {
     m_vidcap = vidcap;
   }
 
+  bool BaseEye::can_see_target() {
+    return false;
+  }
+
   void BaseEye::blink() {
     m_vidcap >> m_frame;
   }

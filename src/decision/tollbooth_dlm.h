@@ -28,6 +28,8 @@ namespace decision {
       m_downward_eye = new vision::TollboothEye(m_downward_vidcap);
     }
 
+    virtual bool can_assume_control();
+
     // TODO(LPE) Implement.
     virtual void activate() {
       return;

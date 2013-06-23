@@ -2,8 +2,8 @@
 
 #include "movement/fuzzy_sets.h"
 #include <boost/thread/mutex.hpp>
+#include <assert.h>
 #include <string>
-#include "decision/base_dlm.h"
 
 using ::std::string;
 

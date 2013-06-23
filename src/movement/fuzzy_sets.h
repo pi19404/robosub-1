@@ -9,9 +9,9 @@
 using ::std::string;
 
 namespace movement {
-  enum sub_wants_t {move_down, move_up, move_right, move_left, move_forward,
-                    move_downward, rotate_right, rotate_left, tilt_down,
-                    tilt_up, roll_right, roll_left,
+  enum sub_wants_t {MOVE_DOWN, MOVE_UP, MOVE_RIGHT, MOVE_LEFT, MOVE_FORWARD,
+                    MOVE_DOWNWARD, ROTATE_RIGHT, ROTATE_LEFT, TILT_DOWN,
+                    TILT_UP, ROLL_RIGHT, ROLL_LEFT,
                     NUM_SETS};
 
   class FuzzySets {

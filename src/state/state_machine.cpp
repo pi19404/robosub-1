@@ -1,0 +1,83 @@
+#include "state/state_machine.h"
+#include <cv.h>
+#include <highgui.h>
+#include <vector>
+#include <string>
+
+// TODO(LPE) Things should eventually work without including mock_dlm.h
+#include "decision/mock_dlm.h"
+#include "decision/tollbooth_dlm.h"
+#include "vision/base_eye.h"
+#include "movement/fuzzy_sets.h"
+
+using ::std::vector;
+using ::std::map;
+using ::std::string;
+
+namespace state {
+  StateMachine::StateMachine(
+      cv::VideoCapture forward_eye, cv::VideoCapture downward_eye) {
+    m_fuzzy_sub_state = new movement::FuzzySets();
+
+    // TODO(LPE) All of the MockDLM objects should be replaced with
+    // the appropriate DLM.
+    m_task_to_dlm[START] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[PATH] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[TRAFFIC_LIGHT] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[PARKING] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[SPEED_TRAP] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[TOLLBOOTH] = new decision::TollboothDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[DRIVING] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[PIZZA] = new decision::MockDLM(
+        m_fuzzy_sub_state, forward_eye, downward_eye);
+
+    for (int from_dex = 0; from_dex < NUM_TASKS; from_dex++) {
+      for (int to_dex = 0; to_dex < NUM_TASKS; to_dex++) {
+        m_can_transition[from_dex][to_dex] = false;
+      }
+    }
+    // This is ugly. Is there a better way to do this?
+    m_can_transition[START][PATH] = true;
+    m_can_transition[PATH][TRAFFIC_LIGHT] = true;
+    m_can_transition[PATH][PARKING] = true;
+    m_can_transition[PATH][SPEED_TRAP] = true;
+    m_can_transition[PATH][TOLLBOOTH] = true;
+    m_can_transition[PATH][DRIVING] = true;
+    m_can_transition[PATH][PIZZA] = true;
+    m_can_transition[TRAFFIC_LIGHT][PATH] = true;
+    m_can_transition[PARKING][PATH] = true;
+    m_can_transition[SPEED_TRAP][PATH] = true;
+    m_can_transition[TOLLBOOTH][PATH] = true;
+    m_can_transition[DRIVING][PATH] = true;
+    m_can_transition[PIZZA][PATH] = true;
+  }
+
+  StateMachine::~StateMachine() {
+  }
+
+  void StateMachine::activate() {
+    m_task_to_dlm[START]->activate();
+
+    task_t previous_task = START;
+    map<task_t, decision::DecisionLogicModule*>::iterator candidate_iter;
+    for (candidate_iter = m_task_to_dlm.begin();
+         candidate_iter != m_task_to_dlm.end(); ++candidate_iter) {
+      // PATH can transition to most everything, most everything can
+      // only transition to PATH. If this assumption becomes invalid,
+      // this if statement will need to be overhauled.
+      if (!candidate_iter->second->get_mission_accomplished() &&
+          m_can_transition[previous_task][candidate_iter->first]) {
+        candidate_iter->second->activate();
+        previous_task = candidate_iter->first;
+      }
+    }
+  }
+}  // namespace state
+

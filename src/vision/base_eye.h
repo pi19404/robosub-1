@@ -19,7 +19,7 @@ namespace vision {
     BaseEye();
     explicit BaseEye(cv::VideoCapture vidcap);
     virtual ~BaseEye();
-    virtual bool can_see_target()=0;
+    virtual bool can_see_target();
     virtual void blink();
   };
 

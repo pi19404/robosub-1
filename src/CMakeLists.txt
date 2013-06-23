@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8)
 project (robosub)
 add_library(robosub_pre_exe SHARED "")
 add_executable(robosub main.cpp)
+target_link_libraries(robosub robosub_pre_exe)
 find_package(OpenCV REQUIRED)
 #target_link_libraries(robosub ${OpenCV_LIBS} )
 # The version number.

@@ -10,6 +10,12 @@
 using ::cv::imread;
 
 namespace decision {
+  // TODO(LPE) Implement.
+  bool TollboothDLM::can_assume_control() {
+    return false;
+  }
+
+
   // This function exists to make sure we can call functions
   // in this file from the testing dir. Don't remove.
   string can_call_tollbooth_dlm() {

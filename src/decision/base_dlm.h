@@ -18,8 +18,7 @@ namespace decision {
     cv::VideoCapture m_forward_vidcap;
     cv::VideoCapture m_downward_vidcap;
     bool m_mission_accomplished;
-
-    void set_mission_accomplished(bool setting);
+    virtual void set_mission_accomplished(bool setting);
    public:
     DecisionLogicModule(movement::FuzzySets *fuzzy_sub_state,
                         cv::VideoCapture forward_vidcap,
@@ -30,7 +29,7 @@ namespace decision {
       m_mission_accomplished = false;
     }
 
-    bool get_mission_accomplished();
+    virtual bool get_mission_accomplished();
 
     virtual void activate()=0;
     virtual bool can_assume_control()=0;
