@@ -1,9 +1,0 @@
-Installing opencv
-=================
-
-Synaptic did not work well for me. To install opencv on Ubuntu, follow the instructions here:
-
-http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html#linux-installation
-
-Make certain to include libgtk2.0-dev
-
