@@ -1,0 +1,4 @@
+// the configured options and settings for ROBOSUB
+#define ROBOSUB_VERSION_MAJOR @ROBOSUB_VERSION_MAJOR@
+#define ROBOSUB_VERSION_MINOR @ROBOSUB_VERSION_MINOR@
+
