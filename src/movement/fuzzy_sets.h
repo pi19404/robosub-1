@@ -1,8 +1,10 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #ifndef SRC_MOVEMENT_FUZZY_SETS_H_
 #define SRC_MOVEMENT_FUZZY_SETS_H_
 
-#include <string>
 #include <boost/thread/mutex.hpp>
+#include <string>
 
 using ::std::string;
 

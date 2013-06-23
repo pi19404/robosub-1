@@ -1,10 +1,11 @@
+// Copyright 2013 Robosub Club of the Palouse
+
+#include "vision/tollbooth_eye.h"
 #include <cv.h>
 #include <highgui.h>
 #include <string>
 #include <vector>
-
-#include "tollbooth_eye.h"
-#include "vision_utilities.h"
+#include "vision/vision_utilities.h"
 
 using ::std::string;
 using ::cv::imread;
@@ -19,9 +20,9 @@ namespace vision {
     m_frame = imread(filename);
   }
 
-//TollboothEye::~TollboothEye() {
-//  m_frame.release();
-//}
+  TollboothEye::~TollboothEye() {
+    m_frame.release();
+  }
 
   // TODO(LPE): Implement
   bool TollboothEye::can_see_target() {

@@ -17,11 +17,6 @@ include_directories($ENV{GTEST_ROOT}/include $ENV{GTEST_ROOT})
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories(${ROBOSUB_SOURCE_DIR})
 
-include_directories("${ROBOSUB_SOURCE_DIR}/decision")
-include_directories("${ROBOSUB_SOURCE_DIR}/movement")
-include_directories("${ROBOSUB_SOURCE_DIR}/state_machine")
-include_directories("${ROBOSUB_SOURCE_DIR}/vision")
-
 add_executable(robosub_tests vision_test.cpp can_call.cpp)
 
 target_link_libraries(robosub_tests robosub_pre_exe)

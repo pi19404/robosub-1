@@ -1,3 +1,4 @@
+// Copyright 2013 Robosub Club of the Palouse
 #ifndef SRC_DECISION_BASE_DLM_H_
 #define SRC_DECISION_BASE_DLM_H_
 
@@ -5,7 +6,7 @@
 #include <highgui.h>
 #include <string>
 
-#include "fuzzy_sets.h"
+#include "movement/fuzzy_sets.h"
 
 using ::std::string;
 

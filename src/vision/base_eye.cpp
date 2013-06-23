@@ -1,8 +1,10 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #include <cv.h>
 #include <highgui.h>
 #include <string>
 
-#include "base_eye.h"
+#include "vision/base_eye.h"
 
 using ::std::string;
 

@@ -1,9 +1,11 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #include <string>
 #include <iostream>
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "tollbooth_eye.h"
+#include "vision/tollbooth_eye.h"
 
 using ::std::endl;
 using ::std::vector;

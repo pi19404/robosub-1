@@ -1,6 +1,8 @@
-#include "base_dlm.h"
+// Copyright 2013 Robosub Club of the Palouse
 
+#include "decision/base_dlm.h"
 #include <string>
+
 using ::std::string;
 
 namespace decision {

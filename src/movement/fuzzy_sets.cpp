@@ -1,8 +1,9 @@
-#include <string>
-#include <boost/thread/mutex.hpp>
+// Copyright 2013 Robosub Club of the Palouse
 
-#include "fuzzy_sets.h"
-#include "base_dlm.h"
+#include "movement/fuzzy_sets.h"
+#include <boost/thread/mutex.hpp>
+#include <string>
+#include "decision/base_dlm.h"
 
 using ::std::string;
 
@@ -11,9 +12,6 @@ namespace movement {
     for (int i = 0; i < NUM_SETS; i++) {
       m_membership[i] = 0.0;
     }
-
-    // TODO REMOVE
-    decision::can_call_base_dlm();
   }
 
   void FuzzySets::set_sub_wants_to(sub_wants_t category, double membership) {
@@ -37,5 +35,5 @@ namespace movement {
   string can_call_fuzzy_sets() {
     return string("can_call_fuzzy_sets");
   }
-}  // namespace decision
+}  // namespace movement
 

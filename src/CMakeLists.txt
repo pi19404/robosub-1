@@ -18,10 +18,7 @@ configure_file (
 # add the binary tree to the search path for include files
 # so that we will find robosubConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
-include_directories("${PROJECT_SOURCE_DIR}/decision")
-include_directories("${PROJECT_SOURCE_DIR}/movement")
-include_directories("${PROJECT_SOURCE_DIR}/state_machine")
-include_directories("${PROJECT_SOURCE_DIR}/vision")
+include_directories("${PROJECT_SOURCE_DIR}")
 add_subdirectory (decision) 
 add_subdirectory (movement) 
 add_subdirectory (state_machine) 

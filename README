@@ -11,11 +11,11 @@ represents the root of the repository.
 Overview: Perform an out-of-tree cmake build, then use make to build
 the code.
 
-ai/src $ mkdir build
-ai/src $ cd build
-ai/src/build $ cmake ..
-ai/src/build $ make
-ai/src/build $ ./robosub --version
+ai $ mkdir build
+ai $ cd build
+ai/build $ cmake ../src
+ai/build $ make
+ai/build $ ./robosub --version
 
 
 --------------------------------------------

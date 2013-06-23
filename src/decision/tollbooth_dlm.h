@@ -1,13 +1,15 @@
+// Copyright 2013 Robosub Club of the Palouse
+
 #ifndef SRC_DECISION_TOLLBOOTH_DLM_H_
 #define SRC_DECISION_TOLLBOOTH_DLM_H_
-
-#include "base_dlm.h"
-#include "fuzzy_sets.h"
-#include "tollbooth_eye.h"
 
 #include <cv.h>
 #include <highgui.h>
 #include <string>
+
+#include "decision/base_dlm.h"
+#include "vision/tollbooth_eye.h"
+#include "movement/fuzzy_sets.h"
 
 using ::std::string;
 

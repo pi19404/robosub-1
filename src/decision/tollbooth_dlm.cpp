@@ -1,9 +1,11 @@
-#include "tollbooth_dlm.h"
+// Copyright 2013 Robosub Club of the Palouse
 
+#include "decision/tollbooth_dlm.h"
 #include <cv.h>
 #include <highgui.h>
 #include <string>
 #include <vector>
+
 
 using ::cv::imread;
 
