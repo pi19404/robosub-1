@@ -33,6 +33,6 @@ int main(int argc, char **argv) {
   cv::VideoCapture downward_eye(0);
 
   state::StateMachine sm(forward_eye, downward_eye);
-  sm.activate();
+  sm.enter();
 }
 

@@ -34,7 +34,7 @@ namespace state {
     // initialize all of the movement modules.
     StateMachine(cv::VideoCapture forward_eye, cv::VideoCapture downward_eye);
     ~StateMachine();
-    void activate();
+    void enter();
   };
 }  // namespace state
 

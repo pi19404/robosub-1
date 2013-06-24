@@ -15,7 +15,7 @@
 #define DEBUG_METHOD()
 #define DEBUG_MESSAGE(debug_message)
 #define DEBUG_VALUE_OF(variable)
-#define DEBUG_VALUE_AND_TYPE_OF(variable)
+//#define DEBUG_VALUE_AND_TYPE_OF(variable)
 
 #else
 
@@ -27,8 +27,8 @@
 #define DEBUG_SET_STREAM(stream) { BornanderLog::set_stream(stream); }
 #define DEBUG_METHOD() BornanderLog _debugLog(__func__, __FILE__, __LINE__);
 #define DEBUG_MESSAGE(debug_message) { _debugLog.message(debug_message); }
-#define DEBUG_VALUE_OF(variable) { _debugLog.value_of(#variable, variable, false); }
-#define DEBUG_VALUE_AND_TYPE_OF(variable) { _debugLog.value_of(#variable, variable, true); }
+#define DEBUG_VALUE_OF(variable) { _debugLog.value_of(#variable, variable, true); }
+//#define DEBUG_VALUE_AND_TYPE_OF(variable) { _debugLog.value_of(#variable, variable, true); }
 
 enum list_segment
 {
@@ -52,8 +52,6 @@ class BornanderLog
   public:    // Methods
     void message(const std::string& message);
     template<class T> void value_of(const std::string& name, const T& value, const bool outputTypeInformation);
-    template<class T> void value_of_collection(const std::string& name, const T& collection, const typename T::size_type max, const list_segment segment, const bool outputTypeInformation);
-
     static void set_stream(std::ostream& stream);
   public:    // Constructor, Destructor
     BornanderLog(const std::string& ctx_func, const std::string& ctx_file, const int ctx_line);
@@ -71,7 +69,6 @@ template<class T> void BornanderLog::value_of(const std::string& name, const T& 
   }
   *stream << "=[" << value << "]" << std::endl;
   stream->flush();
-
 }
 
 #endif

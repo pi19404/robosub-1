@@ -17,20 +17,17 @@ namespace movement {
   }
 
   void FuzzySets::set_sub_wants_to(sub_wants_t category, double membership) {
-    DEBUG_METHOD();
     boost::lock_guard<boost::mutex> (accessor_mut(category));
     assert(0.0 <= membership && membership <= 1.0);
     m_membership[category] = membership;
   }
 
   double FuzzySets::get_sub_wants_to(sub_wants_t category) {
-    DEBUG_METHOD();
     boost::lock_guard<boost::mutex> (accessor_mut(category));
     return m_membership[category];
   }
 
   boost::mutex& FuzzySets::accessor_mut(int n) {
-    DEBUG_METHOD();
     static boost::mutex mut[NUM_SETS];
     return mut[n];
   }

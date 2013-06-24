@@ -5,9 +5,15 @@
 #include <string>
 
 // TODO(LPE) Things should eventually work without including mock_dlm.h
-#include "decision/mock_dlm.h"
+#include "decision/driving_dlm.h"
+#include "decision/parking_dlm.h"
+#include "decision/path_dlm.h"
+#include "decision/pizza_dlm.h"
+#include "decision/speed_trap_dlm.h"
+#include "decision/start_dlm.h"
 #include "decision/tollbooth_dlm.h"
-#include "vision/base_eye.h"
+#include "decision/traffic_light_dlm.h"
+
 #include "movement/fuzzy_sets.h"
 #include "utility/DebugLog.hpp"
 
@@ -17,28 +23,26 @@ using ::std::string;
 
 namespace state {
   StateMachine::StateMachine(
-      cv::VideoCapture forward_eye, cv::VideoCapture downward_eye) {
+      cv::VideoCapture forward_vidcap, cv::VideoCapture downward_vidcap) {
     DEBUG_METHOD();
     m_fuzzy_sub_state = new movement::FuzzySets();
 
-    // TODO(LPE) All of the MockDLM objects should be replaced with
-    // the appropriate DLM.
-    m_task_to_dlm[START] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
-    m_task_to_dlm[PATH] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
-    m_task_to_dlm[TRAFFIC_LIGHT] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
-    m_task_to_dlm[PARKING] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
-    m_task_to_dlm[SPEED_TRAP] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
+    m_task_to_dlm[START] = new decision::StartDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
+    m_task_to_dlm[PATH] = new decision::PathDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
+    m_task_to_dlm[TRAFFIC_LIGHT] = new decision::TrafficLightDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
+    m_task_to_dlm[PARKING] = new decision::ParkingDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
+    m_task_to_dlm[SPEED_TRAP] = new decision::SpeedTrapDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
     m_task_to_dlm[TOLLBOOTH] = new decision::TollboothDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
-    m_task_to_dlm[DRIVING] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
-    m_task_to_dlm[PIZZA] = new decision::MockDLM(
-        m_fuzzy_sub_state, forward_eye, downward_eye);
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
+    m_task_to_dlm[DRIVING] = new decision::DrivingDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
+    m_task_to_dlm[PIZZA] = new decision::PizzaDLM(
+        m_fuzzy_sub_state, forward_vidcap, downward_vidcap);
 
     for (int from_dex = 0; from_dex < NUM_TASKS; from_dex++) {
       for (int to_dex = 0; to_dex < NUM_TASKS; to_dex++) {
@@ -64,7 +68,7 @@ namespace state {
   StateMachine::~StateMachine() {
   }
 
-  void StateMachine::activate() {
+  void StateMachine::enter() {
     DEBUG_METHOD();
     m_task_to_dlm[START]->activate();
 

@@ -55,7 +55,6 @@ namespace vision {
   vector<Rect>* TollboothEye::get_tollbooth_windows(Mat frame, Rect rect) {
     return NULL;
   }
-
   // TODO(LPE): Implement
   color_t TollboothEye::get_tollbooth_window_color(
       Mat frame, Rect tollbooth_window) {
