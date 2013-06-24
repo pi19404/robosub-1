@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "vision/vision_utilities.h"
+#include "utility/DebugLog.hpp"
 
 using ::std::vector;
 using ::std::string;
@@ -17,10 +18,12 @@ using ::cv::Point;
 namespace vision {
   TollboothEye::TollboothEye(cv::VideoCapture vidcap)
   : BaseEye(vidcap) {
+    DEBUG_METHOD();
   }
 
   TollboothEye::TollboothEye(string filename)
   : BaseEye() {
+    DEBUG_METHOD();
     m_frame = imread(filename);
   }
 

@@ -10,20 +10,25 @@
 #include <highgui.h>
 #include <string>
 #include <vector>
+#include "utility/DebugLog.hpp"
 
 
 using ::cv::imread;
 
 namespace decision {
   void MockDLM::activate() {
+    DEBUG_METHOD();
     m_can_assume_control_mock_ret = false;
+    m_mission_accomplished = true;
   }
 
   bool MockDLM::can_assume_control() {
+    DEBUG_METHOD();
     return m_can_assume_control_mock_ret;
   }
 
   void MockDLM::set_mission_accomplished(bool setting) {
+    DEBUG_METHOD();
     DecisionLogicModule::set_mission_accomplished(setting);
   }
 }  // namespace decision

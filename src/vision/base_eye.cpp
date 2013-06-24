@@ -4,11 +4,13 @@
 #include <cv.h>
 #include <highgui.h>
 #include <string>
+#include "utility/DebugLog.hpp"
 
 using ::std::string;
 
 namespace vision {
   BaseEye::BaseEye() {
+    DEBUG_METHOD();
   }
 
   BaseEye::~BaseEye() {

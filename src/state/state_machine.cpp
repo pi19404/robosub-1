@@ -9,6 +9,7 @@
 #include "decision/tollbooth_dlm.h"
 #include "vision/base_eye.h"
 #include "movement/fuzzy_sets.h"
+#include "utility/DebugLog.hpp"
 
 using ::std::vector;
 using ::std::map;
@@ -17,6 +18,7 @@ using ::std::string;
 namespace state {
   StateMachine::StateMachine(
       cv::VideoCapture forward_eye, cv::VideoCapture downward_eye) {
+    DEBUG_METHOD();
     m_fuzzy_sub_state = new movement::FuzzySets();
 
     // TODO(LPE) All of the MockDLM objects should be replaced with
@@ -63,19 +65,33 @@ namespace state {
   }
 
   void StateMachine::activate() {
+    DEBUG_METHOD();
     m_task_to_dlm[START]->activate();
 
     task_t previous_task = START;
-    map<task_t, decision::DecisionLogicModule*>::iterator candidate_iter;
-    for (candidate_iter = m_task_to_dlm.begin();
-         candidate_iter != m_task_to_dlm.end(); ++candidate_iter) {
-      // PATH can transition to most everything, most everything can
-      // only transition to PATH. If this assumption becomes invalid,
-      // this if statement will need to be overhauled.
-      if (!candidate_iter->second->get_mission_accomplished() &&
-          m_can_transition[previous_task][candidate_iter->first]) {
-        candidate_iter->second->activate();
-        previous_task = candidate_iter->first;
+    map<task_t, decision::DecisionLogicModule*>::iterator it;
+    bool can_continue = true;
+    while (can_continue) {
+      for (it = m_task_to_dlm.begin(); it != m_task_to_dlm.end(); ++it) {
+        // PATH can transition to most everything, most everything can
+        // only transition to PATH. If this assumption becomes invalid,
+        // this if statement will need to be overhauled.
+        if (!it->second->get_mission_accomplished() &&
+            m_can_transition[previous_task][it->first]) {
+          it->second->activate();
+          previous_task = it->first;
+          break;
+        }
+      }
+
+      // Check to see if we are done.
+      can_continue = false;
+      for (it = m_task_to_dlm.begin(); it != m_task_to_dlm.end(); ++it) {
+        if (m_can_transition[previous_task][it->first] &&
+            !it->second->get_mission_accomplished()) {
+          can_continue = true;
+          break;
+        }
       }
     }
   }

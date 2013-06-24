@@ -2,7 +2,9 @@
 #include <string.h>
 #include <cv.h>
 #include <highgui.h>
+//#include <iostream>
 #include "robosub.h"
+#include "utility/DebugLog.hpp"
 #include "state/state_machine.h"
 
 #include "movement/fuzzy_sets.h"
@@ -11,7 +13,8 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-  cout << movement::can_call_fuzzy_sets() << endl;
+  DEBUG_SET_STREAM(std::cerr);
+  DEBUG_METHOD();
 
   if (argc == 2 && (strncmp(argv[1], "-v", 2) == 0 ||
                     strncmp(argv[1], "--version", 9) == 0)) {

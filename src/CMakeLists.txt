@@ -8,13 +8,21 @@ find_package(OpenCV REQUIRED)
 # The version number.
 set (ROBOSUB_VERSION_MAJOR 0)
 set (ROBOSUB_VERSION_MINOR 1)
+
+option(USE_DEBUG_LOGGING
+  "Print debug logs to stderr on execution." ON
+)
+
+if (USE_DEBUG_LOGGING)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_LOG_ENABLE")
+endif (USE_DEBUG_LOGGING)
  
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
   "${PROJECT_SOURCE_DIR}/robosub.h.in"
   "${PROJECT_BINARY_DIR}/robosub.h"
-  )
+)
  
 # add the binary tree to the search path for include files
 # so that we will find robosubConfig.h
@@ -23,6 +31,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 add_subdirectory (decision) 
 add_subdirectory (movement) 
 add_subdirectory (state) 
+add_subdirectory (utility) 
 add_subdirectory (vision) 
 
 target_link_libraries(robosub_pre_exe
@@ -30,6 +39,7 @@ target_link_libraries(robosub_pre_exe
   decision_libs
   movement_libs
   state_libs
+  utility_libs
   vision_libs
 )
 
