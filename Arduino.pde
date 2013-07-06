@@ -24,7 +24,7 @@ void setup()
 
     // Initialize Motor Controller Bus
     _lm.LogStr("Initializing Motor Controller Bus.");
-    Serial1.begin(115200);
+    Serial1.begin(9600);
 
     // Initialize I2C Bus
     _lm.LogStr("Initializing I2C Bus for Wire Devices.");

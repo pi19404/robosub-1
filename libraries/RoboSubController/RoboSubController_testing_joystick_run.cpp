@@ -55,18 +55,14 @@ void RoboSubController::Run()
     int thrusterDutyCycleBuf[NUM_THRUSTERS];
     int thrusterDirBuf[NUM_THRUSTERS];
 
-//    char clsBuffer[20];
-
-    // this is the CLS pmod that stuff can be printed to
-//    CLS mLittleScreen;
-
     // a local instance of the log manager
     LogManager& _lm = LogManager::GetInstance();
 
     memset(pcCmdDataBuffer, 0, RoboSubControlData::SIZE);
     memset(thrusterDutyCycleBuf, 0, sizeof(thrusterDutyCycleBuf));
     memset(thrusterDirBuf, 0, sizeof(thrusterDirBuf));
-//    memset(clsBuffer, 0, sizeof(clsBuffer));
+    memset(thrusterDutyCycleBuf, 0, sizeof(thrusterDutyCycleBuf));
+    memset(thrusterDirBuf, 0, sizeof(thrusterDirBuf));
 
     while( true )
     {
@@ -237,6 +233,12 @@ void RoboSubController::Run()
         depthInches = mIMU.readDepth();
 
         // read the accelerometer
+        mIMU.getAccelAll(&myAccelData);
+
+        // read the gyroscope
+        mIMU.getGyroAll(&myGyroData);
+/*
+        // read the accelerometer
         myAccelData.X = 1.1;
         myAccelData.Y = 2.2;
         myAccelData.Z = -3.3;
@@ -245,7 +247,7 @@ void RoboSubController::Run()
         myGyroData.X = 4.4;
         myGyroData.Y = -5.5;
         myGyroData.Z = 6.6;
-
+*/
 
         // serialize the sensor data and send it back to the sub's PC
         String toSubPC;
@@ -266,9 +268,9 @@ void RoboSubController::Run()
 
         // "Pretty" print the joystick commands back to the serial line to 
         // ensure the data was sent correctly.
-        String toPrint;
-        pcCmdData.ToString(toPrint);
-        Serial.print(toPrint);
+//        String toPrint;
+//        pcCmdData.ToString(toPrint);
+//        Serial.print(toPrint);
 
         delay(100);
     }

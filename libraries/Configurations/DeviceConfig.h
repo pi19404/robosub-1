@@ -14,22 +14,45 @@
 #define DEPTH_PIN A7
 #define DEPTH_SCALE (5.0L / 12.0L)
 
+// the number of thrusters 
+#define NUM_THRUSTERS 6
+
 // the serial addresses (??verify??) of each motor
 #define M1_ADDR 128
 #define M2_ADDR 129
 #define M3_ADDR 130
 
-// the number of thrusters 
-#define NUM_THRUSTERS 6
+// the number of pneumatic solenoids;
+#define NUM_PNEUMATICS 6
 
-// values beyond these can burn out the thrusters
-#define PWM_MAX  127
-#define PWM_MIN -127
+// the pin numbers that control each solenoid
+/*
+    A pneumatic device has two pneumatic hoses connected to it, and the way 
+    that those hoses are connected to the solenoids determines the solenoid 
+    that powers each device, and therefore also the arduino's pin number 
+    corresponding to that device.
 
-// the number of pneumatic actuators;
-// Note: not neccessarily the number of pneumatic devices;
-// for example, one of the claws has two actuators (rotate and grab)
-#define NUM_PNEUMATICS 7
+    Details can be found in the drop box in the document titled
+    "Shield Pinout.xlsx".
+
+    Current (7-6-2013) connection:
+    Device      Location        Solenoid #
+    --------------------------------------
+    Torpedo 1   port            3
+    Torpedo 2   starboard       6
+    Marker 1    port            1
+    Marker 2    starboard       4
+    Claw 1      port            2
+    Claw 2      starboard       5
+
+*/
+#define solenoid1Pin 52
+#define solenoid2Pin 53
+#define solenoid3Pin 49
+#define solenoid4Pin 43
+#define solenoid5Pin 41
+#define solenoid6Pin 31
+
 
 
 #endif

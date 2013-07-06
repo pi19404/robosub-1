@@ -30,6 +30,11 @@ void RoboSubController::Run()
     // pause for a moment before beginning
     delay(2000);
 
+    for(i = 0; i < NUM_THRUSTERS; i++)
+    {
+        dutyCycles[i] = 0;
+        motorDirections[i] = 0;
+    }
 /*
     // set all drive thrusters to drive forward at 50% duty cycle
     for (i = 0; i < 4; i++)
@@ -50,9 +55,21 @@ void RoboSubController::Run()
 
     while( true )
     {
-        _lm.LogStr("turning roll thrusters on");
+        // periodically turn the thrusters on and off
+/*
+        _lm.LogStr("turning port thrusters on");
+        dutyCycles[0] = 30;
+        dutyCycles[1] = 30;
+        mCU.setThrusters(dutyCycles, motorDirections);
+        delay(2000);
 
-        // periodically turn the starboard thrusters on and off
+        _lm.LogStr("turning port thrusters off");
+        dutyCycles[0] = 0;
+        dutyCycles[1] = 0;
+        mCU.setThrusters(dutyCycles, motorDirections);
+        delay(4000);
+
+        _lm.LogStr("turning starboard thrusters on");
         dutyCycles[2] = 20;
         dutyCycles[3] = 20;
         mCU.setThrusters(dutyCycles, motorDirections);
@@ -62,7 +79,39 @@ void RoboSubController::Run()
         dutyCycles[2] = 0;
         dutyCycles[3] = 0;
         mCU.setThrusters(dutyCycles, motorDirections);
-        delay(5000);
+        delay(4000);
+
+        _lm.LogStr("turning roll thrusters on");
+        dutyCycles[4] = 30;
+        dutyCycles[5] = 30;
+        mCU.setThrusters(dutyCycles, motorDirections);
+        delay(2000);
+
+        _lm.LogStr("turning roll thrusters off");
+        dutyCycles[4] = 0;
+        dutyCycles[5] = 0;
+        mCU.setThrusters(dutyCycles, motorDirections);
+        delay(4000);
+*/
+        _lm.LogStr("turning thrusters on");
+        dutyCycles[0] = 30;
+        dutyCycles[1] = 30;
+        dutyCycles[2] = 30;
+        dutyCycles[3] = 30;
+        dutyCycles[4] = 30;
+        dutyCycles[5] = 30;
+        mCU.setThrusters(dutyCycles, motorDirections);
+        delay(2000);
+
+        _lm.LogStr("turning thrusters off");
+        dutyCycles[0] = 0;
+        dutyCycles[1] = 0;
+        dutyCycles[2] = 0;
+        dutyCycles[3] = 0;
+        dutyCycles[4] = 0;
+        dutyCycles[5] = 0;
+        mCU.setThrusters(dutyCycles, motorDirections);
+        delay(4000);
     }
 }
 

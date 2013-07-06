@@ -1,4 +1,5 @@
 #include <Overseers/CU.h>
+#include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
 CU::CU(void) 
@@ -16,11 +17,14 @@ CU::CU(void)
 
     mLogInstance.LogStr("CU::CU - starting up pneumatics");
     // set the pin numbers for each pneumatic device (this initialization also
-    // sets the pins as outputs)
-    mTorpedo1.init(52);
-    mTorpedo2.init(53);
-    mMarker1.init(49);
-    mMarker2.init(43);
+    // sets the pins as outputs);
+    // see DeviceConfig.h for more details
+    mTorpedo1.init(solenoid3Pin);
+    mTorpedo2.init(solenoid6Pin);
+    mMarker1.init(solenoid1Pin);
+    mMarker2.init(solenoid4Pin);
+    mClaw1.init(solenoid2Pin);
+    mClaw2.init(solenoid5Pin);
 
     // set all pneumatic devices as ready to fire
     mTorpedo1Ready = true;

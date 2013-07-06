@@ -3,6 +3,7 @@
 #include <WProgram.h>
 
 #include "thrusterPair.h"
+#include "string.h"
 
 thrusterPair::thrusterPair()
 {
@@ -40,6 +41,8 @@ void thrusterPair::setMotor(int motorNum, int dutyCycle, int direction)
     unsigned char commandData = 0;
     unsigned char checkSum = 0;
 
+    LogManager& mLogInstance = LogManager::GetInstance();
+
     // check the duty cycle argument and force it to be within range
     /*
         We decided that we did not want the h bridges to run at 100% duty cycle
@@ -52,9 +55,9 @@ void thrusterPair::setMotor(int motorNum, int dutyCycle, int direction)
     {
         dutyCycle = 0;
     } 
-    else if (dutyCycle > 25)
+    else if (dutyCycle > 30)
     {
-        dutyCycle = 25;
+        dutyCycle = 30;
     }
 
     // set command based on motor number and direction
@@ -65,43 +68,34 @@ void thrusterPair::setMotor(int motorNum, int dutyCycle, int direction)
     // 5 - drive motor 2 backward
     if (1 == motorNum)
     {
-        if (0 < direction)
-        {
-            // motor 1 forward
-            command = 0;
-        }
-        else if (0 > direction)
+        if (direction < 0)
         {
             // motor 1 backwards
             command = 1;
         }
-        else
+        else 
         {
-            // direction = 0 = bad; ignore command and abort
-            return;
+            // motor 1 forward
+            command = 0;
         }
     }
     else if (2 == motorNum)
     {
-        if (0 < direction)
-        {
-            // motor 1 forward
-            command = 4;
-        }
-        else if (0 > direction)
+        if (direction < 0)
         {
             // motor 2 backwards
             command = 5;
         }
-        else
+        else 
         {
-            // direction = 0 = bad; ignore command and abort
-            return;
+            // motor 1 forward
+            command = 4;
         }
     }
     else
     {
         // motor number is bad; ignore command and abort
+        mLogInstance.LogStr("thrusterPair::setMotor - bad motor number.");
         return;
     }
 

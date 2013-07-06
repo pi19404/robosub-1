@@ -57,6 +57,8 @@ private:
     pDev mTorpedo2;
     pDev mMarker1;
     pDev mMarker2;
+    pDev mClaw1;
+    pDev mClaw2;
     
     // these track the state of pneumatic actiuators that are only supposed to 
     // fire one time

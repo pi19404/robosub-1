@@ -36,7 +36,10 @@ SYS_INCLUDES += $(patsubst %,-I%,$(USER_LIB_PATH))
 ## also put the logging flag here, which says whether or not the log manager
 ## is active ##
 CPPFLAGS +=             \
--DLOGGING='1'           \
+-DLOGGING='0'           \
+-DHAVE_ACCEL            \
+-DACCEL_MODEL='ADXL345' \
+-DHAVE_GYRO             \
+-DGYRO_MODEL='L3G4200D' \
 -DROBOSUBCONTROLLER_TESTING_JOYSTICK_RUN   \
-
 
