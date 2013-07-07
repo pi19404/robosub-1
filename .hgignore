@@ -2,9 +2,14 @@ syntax: regexp
 .*\.pyc$
 .*\.sw[op]$
 .*~$
-.*vision_tests.*
 .*\.o$
 .*\.a$
 .*\.orig$
 .*\.out$
+.*\.pdf$
+robosub$
+.*CMakeFiles/.*
+.*\.cmake$
+CMakeCache.txt
+^build/.*
 
