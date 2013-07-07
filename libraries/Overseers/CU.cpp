@@ -31,6 +31,7 @@ CU::CU(void)
     mTorpedo2Ready = true;
     mMarker1Ready = true;
     mMarker2Ready = true;
+    mClawIsClosed = true;
 
     mLogInstance.LogStr("CU::CU - finished");
 }
@@ -207,11 +208,32 @@ The first check should have caught this.");
     }
 }
 	
-bool CU::clawOpen()
+void CU::clawOpen()
 {
-    // ?? necessary? to do??
-    return false;
+    // if the claw pneumatics are such that the claw is close, activate them
+    if (mClawIsClosed)
+    {
+        // there are two pneumatics for the claw; use both simultaneously
+        mClaw1.activate();
+        mClaw2.activate();
+
+        mClawIsClosed = false;
+    }
 }
+
+void CU::clawClose()
+{
+    // if the claw pneumatics are such that the claw is close, activate them
+    if (!mClawIsClosed)
+    {
+        // there are two pneumatics for the claw; use both simultaneously
+        mClaw1.deactivate();
+        mClaw2.deactivate();
+
+        mClawIsClosed = true;
+    }
+}
+
 
 uint8_t CU::thrusterNState(uint8_t thrusterNum)
 {

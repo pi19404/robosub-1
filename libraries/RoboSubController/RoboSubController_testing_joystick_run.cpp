@@ -229,6 +229,17 @@ void RoboSubController::Run()
             mCU.dropMarkerN(1);
         }
 
+        // check claw command
+        tempPneumaticData = pcCmdData.Data.Claw_Latch;
+        if (tempPneumaticData)
+        {
+            mCU.clawOpen();
+        }
+        else
+        {
+            mCU.clawClose();
+        }
+
         // read the depth sensor
         depthInches = mIMU.readDepth();
 

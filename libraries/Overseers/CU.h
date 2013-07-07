@@ -36,8 +36,9 @@ public:
 
 	virtual bool markerNReady(uint8_t markerNum);
     virtual void dropMarkerN(uint8_t markerNum);
-	
-	virtual bool clawOpen();
+
+	virtual void clawOpen();
+	virtual void clawClose();
 
 	virtual uint8_t thrusterNState(uint8_t thrusterNum);
     virtual void setThrusters(int *dutyCycles, int *motorDirections);
@@ -60,12 +61,12 @@ private:
     pDev mClaw1;
     pDev mClaw2;
     
-    // these track the state of pneumatic actiuators that are only supposed to 
-    // fire one time
+    // these track the state of the pneumatic actiuators 
     bool mTorpedo1Ready;
     bool mTorpedo2Ready;
     bool mMarker1Ready;
     bool mMarker2Ready;
+    bool mClawIsClosed;
 };
 
 
