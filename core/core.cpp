@@ -283,8 +283,8 @@ int ObstacleCourse(KB *kb)
 
 int Torpedos(KB *kb)
 {
-    // TODO
     // Find targets
+    // TODO
     // Find primary target
         // Move to position in front of small hexagon
         // Aim
