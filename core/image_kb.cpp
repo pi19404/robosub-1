@@ -16,8 +16,8 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->drivingObstacle = false;
     im->sonarObstacle   = false;
 
-	// Start Gate
-	im->startGateCenterDistance = -1.0;
+	 // Start Gate
+	 im->startGateCenterDistance = -1.0;
     im->sgPillars[0].pillarSeen = false;
     im->sgPillars[1].pillarSeen = false;
     im->sgPillars[0].pillarX    = 0;
@@ -33,7 +33,7 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
 
 
     // Buoys
-	im->numBuoysSeen = 0;
+	 im->numBuoysSeen = 0;
     im->buoys[0].buoySeen  = false;
     im->buoys[1].buoySeen  = false;
     im->buoys[2].buoySeen  = false;
@@ -86,22 +86,22 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
 
     // Bins
     im->bins[0].binSeen = false;
-	im->bins[1].binSeen = false;
-	im->bins[2].binSeen = false;
-	im->bins[3].binSeen = false;
+	 im->bins[1].binSeen = false;
+	 im->bins[2].binSeen = false;
+	 im->bins[3].binSeen = false;
     
     im->bins[0].binX = 0;
-	im->bins[0].binY = 0;
-	im->bins[0].binZ = 0;
-	im->bins[1].binX = 0;
-	im->bins[1].binY = 0;
-	im->bins[1].binZ = 0;
-	im->bins[2].binX = 0;
-	im->bins[2].binY = 0;
-	im->bins[2].binZ = 0;
-	im->bins[3].binX = 0;
-	im->bins[3].binY = 0;
-	im->bins[3].binZ = 0;
+	 im->bins[0].binY = 0;
+	 im->bins[0].binZ = 0;
+	 im->bins[1].binX = 0;
+	 im->bins[1].binY = 0;
+	 im->bins[1].binZ = 0;
+	 im->bins[2].binX = 0;
+	 im->bins[2].binY = 0;
+	 im->bins[2].binZ = 0;
+	 im->bins[3].binX = 0;
+	 im->bins[3].binY = 0;
+	 im->bins[3].binZ = 0;
 
     // Manipulation
     im->wheelSeen   = false;
@@ -115,10 +115,10 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->shiftZ      = 0;
 
     // Octagons
-	im->octagons[0].octagonSeen = false;
-	im->octagons[0].octagonX    = 0;	// object to pick up below the octagon
-	im->octagons[0].octagonY    = 0;
-	im->octagons[0].octagonZ    = 0;
+	 im->octagons[0].octagonSeen = false;
+	 im->octagons[0].octagonX    = 0;	// object to pick up below the octagon
+	 im->octagons[0].octagonY    = 0;
+	 im->octagons[0].octagonZ    = 0;
 
     // Center point for target one
     im->x1 = 0;  // pixels? 
@@ -152,7 +152,7 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->target4color = DEFAULT;
     im->target4image = UNKNOWN;
 
-	return;
+	 return;
 }
 
 IMAGE_KB::IMAGE_KB()

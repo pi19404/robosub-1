@@ -21,7 +21,7 @@ KB::KB()
         pillar2Found = false;
 
         // Paths
-		path1found = false;
+        path1found = false;
         path2found = false;
         path3found = false;
         path4found = false;
@@ -30,7 +30,7 @@ KB::KB()
         path7found = false;
 
         // Buoys
-		correctHeading = false;
+        correctHeading = false;
         buoy1Found = false;
         buoy2Found = false;
         buoy3Found = false;
@@ -54,17 +54,17 @@ KB::KB()
         // Torpedoes
         primaryTorpedoTargetComplete = false;
         secondaryTorpedoTargetComplete = false;
-		int torpedoDistance = 0;
+        int torpedoDistance = 0;
 
         // Bins
         binsFound  = false;
         binsPrimaryFound = false;
-		binsSecondaryFound = false;
+        binsSecondaryFound = false;
         primaryBinTargetComplete = false;
         secondaryBinTargetComplete = false;
         binDistance = false;
 
-		// Octaons
+        // Octaons
         objectFound = false;
         objectGrabbed = false;
         objectDistance = 0;
@@ -107,13 +107,13 @@ KB::KB()
         
         // TODO LIVE MISSION PLAN UPDATE
         // Buoy Targets
-		buoy1Complete = false;
-		buoy1Found = false;
-		buoy2Complete = false;
-		buoy2Found = false;
-		buoy3Complete = false;
-		buoy3Found = false;
-		buoyGoalColor = DEFAULT;	// Either: set this if we know what color we want
+        buoy1Complete = false;
+        buoy1Found = false;
+        buoy2Complete = false;
+        buoy2Found = false;
+        buoy3Complete = false;
+        buoy3Found = false;
+        buoyGoalColor = DEFAULT;	// Either: set this if we know what color we want
 											// to make the buoys or set it when we collide
 											// with the first buoy so the rest of the buoys match
         

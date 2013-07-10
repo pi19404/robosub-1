@@ -223,6 +223,59 @@ int Buoys(KB *kb, IMAGE_KB *im)
 
 int ObstacleCourse(KB *kb)
 {
+    // Find bars
+    if(im->horizBarSeen && !kb->horizBarFound)
+    {
+        kb->horizBarFound = true;  
+    }
+    if(im->leftBarSeen && !kb->leftBarFound)
+    {
+        kb->leftBarFound = true;
+    }
+    if(im->rightBarSeen && !kb->rightBarFound)
+    {
+        kb->rightBarFound = true;
+    }
+
+    if(kb->horizBarFound && kb->leftBarFound && kb->rightBarFound &&
+        ( im->horizBarSeen || im->leftBarSeen || im->rightBarSeen ) )
+    {
+        // Move to the center of the obstacle lower half
+        // if the bar is green 
+        // if distance < 2ft and bar is green: move through
+        // if distance < 2ft and bar is red: stop
+        // if distance > 2ft move forward
+        // TODO
+        if ( im->horizBarZ < 2 )
+        {
+            if ( im->leftBarColor == GREEN && im->rightBarColor == GREEN)
+            {
+                // Move through the gate, lower half
+                // TODO add parallel parking logic if straffing works well
+                //TODO move();
+            }
+            else
+            {
+                // Move to the gate but not through it yet
+                move(0,0,0,0);
+            }
+        }
+        else 
+        {
+            // Move towards the center of the gate lower half 
+            //TODO
+            //move();
+
+        }
+    }
+    if(kb->horizBarFound && kb->leftBarFound && kb->rightBarFound &&
+        (!im->horizBarSeen && !im->leftBarSeen && !im->rightBarSeen ) )
+    {
+        kb->obstacleCourse1Complete = true;
+		// continue moving forward (to find the path) for a specified amount of time, maybe wait for a bit once we dont see the pillars anymore
+        // TODO
+		/*wait()*/
+    }
 
     return 0;
 }
@@ -230,21 +283,49 @@ int ObstacleCourse(KB *kb)
 
 int Torpedos(KB *kb)
 {
+    // TODO
+    // Find targets
+    // Find primary target
+        // Move to position in front of small hexagon
+        // Aim
+        // First torpedo 1
+    // Find secondary target
+        // Move to position in front of small hexagon
+        // Aim
+        // First torpedo 2
+    
+    // Move towards paths or bins if not already complete
 
     return 0;
 }
 
 int Bins(KB *kb, IMAGE_KB *im)
 {
-
+    // TODO
+    // Find Bins
+    // Find primary target
+        // Move directly above primary target 
+        // Aim
+        // Drop marker 1
+    // Find secondary target
+        // Move directly above secondary target 
+        // Aim
+        // Drop marker 2
     return 0;
 }
 
 bool move(int x, int y, int z, double heading)
 {
 	bool result = false;
-    cout << "X: " << x << " Y: " << y << " Z: " << z << " Heading: " << heading << endl;
-    // TODO Send to controller code
+   cout << "X: " << x << " Y: " << y << " Z: " << z << " Heading: " << heading << endl;
+   // X left and right
+   // Y forward back
+   // Z up and down
+   // Heading positive clockwise and negative counter clockwise
+   // TODO Send to controller code
+
+   //-128 to 128   // 0.5 
+   // -100 to 100 for thrusters
 
 	return result;
 }
