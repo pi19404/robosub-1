@@ -42,8 +42,11 @@ void loop()
     LogManager& _lm = LogManager::GetInstance();
     _lm.LogStr("\nArduino.pde sketch; begin loop.");
 
-    // Loop at 100Hz
-    delay(2000);
+    // the h bridges (SaberTooth 2x12) appear to have a startup time, and 2sec,
+    // in addition to the other startup that the Arduino does, is a little too
+    // fast for the first h bridge, which is for the port thrusters; a delay of
+    // 4sec should be more than enough to allow ample startup of the h bridges
+    delay(4000);
     _lm.LogStr("Arduino.pde sketch; initializing RoboSubController object.");
     RoboSubController Controller (ROBO_COM, 100.0);
     _lm.LogStr("Arduino.pde sketch; finished RoboSubController object.");
