@@ -38,9 +38,9 @@ struct ArduinoStatus : public Serializable
     {
         if( !str ){ return; }
      
-        // Write magic number   
+        // Write beginning magic number  
         char *str2 = str;
-        *str2 = MAGIC;
+        *str2 = MAGIC_START;
         ++str2;
 
         // Accelerometer and Gyroscope
@@ -55,6 +55,9 @@ struct ArduinoStatus : public Serializable
         // Depth Sensor
         sz = sizeof(uint32_t);
         _Serialize( &Data.Depth, sz, &str2 );
+
+        // Write ending magic number
+        *str2 = MAGIC_STOP;
     }
 
     // DeserializeFromString
@@ -64,9 +67,10 @@ struct ArduinoStatus : public Serializable
     // \post the object will contain the deserialized data from str.
     void DeserializeFromString( const char *str )
     {
-        // Check magic number
+        // Check beginning and ending magic numbers
         const char * str2 = str;
-        if( str && (*str != MAGIC) )
+        if( !str || (str[0]     != MAGIC_START) 
+                 || (str[SIZE-1] != MAGIC_STOP) )
         { 
             return; 
         }
@@ -110,8 +114,9 @@ struct ArduinoStatus : public Serializable
 
     } Data;
 
-    static const char MAGIC = 0x25;
-    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA);
+    static const char MAGIC_START = 0x25;
+    static const char MAGIC_STOP  = 0x26;
+    static const uint32_t SIZE = sizeof(MAGIC_START) + sizeof(MAGIC_STOP) + sizeof(DATA);
 };
 
 #endif //__ARDUINO_STATUS_H__
