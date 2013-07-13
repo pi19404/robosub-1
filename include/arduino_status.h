@@ -111,7 +111,7 @@ struct ArduinoStatus : public Serializable
     } Data;
 
     static const char MAGIC = 0x25;
-    static const uint32_t SIZE = sizeof(DATA);
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA);
 };
 
 #endif //__ARDUINO_STATUS_H__
