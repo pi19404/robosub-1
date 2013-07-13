@@ -126,12 +126,12 @@ void RoboSubController::Run()
         write( _ArduinoPort, ba::buffer( sendBuffer, RoboSubControlData::SIZE ) ) ;
 
         // Get status from arduino
-        read( _ArduinoPort, ba::buffer( recvBuffer, ArduinoData::SIZE ) );
+        /*read( _ArduinoPort, ba::buffer( recvBuffer, ArduinoData::SIZE ) );
         arduinoData.DeserializeFromString(recvBuffer);
 
         // Write info to stdout
         cout << "\nReceived Status: " << endl;
-        cout << arduinoData << endl;
+        cout << arduinoData << endl;*/
     }
     delete [] sendBuffer;
     delete [] recvBuffer;
