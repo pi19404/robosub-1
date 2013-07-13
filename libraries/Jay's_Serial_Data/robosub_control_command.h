@@ -126,7 +126,7 @@ struct RoboSubControlCommand : public Serializable
     } Data;
 
     static const char MAGIC = 0x22;
-    static const uint32_t SIZE = sizeof(DATA);
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA);
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__
