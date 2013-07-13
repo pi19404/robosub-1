@@ -69,7 +69,7 @@ void RoboSubController::Run()
         // Only read when we have the "magic" number
         // this number indicates that we have control data
         _lm.LogStr("waiting for transmission start");
-        while(Serial.peek() != RoboSubControlData::MAGIC)
+        while(Serial.peek() != RoboSubControlData::MAGIC_START)
         {
             // Discard this byte,
             // we don't want it
@@ -88,6 +88,14 @@ void RoboSubController::Run()
         {
             int c = Serial.read();
             pcCmdDataBuffer[i] = static_cast<char>(c);
+        }
+
+        // Check for the magic number at the end of the read bytes
+        // to help verify that the data has not been corrupted.
+        if( pcCmdDataBuffer[RoboSubControlData::SIZE-1] != RoboSubControlData::MAGIC_STOP )
+        {
+            // The data was malformed, so, discard it
+            continue;
         }
 
         // Deserialize the read in bytes into
@@ -287,8 +295,6 @@ void RoboSubController::Run()
 //        String toPrint;
 //        pcCmdData.ToString(toPrint);
 //        Serial.print(toPrint);
-
-        delay(100);
     }
 }
 
