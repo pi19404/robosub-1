@@ -1,8 +1,8 @@
 #ifdef ROBOSUBCONTROLLER_TESTING_JOYSTICK_RUN
 
 #include <RoboSubController/RoboSubController.h>
-#include <Jay's_Serial_Data/robosub_control_data.h>
-#include <Jay's_Serial_Data/arduino_data.h>
+#include <Jay's_Serial_Data/robosub_control_data.h> // for commands from PC
+#include <Jay's_Serial_Data/arduino_data.h>         // for sensor data to PC
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
@@ -204,12 +204,14 @@ void RoboSubController::Run()
 
         // check torpedo commands
         tempPneumaticData = pcCmdData.Data.Torpedo1_Fire;
+        _lm.LogStrInt("torpedo 1: ", tempPneumaticData);
         if (tempPneumaticData)
         {
             mCU.fireTorpedoN(1);
         }
 
         tempPneumaticData = pcCmdData.Data.Torpedo2_Fire;
+        _lm.LogStrInt("torpedo 2: ", tempPneumaticData);
         if (tempPneumaticData)
         {
             mCU.fireTorpedoN(2);
@@ -218,12 +220,14 @@ void RoboSubController::Run()
 
         // check marker dropper commands
         tempPneumaticData = pcCmdData.Data.Marker1_Drop;
+        _lm.LogStrInt("marker 1: ", tempPneumaticData);
         if (tempPneumaticData)
         {
             mCU.dropMarkerN(1);
         }
 
         tempPneumaticData = pcCmdData.Data.Marker2_Drop;
+        _lm.LogStrInt("marker 2: ", tempPneumaticData);
         if (tempPneumaticData)
         {
             mCU.dropMarkerN(1);
@@ -231,6 +235,7 @@ void RoboSubController::Run()
 
         // check claw command
         tempPneumaticData = pcCmdData.Data.Claw_Latch;
+        _lm.LogStrInt("claw: ", tempPneumaticData);
         if (tempPneumaticData)
         {
             mCU.clawOpen();
