@@ -5,7 +5,7 @@
 # targets: "all" and "install", and place that 
 # Makefile in your project folder.
 ####################################################
-TARGETS=joytest libav8r librealjoy robosub_joystick
+TARGETS=joytest libav8r librealjoy robosub_joystick control_system
 
 .PHONY: all
 all: 
