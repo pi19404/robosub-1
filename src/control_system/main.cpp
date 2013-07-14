@@ -10,12 +10,16 @@
 // 1-Jun-2013      JS      Created File.
 ///////////////////////////////////////////////////////////////////////////////
 #include "robosub_controller.h" // reads from file, sends command to arduino.
-#include "arduino_data.h"
-#include <boost/program_options.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <exception>
+
+#include <unistd.h>
+
+#include <boost/program_options.hpp>
+#include <boost/bind.hpp>
 
 using std::cout;
 using std::cout;
@@ -25,6 +29,18 @@ using std::fstream;
 using std::istream;
 using std::string;
 using std::exception;
+
+void recv_callback( const ArduinoData& data )
+{
+    cout << "Status Received from Arduino: " << endl;
+    cout << data << endl;
+}
+
+void send_callback( const RoboSubCommand& data )
+{
+    cout << "Command Sent to Aruino: " << endl;
+    cout << data << endl;
+}
 
 int main( int argc, char **argv )
 {
@@ -73,9 +89,12 @@ int main( int argc, char **argv )
    /*
     * Run the Controller. 
     */
-    RoboSubController Controller(serial_dev, baud_rate);
-    ArduinoData arduinoReply;
+    RoboSubController Controller;
+    Controller.AttachDataReceivedCallback(recv_callback);
+    Controller.AttachDataSentCallback(send_callback);
 
+    Controller.Run(serial_dev, baud_rate);
+    
     Controller.SetThrustAll( ThrustMode::STOP,
                              ThrustMode::POS_FULL,
                              ThrustMode::NEG_FULL,
@@ -87,14 +106,15 @@ int main( int argc, char **argv )
                             PneumMode::ACTIVATED,
                             PneumMode::ACTIVATED );
     
-    cout << "Command Sent to Aruino: " << endl;
-    cout << Controller.Command() << endl;
 
-    Controller.SendCommand(arduinoReply);
-
-    cout << "Status Received from Arduino: " << endl;
-    cout << arduinoReply << endl;
-
+    int i=5;
+    while(i)
+    {
+        Controller.SendCommand();
+        sleep(1);
+        --i;
+    }
+    
     return 0;
 }
 

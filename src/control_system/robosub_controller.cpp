@@ -10,14 +10,14 @@
 // 09-Jul-2013      JS      Created File.
 ///////////////////////////////////////////////////////////////////////////////
 #include "robosub_controller.h"
-#include "robosub_control_data.h"
-#include "arduino_data.h"
 
 #include <exception>
 #include <cstdlib>
 #include <unistd.h>
 #include <iostream>
 #include <sstream>
+
+#include <boost/bind.hpp>
 
 using std::istream;
 using std::ostringstream;
@@ -36,14 +36,46 @@ const float RoboSubController::_FULL_THRUST_PWR    = 80.0;
 const bool RoboSubController::_DEFAULT_PNEUMATIC_STATE   = false;
 const bool RoboSubController::_ACTIVATED_PNEUMATIC_STATE = true;
 
-RoboSubController::RoboSubController( string comPort, string baudRate )
+RoboSubController::RoboSubController()
     :
     _Io(),
+    _Work(_Io),
     _ArduinoPort(_Io),
     _Command(),
     _Status(),
-    _SendBuffer(NULL),
-    _RecvBuffer(NULL)
+    _SendBuffer(),
+    _RecvBuffer(),
+    _DataRecvCallback(NULL),
+    _DataSentCallback(NULL)
+{
+    size_t i;
+    for(i=0; i < RoboSubControlData::SIZE; ++i)
+    {
+        _SendBuffer[i] = 0;
+    }
+
+    for(i=0; i < ArduinoData::SIZE; ++i)
+    {
+        _RecvBuffer[i] = 0;
+    }
+}
+
+RoboSubController::~RoboSubController()
+{
+   
+}
+
+void RoboSubController::AttachDataReceivedCallback( void (&c)(const ArduinoData&) )
+{
+    _DataRecvCallback = &c;
+}
+
+void RoboSubController::AttachDataSentCallback( void (&c)(const RoboSubCommand&) )
+{
+    _DataSentCallback = &c;
+}
+
+void RoboSubController::Run(std::string comPort, std::string baudRate )
 {
 
     // Open Arduino Communications Port:
@@ -62,9 +94,7 @@ RoboSubController::RoboSubController( string comPort, string baudRate )
         cout << "CONTROL_SYS>> Waiting For Arduino To Initialize..." << endl;
         usleep(2000000);
 
-        _SendBuffer = new char[RoboSubControlData::SIZE];
-        _RecvBuffer = new char[ArduinoData::SIZE];
-        
+        _MeasurementDataAvailableHandler(boost::system::error_code(), 0);
     }
     catch(...)
     {
@@ -72,48 +102,28 @@ RoboSubController::RoboSubController( string comPort, string baudRate )
     }
 }
 
-RoboSubController::~RoboSubController()
+void RoboSubController::SendCommand()
 {
-    // close the arduino port
-    _ArduinoPort.close();
-
-    // clear the buffers
-    if( _SendBuffer )
-    {
-        delete[] _SendBuffer;
-        _SendBuffer = NULL;
-    }
-
-    if( _RecvBuffer )
-    {
-        delete[] _RecvBuffer;
-        _RecvBuffer = NULL;
-    }
-}
-
-void RoboSubController::SendCommand(ArduinoStatus& response)
-{
-    // Data Transfer Loop
-    RoboSubControlData controlData;
-    ArduinoData        arduinoData;
-    
     // Convert Command to Control Message
+    RoboSubControlData controlData;
     controlData.FromCommand( &_Command );
 
     // Send to Arduino
     namespace ba = boost::asio;
     controlData.SerializeToString( _SendBuffer );
-    write( _ArduinoPort, ba::buffer( _SendBuffer, RoboSubControlData::SIZE ) ) ;
-
-    // Get status from arduino
-    read( _ArduinoPort, ba::buffer( _RecvBuffer, ArduinoData::SIZE ) );
-    arduinoData.DeserializeFromString( _RecvBuffer );
-
-    // Emit Response
-    response = arduinoData;
+    
+    ba::async_write( _ArduinoPort,
+                    ba::buffer(_SendBuffer,RoboSubControlData::SIZE),
+                    ba::transfer_at_least(RoboSubControlData::SIZE),
+                    boost::bind( 
+                        &RoboSubController::_SentDataHandler, 
+                        this, 
+                        ba::placeholders::error,
+                        ba::placeholders::bytes_transferred ) );
 
     // Reset Timed Pneumatics
     _ResetTimedPneumatics();
+    _Io.poll();
 }
 
 const RoboSubCommand& RoboSubController::Command() const
@@ -194,7 +204,66 @@ void RoboSubController::SetPneumClaw( const PneumMode& mode )
 {
     _SetPneumHelper( _Command.Claw_Latch, mode );
 }
+
+void RoboSubController::_MeasurementDataAvailableHandler( 
+                                           const boost::system::error_code& ec,
+                                           size_t bytes_transferred )
+{  
+    namespace ba = boost::asio;
+
+    // If no callback is registered,
+    // don't bother receiving anything
+    if( !_DataRecvCallback )
+    {
+        return;
+    }
+
+    // Case: All data is here, and checks out.
+    if( ( bytes_transferred == ArduinoData::SIZE-1 ) &&
+        ( _RecvBuffer[0] == ArduinoStatus::MAGIC ) )
+    {
+
+        if( ArduinoStatus::SerializedIsValid(_RecvBuffer, ArduinoData::SIZE) )
+        {
+            _Status.DeserializeFromString(_RecvBuffer);
+            (*_DataRecvCallback)(_Status);
+        }
+    }
+    // Case: first byte found
+    else if( _RecvBuffer[0] == ArduinoStatus::MAGIC )
+    {   
+        ba::async_read ( _ArduinoPort,
+                         ba::buffer(&_RecvBuffer[1],ArduinoData::SIZE-1),
+                         ba::transfer_at_least(ArduinoData::SIZE-1),
+                         boost::bind( 
+                             &RoboSubController::_MeasurementDataAvailableHandler, 
+                             this, 
+                             ba::placeholders::error,
+                             ba::placeholders::bytes_transferred ) );
+        _Io.poll();
+        return;
+    } 
+    ba::async_read ( _ArduinoPort,
+                     ba::buffer(_RecvBuffer,1),
+                     ba::transfer_at_least(1),
+                     boost::bind( 
+                         &RoboSubController::_MeasurementDataAvailableHandler, 
+                         this, 
+                         ba::placeholders::error,
+                         ba::placeholders::bytes_transferred ) );
+    _Io.poll();
+}
  
+void RoboSubController::_SentDataHandler( 
+                                          const boost::system::error_code& ec,
+                                          size_t bytes_transferred )
+{
+    if( _DataSentCallback )
+    {
+        (*_DataSentCallback)(_Command);
+    }
+}
+
 void RoboSubController::_SetThrustHelper( float& thruster, 
                                           const ThrustMode& mode )
 {

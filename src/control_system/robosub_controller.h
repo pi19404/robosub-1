@@ -11,11 +11,12 @@
 // Major Changes:
 // 09-Jul-2013      JS      Created File.
 ///////////////////////////////////////////////////////////////////////////////
-#include "robosub_command.h" // (To   Arduino) Command
-#include "arduino_status.h"  // (From Arduino) Status
+#include "robosub_control_data.h" // (To   Arduino) Command
+#include "arduino_data.h"         // (From Arduino) Status
 
 #include <string>
 #include <boost/asio.hpp>
+#include <boost/function.hpp>
 
 class ThrustMode;
 class PneumMode;
@@ -27,15 +28,28 @@ class RoboSubController
 public:
     
     // Constructor
-    RoboSubController( std::string comPort,
-                       std::string baudRate );
+    RoboSubController();
 
     // Destructor
     ~RoboSubController();
 
+    // Run
+    // \brief causes the control system to open the serial port and 
+    // start listening for measurement data.
+    // \throw runtime_error if port fails to open
+    void Run( std::string comPort, std::string baudRate );
+
+    // AttachDataReceivedCallback
+    // \brief attaches a data ready handler for reading measurement data
+    void AttachDataReceivedCallback( void (&)(const ArduinoData&) );
+
+    // AttachDataSentCallback
+    // \brief attaches a data ready handler for reading measurement data
+    void AttachDataSentCallback( void (&)(const RoboSubCommand&) );
+
     // SendCommand
     // \brief issues a command to the Arduino and gets the response
-    void SendCommand(ArduinoStatus& response);
+    void SendCommand();
 
     // Command
     // \brief const accessor for the internally stored robosub command
@@ -97,6 +111,16 @@ public:
     void SetPneumClaw( const PneumMode& mode );   
 
 private:
+
+    // _MeasurementDataAvailableHandler
+    // \brief callback for reading measurement data
+    void _MeasurementDataAvailableHandler( const boost::system::error_code& ec,
+                                           size_t bytes_transferred );
+
+    // _SentDataHandler
+    // \brief callback for when data has been sent
+    void _SentDataHandler( const boost::system::error_code& ec,
+                           size_t bytes_transferred );
         
     // _SetThrustHelper
     // \brief helper function for setting the thrust
@@ -118,14 +142,21 @@ private:
     static const bool _DEFAULT_PNEUMATIC_STATE;
     static const bool _ACTIVATED_PNEUMATIC_STATE;    
 
-    boost::asio::io_service     _Io;
-    boost::asio::serial_port    _ArduinoPort;
-
-    RoboSubCommand              _Command;
-    ArduinoStatus               _Status;
+    std::string                   _ComPort;
+    std::string                   _BaudRate;
     
-    char*                       _SendBuffer;
-    char*                       _RecvBuffer;
+    boost::asio::io_service       _Io;
+    boost::asio::io_service::work _Work;
+    boost::asio::serial_port      _ArduinoPort;
+
+    RoboSubCommand                _Command;
+    ArduinoData                   _Status;
+    
+    char                          _SendBuffer[RoboSubControlData::SIZE];
+    char                          _RecvBuffer[ArduinoData::SIZE];
+
+    void (*_DataRecvCallback)(const ArduinoData&);
+    void (*_DataSentCallback)(const RoboSubCommand&);
 };
 
 //////////////////////////////////////////////
