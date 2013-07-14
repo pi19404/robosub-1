@@ -125,6 +125,10 @@ void RoboSubController::Run()
         controlData.SerializeToString(sendBuffer);
         write( _ArduinoPort, ba::buffer( sendBuffer, RoboSubControlData::SIZE ) ) ;
 
+        // notify the user of the joystick user's computer that the sub is 
+        // waiting on the arduino now
+        cout << "\nWaiting for arduino..." << endl;
+
         // Get status from arduino
         read( _ArduinoPort, ba::buffer( recvBuffer, ArduinoData::SIZE ) );
         arduinoData.DeserializeFromString(recvBuffer);
