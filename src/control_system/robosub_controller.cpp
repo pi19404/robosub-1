@@ -94,7 +94,7 @@ void RoboSubController::Run(std::string comPort, std::string baudRate )
         cout << "CONTROL_SYS>> Waiting For Arduino To Initialize..." << endl;
         usleep(2000000);
 
-        _MeasurementDataAvailableHandler(boost::system::error_code(), 0);
+        _DataAvailableHandler(boost::system::error_code(), 0);
     }
     catch(...)
     {
@@ -205,7 +205,7 @@ void RoboSubController::SetPneumClaw( const PneumMode& mode )
     _SetPneumHelper( _Command.Claw_Latch, mode );
 }
 
-void RoboSubController::_MeasurementDataAvailableHandler( 
+void RoboSubController::_DataAvailableHandler( 
                                            const boost::system::error_code& ec,
                                            size_t bytes_transferred )
 {  
@@ -236,7 +236,7 @@ void RoboSubController::_MeasurementDataAvailableHandler(
                          ba::buffer(&_RecvBuffer[1],ArduinoData::SIZE-1),
                          ba::transfer_at_least(ArduinoData::SIZE-1),
                          boost::bind( 
-                             &RoboSubController::_MeasurementDataAvailableHandler, 
+                             &RoboSubController::_DataAvailableHandler, 
                              this, 
                              ba::placeholders::error,
                              ba::placeholders::bytes_transferred ) );
@@ -247,7 +247,7 @@ void RoboSubController::_MeasurementDataAvailableHandler(
                      ba::buffer(_RecvBuffer,1),
                      ba::transfer_at_least(1),
                      boost::bind( 
-                         &RoboSubController::_MeasurementDataAvailableHandler, 
+                         &RoboSubController::_DataAvailableHandler, 
                          this, 
                          ba::placeholders::error,
                          ba::placeholders::bytes_transferred ) );

@@ -74,8 +74,17 @@ int main( int argc, char **argv )
    /*
     * Run the Controller. 
     */
-    RoboSubController Controller(infile_name, serial_dev, baud_rate);
-    Controller.Run();
+    RoboSubController Controller;
+
+    try
+    {
+        Controller.Run(infile_name, serial_dev, baud_rate);
+    }
+    catch (std::runtime_error& e)
+    {
+        cout << e.what();
+        return 1;
+    }
 
     return 0;
 }

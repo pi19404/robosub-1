@@ -16,7 +16,6 @@
 
 #include <string>
 #include <boost/asio.hpp>
-#include <boost/function.hpp>
 
 class ThrustMode;
 class PneumMode;
@@ -112,9 +111,9 @@ public:
 
 private:
 
-    // _MeasurementDataAvailableHandler
+    // _DataAvailableHandler
     // \brief callback for reading measurement data
-    void _MeasurementDataAvailableHandler( const boost::system::error_code& ec,
+    void _DataAvailableHandler( const boost::system::error_code& ec,
                                            size_t bytes_transferred );
 
     // _SentDataHandler
@@ -141,9 +140,6 @@ private:
 
     static const bool _DEFAULT_PNEUMATIC_STATE;
     static const bool _ACTIVATED_PNEUMATIC_STATE;    
-
-    std::string                   _ComPort;
-    std::string                   _BaudRate;
     
     boost::asio::io_service       _Io;
     boost::asio::io_service::work _Work;

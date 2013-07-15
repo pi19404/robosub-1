@@ -9,3 +9,4 @@ joystick_data
 joytest/joytest
 robosub_joystick/auv/auv
 robosub_joystick/client/client
+control_task

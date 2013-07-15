@@ -12,7 +12,8 @@
 // Major Changes:
 // 01-Jun-2013      JS      Created File.
 ///////////////////////////////////////////////////////////////////////////////
-#include "robosub_command.h"        // Command Data 
+#include "robosub_control_data.h"
+#include "arduino_data.h"
 
 #include <boost/asio.hpp>
 
@@ -26,22 +27,56 @@ class RoboSubController
 public:
     
     // Constructor
-    RoboSubController( std::string infile, 
-                       std::string comPort,
-                       std::string baudRate );
+    RoboSubController();
 
     // Destructor
     ~RoboSubController();
 
     // Run
     // \brief runs the controller program
-    void Run();
+    // \throws runtime_error if any errors occur
+    void Run( std::string infile, 
+              std::string comPort,
+              std::string baudRate );
 
 private:
 
-    std::ifstream               _InputStream;
-    boost::asio::io_service     _Io;
-    boost::asio::serial_port    _ArduinoPort;
+    // _GetNextCommand
+    // \brief helper for getting the next command from the input file
+    void _GetNextCommand();
+
+    // _SendControlData
+    // \brief helper for sending the derived control data from the command
+    void _SendControlData();
+
+    // _DataAvailableHandler
+    // \brief callback for reading measurement data
+    void _DataAvailableHandler( const boost::system::error_code& ec,
+                                           size_t bytes_transferred );
+
+    // _SentDataHandler
+    // \brief callback for when data has been sent
+    void _SentDataHandler( const boost::system::error_code& ec,
+                           size_t bytes_transferred );
+
+
+private:
+
+    static const unsigned int     _SEND_QUEUE_MAX_SIZE = 10;
+
+    std::ifstream                 _InputStream;
+    boost::asio::io_service       _Io;
+    boost::asio::io_service::work _Work;
+    boost::asio::serial_port      _ArduinoPort;
+    unsigned int                  _SendQueueCounter;
+
+    RoboSubCommand                _Command;
+    RoboSubControlData            _ControlData;
+    
+    char                          _CommandBuffer[sizeof(RoboSubCommand)];
+    char                          _SendBuffer[RoboSubControlData::SIZE];
+    char                          _RecvBuffer[ArduinoData::SIZE];
+
 };
 
 
