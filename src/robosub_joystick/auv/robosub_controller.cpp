@@ -14,7 +14,7 @@
 
 #include <exception>
 #include <cstdlib>
-#include <unistd.h>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 
@@ -31,7 +31,7 @@ RoboSubController::RoboSubController()
     _Io(),
     _Work(_Io),
     _ArduinoPort(_Io),
-    _SendQueueCounter(0),
+    _Mutex(),
     _Command(),
     _ControlData(),
     _CommandBuffer(),
@@ -101,11 +101,17 @@ void RoboSubController::Run( string infile,
     // Data Transfer Loop
     while(_InputStream.good())
     {
+        // 1 ms sleep time
+        static const struct timespec sleep_time_ns = { 0, 1000 };
+
         // Get the next command
         _GetNextCommand();
        
         // Send Control Data from Command
         _SendControlData();
+
+        // Sleep 1 ms
+        nanosleep(&sleep_time_ns, 0);
      }
 }
 
@@ -116,38 +122,41 @@ void RoboSubController::_GetNextCommand()
     string buffStr(_CommandBuffer, sizeof(RoboSubCommand));
 
     // Deserialize the command
+    _Mutex.lock();
     _Command.DeserializeFromString(buffStr);
+    _Mutex.unlock();
 
     // Print Received Command
     cout << "\nReceived Command: " << endl;
+    _Mutex.lock();
     cout << _Command << endl;
+    _Mutex.unlock();
 }
 
 void RoboSubController::_SendControlData()
 {
     namespace ba = boost::asio;
 
-    // Send Control Data if queue is not full
-    if( _SendQueueCounter < _SEND_QUEUE_MAX_SIZE )
-    {
-        // Convert Command to Control Data
-        _ControlData.FromCommand( &_Command );
+    // Convert Command to Control Data
+    _Mutex.lock();
+    _ControlData.FromCommand( &_Command );
+    _Mutex.unlock();
 
-        // Serialize and send
-        _ControlData.SerializeToString( _SendBuffer );
-        ba::async_write( _ArduinoPort,
-                        ba::buffer(_SendBuffer,RoboSubControlData::SIZE),
-                        ba::transfer_at_least(RoboSubControlData::SIZE),
-                        boost::bind( 
-                            &RoboSubController::_SentDataHandler, 
-                            this, 
-                            ba::placeholders::error,
-                            ba::placeholders::bytes_transferred ) );
+    // Serialize and send
+    _Mutex.lock();
+    _ControlData.SerializeToString( _SendBuffer );
+    _Mutex.unlock();
+    ba::async_write( _ArduinoPort,
+                    ba::buffer(_SendBuffer,RoboSubControlData::SIZE),
+                    ba::transfer_at_least(RoboSubControlData::SIZE),
+                    boost::bind( 
+                        &RoboSubController::_SentDataHandler, 
+                        this, 
+                        ba::placeholders::error,
+                        ba::placeholders::bytes_transferred ) );
 
-        // Increment queue counter and initiate transfer
-        ++_SendQueueCounter;
-        _Io.poll();
-    }
+    // Increment queue counter and initiate transfer
+    _Io.poll();
 }
 
 void RoboSubController::_DataAvailableHandler( 
@@ -158,23 +167,26 @@ void RoboSubController::_DataAvailableHandler(
 
     // Case: All data is here, and checks out.
     if( ( bytes_transferred == ArduinoData::SIZE-1 ) &&
-        ( _RecvBuffer[0] == ArduinoStatus::MAGIC ) )
+        ( _RecvBuffer[0] == ArduinoData::MAGIC ) )
     {
-
-        if( ArduinoStatus::SerializedIsValid(_RecvBuffer, ArduinoData::SIZE) )
+        if( ArduinoData::SerializedIsValid(_RecvBuffer, ArduinoData::SIZE) )
         {
             ArduinoData recvData;
             recvData.DeserializeFromString(_RecvBuffer);
             cout << "\nReceived Status: " << endl;
             cout << recvData << endl;
         }
+         else
+        {
+            cout << "\nError reading arduino response." << endl;
+        }
     }
     // Case: first byte found
-    else if( _RecvBuffer[0] == ArduinoStatus::MAGIC )
-    {   
+    else if( _RecvBuffer[0] == ArduinoData::MAGIC )
+    {
         ba::async_read ( _ArduinoPort,
                          ba::buffer(&_RecvBuffer[1],ArduinoData::SIZE-1),
-                         ba::transfer_at_least(ArduinoData::SIZE-1),
+                         ba::transfer_at_least(1),
                          boost::bind( 
                              &RoboSubController::_DataAvailableHandler, 
                              this, 
@@ -182,7 +194,7 @@ void RoboSubController::_DataAvailableHandler(
                              ba::placeholders::bytes_transferred ) );
         _Io.poll();
         return;
-    } 
+    }
     ba::async_read ( _ArduinoPort,
                      ba::buffer(_RecvBuffer,1),
                      ba::transfer_at_least(1),
@@ -200,12 +212,9 @@ void RoboSubController::_SentDataHandler(
 {
     // Write info to stdout
     cout << "\nSent Data: " << endl;
+    _Mutex.lock();
     cout << _ControlData << endl;
-
-    if( _SendQueueCounter )
-    {
-        --_SendQueueCounter;
-    }
+    _Mutex.unlock();
 }
 
 

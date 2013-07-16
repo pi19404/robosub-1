@@ -63,14 +63,11 @@ private:
 
 private:
 
-    static const unsigned int     _SEND_QUEUE_MAX_SIZE = 10;
-
     std::ifstream                 _InputStream;
     boost::asio::io_service       _Io;
     boost::asio::io_service::work _Work;
     boost::asio::serial_port      _ArduinoPort;
-
-    unsigned int                  _SendQueueCounter;
+    boost::signals2::mutex        _Mutex;
 
     RoboSubCommand                _Command;
     RoboSubControlData            _ControlData;

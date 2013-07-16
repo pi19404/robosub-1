@@ -89,13 +89,7 @@ function run_auv() {
     ( gnome-terminal --title="AUV" -x /bin/bash -c "$auv_str" ) &
 	auv_pid_1=$!
 
-    # spawn the arduino terminal
-    ard_args="cat $ARDUINO_DEV"
-    ard_str="ssh $AUV_USER@$AUV_IP \"$ard_args\""
-    ( gnome-terminal --title="ARDUINO" -x /bin/bash -c "$ard_str" ) &
-	auv_pid_2=$!
-
-    AUV_PIDS="$auv_pid_0 $auv_pid_1 $auv_pid_2"
+    AUV_PIDS="$auv_pid_0 $auv_pid_1"
 }
 
 ##################
