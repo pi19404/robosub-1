@@ -16,6 +16,7 @@
 #include "arduino_data.h"
 
 #include <boost/asio.hpp>
+#include <boost/signals2/mutex.hpp>
 
 #include <fstream>
 #include <string>
@@ -68,6 +69,7 @@ private:
     boost::asio::io_service       _Io;
     boost::asio::io_service::work _Work;
     boost::asio::serial_port      _ArduinoPort;
+
     unsigned int                  _SendQueueCounter;
 
     RoboSubCommand                _Command;

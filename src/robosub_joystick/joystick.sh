@@ -12,8 +12,8 @@
 ###########################
 # SCRIPT DEFINITIONS HERE
 ###########################
-CLIENT_IP=192.168.1.120
-AUV_IP=192.168.1.120
+CLIENT_IP=127.0.0.1
+AUV_IP=127.0.0.1
 AUV_USER=j
 JOYSTICK_DEV=/dev/input/js0
 ARDUINO_DEV=/dev/ttyACM0

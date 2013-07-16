@@ -106,10 +106,7 @@ void RoboSubController::Run( string infile,
        
         // Send Control Data from Command
         _SendControlData();
-        
-         
-        // Write info to stdout
-    }
+     }
 }
 
 void RoboSubController::_GetNextCommand()
@@ -148,7 +145,6 @@ void RoboSubController::_SendControlData()
                             ba::placeholders::bytes_transferred ) );
 
         // Increment queue counter and initiate transfer
-        // TODO use mutex
         ++_SendQueueCounter;
         _Io.poll();
     }
@@ -206,8 +202,6 @@ void RoboSubController::_SentDataHandler(
     cout << "\nSent Data: " << endl;
     cout << _ControlData << endl;
 
-    // Decrement send queue counter
-    // TODO Use mutex
     if( _SendQueueCounter )
     {
         --_SendQueueCounter;
