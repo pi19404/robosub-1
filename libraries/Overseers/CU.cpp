@@ -11,9 +11,10 @@ CU::CU(void)
 
     mLogInstance.LogStr("CU::CU - starting up thrusters");
     // set the H bridge address for each pair of thrusters
+    thrustersRoll.init(M3_ADDR);    // ??if we initialize roll first, do they sometimes not start on powerup and the port ones do??
     thrustersPort.init(M1_ADDR);
     thrustersStarboard.init(M2_ADDR);
-    thrustersRoll.init(M3_ADDR);
+    //thrustersRoll.init(M3_ADDR);
 
     mLogInstance.LogStr("CU::CU - starting up pneumatics");
     // set the pin numbers for each pneumatic device (this initialization also
