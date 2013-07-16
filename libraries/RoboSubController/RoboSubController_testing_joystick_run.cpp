@@ -94,6 +94,7 @@ void RoboSubController::Run()
         if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
         {
             // The data was malformed, so, discard it
+            _lm.LogStr("error - control Data malformed, retrying...");
             continue;
         }
 
