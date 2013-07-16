@@ -251,7 +251,7 @@ void RoboSubController::Run()
         {
             mCU.clawClose();
         }
-#if 0
+        
         // read the depth sensor
         depthInches = mIMU.readDepth();
 
@@ -271,7 +271,6 @@ void RoboSubController::Run()
         myGyroData.Y = -5.5;
         myGyroData.Z = 6.6;
 */
-#endif
         // serialize the sensor data and send it back to the sub's PC
         String toSubPC;
         subSensorData.Data.Acl_X = myAccelData.X;
