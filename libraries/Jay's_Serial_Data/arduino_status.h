@@ -1,7 +1,7 @@
 #ifndef __ARDUINO_STATUS_H__
 #define __ARDUINO_STATUS_H__
 ///////////////////////////////////////////////////////////////////////////////
-// \file robosub_control_command.h
+// \file arduino_status.h
 ///////////////////////////////////////////////////////////////////////////////
 // Author: Jay Sidhu <jaypal.sidhu@gmail.com>
 // Project: Control System Communication
@@ -40,7 +40,7 @@ struct ArduinoStatus : public Serializable
      
         // Write beginning magic number  
         char *str2 = str;
-        *str2 = MAGIC_START;
+        *str2 = MAGIC;
         ++str2;
 
         // Accelerometer and Gyroscope
@@ -56,8 +56,8 @@ struct ArduinoStatus : public Serializable
         sz = sizeof(uint32_t);
         _Serialize( &Data.Depth, sz, &str2 );
 
-        // Write ending magic number
-        *str2 = MAGIC_STOP;
+        // Checksum
+        *str2 = _ComputeChecksum(str, SIZE-1);
     }
 
     // DeserializeFromString
@@ -67,10 +67,9 @@ struct ArduinoStatus : public Serializable
     // \post the object will contain the deserialized data from str.
     void DeserializeFromString( const char *str )
     {
-        // Check beginning and ending magic numbers
+        // Check beginning magic number
         const char * str2 = str;
-        if( !str || (str[0]     != MAGIC_START) 
-                 || (str[SIZE-1] != MAGIC_STOP) )
+        if( !(str && (str[0] == MAGIC)) ) 
         { 
             return; 
         }
@@ -89,6 +88,14 @@ struct ArduinoStatus : public Serializable
         sz = sizeof(uint32_t);
         _Deserialize( &Data.Depth, sz, &str2 );
     }
+
+    // SerializedIsValid
+    // \brief determines whether the data is valid using the properties of the
+    //          checksum.
+    // \param sp ptr to the string containing the serialized data
+    // \param sz the size of the data in bytes
+    // \return true if valid, false otherwise
+    using Serializable::SerializedIsValid;
 
     struct DATA 
     {
@@ -114,9 +121,8 @@ struct ArduinoStatus : public Serializable
 
     } Data;
 
-    static const char MAGIC_START = 0x25;
-    static const char MAGIC_STOP  = 0x26;
-    static const uint32_t SIZE = sizeof(MAGIC_START) + sizeof(MAGIC_STOP) + sizeof(DATA);
+    static const char MAGIC = 0x25;
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + 1;
 };
 
 #endif //__ARDUINO_STATUS_H__

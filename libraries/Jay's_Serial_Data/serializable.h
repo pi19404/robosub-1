@@ -38,6 +38,17 @@ public:
     // \post the object will contain the deserialized data from str.
     virtual void DeserializeFromString( const char *str ) = 0;
 
+    // SerializedIsValid
+    // \brief determines whether the data is valid using the properties of the
+    //          checksum.
+    // \param sp ptr to the string containing the serialized data
+    // \param sz the size of the data in bytes
+    // \return true if valid, false otherwise
+    static bool SerializedIsValid(const char *sp, uint32_t sz )
+    {
+        return ( _ComputeChecksum(sp,sz) == 0 );
+    }
+
 protected:
 
     // _Serialize
@@ -47,7 +58,7 @@ protected:
     // \param sp - ptr to the destination string
     // \pre the destination string and the data must have size sz.
     // \post the string pointed to by sp will contain the serialized object.
-    void _Serialize( void *data, uint32_t sz, char **sp )
+    static void _Serialize( void *data, uint32_t sz, char **sp )
     {
         char *dptr = static_cast<char*>(data);
         while( sz )
@@ -67,7 +78,7 @@ protected:
     // \param sp - ptr to the source string
     // \pre the destination data and the source string must have size sz.
     // \post the data pointed to by "data" will contain the deserialized object.
-    void _Deserialize( void *data, uint32_t sz, const char **sp )
+    static void _Deserialize( void *data, uint32_t sz, const char **sp )
     {
         char *dptr = static_cast<char*>(data);
         while( sz )
@@ -78,6 +89,25 @@ protected:
             ++(*sp);
             --sz;
         }
+    }
+
+    // _ComputeChecksum
+    // \brief computes the checksum of the data as a byte
+    // \param data ptr to the string containing the serialized data
+    // \param sz the size of the data in bytes
+    // \return computed checksum
+    static uint8_t _ComputeChecksum( const void *data, uint32_t sz )
+    {
+        if( !data ){ return 0; }
+        
+        const uint8_t* dptr = static_cast<const uint8_t *>(data);
+
+        uint8_t checksum = dptr[0];
+        for( uint32_t i = 1; i < sz; ++i )
+        {
+            checksum ^= dptr[i];
+        }
+        return checksum;
     }
 };
 

@@ -69,7 +69,7 @@ void RoboSubController::Run()
         // Only read when we have the "magic" number
         // this number indicates that we have control data
         _lm.LogStr("waiting for transmission start");
-        while(Serial.peek() != RoboSubControlData::MAGIC_START)
+        while(Serial.peek() != RoboSubControlData::MAGIC)
         {
             // Discard this byte,
             // we don't want it
@@ -90,9 +90,8 @@ void RoboSubController::Run()
             pcCmdDataBuffer[i] = static_cast<char>(c);
         }
 
-        // Check for the magic number at the end of the read bytes
-        // to help verify that the data has not been corrupted.
-        if( pcCmdDataBuffer[RoboSubControlData::SIZE-1] != RoboSubControlData::MAGIC_STOP )
+        // Verify received data is valid
+        if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
         {
             // The data was malformed, so, discard it
             continue;
@@ -252,7 +251,7 @@ void RoboSubController::Run()
         {
             mCU.clawClose();
         }
-
+#if 0
         // read the depth sensor
         depthInches = mIMU.readDepth();
 
@@ -272,7 +271,7 @@ void RoboSubController::Run()
         myGyroData.Y = -5.5;
         myGyroData.Z = 6.6;
 */
-
+#endif
         // serialize the sensor data and send it back to the sub's PC
         String toSubPC;
         subSensorData.Data.Acl_X = myAccelData.X;

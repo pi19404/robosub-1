@@ -40,7 +40,7 @@ struct RoboSubControlCommand : public Serializable
      
         // Write beginning magic number   
         char *str2 = str;
-        *str2 = MAGIC_START;
+        *str2 = MAGIC;
         ++str2;
 
         // Thrusters
@@ -60,8 +60,8 @@ struct RoboSubControlCommand : public Serializable
         _Serialize( &Data.Marker2_Drop, sz, &str2 );
         _Serialize( &Data.Claw_Latch, sz, &str2 );
 
-        // Write ending magic number
-        *str2 = MAGIC_STOP;
+        // Checksum
+        *str2 = _ComputeChecksum(str, SIZE-1);
     }
 
     // DeserializeFromString
@@ -73,8 +73,7 @@ struct RoboSubControlCommand : public Serializable
     {
         // Check beginning and ending magic numbers
         const char * str2 = str;
-        if( !str || (str[0]     != MAGIC_START) 
-                 || (str[SIZE-1] != MAGIC_STOP) )
+        if( !( str && (str[0] == MAGIC) ) ) 
         { 
             return; 
         }
@@ -97,6 +96,14 @@ struct RoboSubControlCommand : public Serializable
         _Deserialize( &Data.Marker2_Drop, sz, &str2 );
         _Deserialize( &Data.Claw_Latch, sz, &str2 );
     }
+
+    // SerializedIsValid
+    // \brief determines whether the data is valid using the properties of the
+    //          checksum.
+    // \param sp ptr to the string containing the serialized data
+    // \param sz the size of the data in bytes
+    // \return true if valid, false otherwise
+    using Serializable::SerializedIsValid;
 
     struct DATA 
     {
@@ -129,9 +136,8 @@ struct RoboSubControlCommand : public Serializable
              Claw_Latch;    // Latch the Claw
     } Data;
 
-    static const char MAGIC_START = 0x22;
-    static const char MAGIC_STOP  = 0x23;
-    static const uint32_t SIZE = sizeof(MAGIC_START) + sizeof(MAGIC_STOP) + sizeof(DATA);
+    static const char MAGIC = 0x22;
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + 1;
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__
