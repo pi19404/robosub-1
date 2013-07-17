@@ -84,6 +84,13 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->torpedoTargets[3].targetY = 0;
     im->torpedoTargets[3].targetZ = 0;
 
+    im->torpedoTargets[0].targetColor = RED;
+    im->torpedoTargets[1].targetColor = BLUE;
+    im->torpedoTargets[2].targetColor = YELLOW;
+    im->torpedoTargets[3].targetColor = GREEN;
+
+    
+
     // Bins
     im->bins[0].binSeen = false;
 	 im->bins[1].binSeen = false;

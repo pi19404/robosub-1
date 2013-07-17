@@ -221,7 +221,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
     return 0;
 }
 
-int ObstacleCourse(KB *kb)
+int ObstacleCourse(KB *kb, IMAGE_KB *im)
 {
     // Find bars
     if(im->horizBarSeen && !kb->horizBarFound)
@@ -285,6 +285,7 @@ int Torpedos(KB *kb)
 {
     // TODO
     // Find targets
+    if(
     // Find primary target
         // Move to position in front of small hexagon
         // Aim

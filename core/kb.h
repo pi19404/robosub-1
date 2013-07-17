@@ -15,6 +15,10 @@ class KB {
         KB(); // Constructor
         int updateKB(IMAGE_KB *im); 
         void printKB(KB *kb);
+	void updatePillars(IMAGE_KB *im);
+	void updateBuoys(IMAGE_KB *im);
+	void updateBins(IMAGE_KB *im);
+	void updateTorpedos(IMAGE_KB *im);
         // Multiple Tasks
         bool startGateComplete;
         bool buoyTaskComplete;
@@ -50,9 +54,9 @@ class KB {
         colors buoy1Color;
         colors buoy2Color;
         colors buoy3Color;
-		bool buoy1Hit;
-		bool buoy2Hit;
-		bool buoy3Hit;
+	bool buoy1Hit;
+	bool buoy2Hit;
+	bool buoy3Hit;
         
         // Parking Obstacle
         bool horizBarFound;
@@ -62,6 +66,8 @@ class KB {
         // re use gate pillar booleans
 
         // Torpedoes
+        bool primaryTorpedoTargetFound;
+	bool secondaryTorpedoTargetFound;
         bool primaryTorpedoTargetComplete;
         bool secondaryTorpedoTargetComplete;
         int  torpedoDistance;
