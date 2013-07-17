@@ -55,9 +55,9 @@ void thrusterPair::setMotor(int motorNum, int dutyCycle, int direction)
     {
         dutyCycle = 0;
     } 
-    else if (dutyCycle > 80)
+    else if (dutyCycle > 50)
     {
-        dutyCycle = 80;
+        dutyCycle = 50;
     }
 
     // set command based on motor number and direction

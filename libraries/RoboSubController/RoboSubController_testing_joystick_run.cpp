@@ -23,6 +23,8 @@ void RoboSubController::Run()
     // a generic integer for loops and stuff
     int i = 0;
 
+    bool durpy = false;
+
     int tempThrusterData;
     bool tempPneumaticData;
     uint16_t depthInches;
@@ -69,6 +71,7 @@ void RoboSubController::Run()
         // Only read when we have the "magic" number
         // this number indicates that we have control data
         _lm.LogStr("waiting for transmission start");
+        _lm.LogStrInt("max bytes: ", RoboSubControlData::NO_MAGIC_SIZE);
         while(Serial.peek() != RoboSubControlData::MAGIC)
         {
             // Discard this byte,
@@ -91,12 +94,26 @@ void RoboSubController::Run()
         }
 
         // Verify received data is valid
+/*
         if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
         {
             // The data was malformed, so, discard it
             _lm.LogStr("error - control Data malformed, retrying...");
+
+            if (durpy)
+            {
+                mCU.clawOpen();
+                durpy = false;
+            }
+            else
+            {
+                mCU.clawClose();
+                durpy = true;
+            }
+
             continue;
         }
+*/
 
         // Deserialize the read in bytes into
         // the command objec
