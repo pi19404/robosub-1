@@ -6,6 +6,16 @@
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
+// undefine this to enable the use of the depth controller in Run(), but note 
+// that the command data from the PC MUST HAVE A TARGET DEPTH FIELD FIRST
+#define ROLL_THRUSTER_MANUAL_CONTROL
+
+// this value is used to cap the target depth at nothing dangeously deep for 
+// sub; after all, a calculation gone bad could cause the sub to think that the 
+// target depth is 100 fathoms, which is way beyond its capabilities, so do the
+// sane thing and sanitize the data
+static const int MAX_SUB_DEPTH_INCHES = 240;
+
 
 RoboSubController::RoboSubController( ComPort &comPort, float loopFrequency )
     :
@@ -18,6 +28,94 @@ loopFrequency) constructor.");
     m_RUN = false;
 }
 
+// this function is not a method of RoboSubController 
+/*
+Ideally, this code would be implemented in the Run() method, but that code is 
+already busy and organized and adding a proportional controller to the mix 
+would make things messy with the variables all the way at the top and the 
+controller way down at the bottom.  So the controller code was placed in its 
+own function here, which should be considered an extension of Run() and not a 
+method that should be called independently of Run().
+
+Note: since this function is not a method of RoboSubController, it cannot 
+access the CU for thruster control or the IMU to read depth, so this function 
+takes a current depth and a target depth, calculates the duty cycle to apply to 
+the roll thrusters, and returns a duty cycle.  
+
+That's it.  It has no responsibility to drive the thrusters.
+*/
+static int depthController(int currentDepthInches, int targetDepthInches)
+{
+    // this non-blocking function implements a proportional controller to take
+    // the sub to a target depth
+    /*
+    In the current design, the sub waits for commands from the PC, and when it 
+    gets them, it executes them, reads sensor data, seriealizes it and spits it 
+    back to the PC, then waits for commands again.  This means that the loop 
+    frequency is entirely dependent upon the PC, which, at the time of this 
+    writing (7-18-2013), sends commands 10 times per second when the joystick 
+    has something to send.  Since the timing is independent of this system, I 
+    do not have access to any timing scheme that grants me a known time 
+    differential between one loop iteration and the next, and therefore I 
+    cannot implement an integral or derivative calculation into the this 
+    controller.  All I have is a simple, linear control curve for roll thruster 
+    duty cycles.  It isn't ideal, but it will work for now.  
+
+    Just calculate the difference between the target depth and the current 
+    depth, multiply that number by a hand-wavy-approximation constant to 
+    convert the error into desired duty cycle, and the return that value.
+    */
+    const int kProportional = 5;
+    int errDepthInches;
+    int newDutyCycle;
+
+    LogManager& mLogInstance = LogManager::GetInstance();
+
+    // calculate the error
+    /*
+    The convention here is that depth is a positive value.  It is not altitude, 
+    even though this subs depth sensor could be used for that.  The sensor 
+    measures absolute pressure, and we want to use it for depth calculations, 
+    so when we read it, we convert the data to depth below the water.  High 
+    postive values means that we are really deep.  Low positive values indicate 
+    that we are near the surface of the water, and negative values mean that we 
+    are above the water.  These concepts require calibrations that are subject 
+    to change from Pullman to the competition in San Diego, CA.
+
+    In this error calculation, a positive error means that we are shallower 
+    than the target depth and need to go down, and a negative error means that 
+    we are below target depth and need to go up.
+
+    Also, cap the target depth at 20'.  We don't want a bad signal to try to 
+    take the sub to 100 fathoms or something.
+    */
+    if (targetDepthInches < 0)
+    {
+        // want to go above the water, so stop it at 0
+        targetDepthInches = 0;
+    }
+    else if (targetDepthInches > MAX_SUB_DEPTH_INCHES)
+    {
+        targetDepthInches = MAX_SUB_DEPTH_INCHES;
+    }
+    errDepthInches = targetDepthInches - currentDepthInches;
+    mLogInstance.LogStrInt("depthController - error: ", errDepthInches);
+
+    // now calculate the new duty cycle for the roll thrusters and apply it
+    /*
+    No data sanitation necessary here because the thrusters handle the 
+    constriction of data to within acceptable parameters.  If I put data 
+    sanitation here then the responsibility of duty cycle sanitation would be 
+    split between this function and the thrusters.  I don't want the 
+    responsibility to be anywhere but the thrusters.
+    */
+    newDutyCycle = errDepthInches * kProportional;
+    mLogInstance.LogStrInt("depthController - new duty cycle: ", newDutyCycle);
+
+    // now give the duty cycle to Run() so it can do something with it
+    return newDutyCycle;
+}
+
 void RoboSubController::Run()
 {
     // a generic integer for loops and stuff
@@ -25,9 +123,10 @@ void RoboSubController::Run()
 
     bool durpy = false;
 
-    int tempThrusterData;
-    bool tempPneumaticData;
-    uint16_t depthInches;
+    int tempThrusterCmdData;
+    bool tempPneumaticCmdData;
+    uint16_t depthCurrentInches;
+    uint16_t depthTargetInches;
     ACCEL_DATA myAccelData;
     GYRO_DATA myGyroData;
 
@@ -123,145 +222,173 @@ void RoboSubController::Run()
         // access the individual items in the serialized data structure
 
         // port fore thruster
-        tempThrusterData = pcCmdData.Data.Thruster_Fore_L;
-        _lm.LogStrInt("port fore thruster: ", tempThrusterData);
-        if (tempThrusterData < 0)
+        tempThrusterCmdData = pcCmdData.Data.Thruster_Fore_L;
+        _lm.LogStrInt("port fore thruster: ", tempThrusterCmdData);
+        if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
-            thrusterDutyCycleBuf[0] = tempThrusterData * (-1);
+            thrusterDutyCycleBuf[0] = tempThrusterCmdData * (-1);
             thrusterDirBuf[0] = -1;
         }
         else
         {
             // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[0] = tempThrusterData;
+            thrusterDutyCycleBuf[0] = tempThrusterCmdData;
             thrusterDirBuf[0] = 1;
         }
 
 
         // port aft thruster
-        tempThrusterData = pcCmdData.Data.Thruster_Aft_L;
-        _lm.LogStrInt("port aft thruster: ", tempThrusterData);
-        if (tempThrusterData < 0)
+        tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_L;
+        _lm.LogStrInt("port aft thruster: ", tempThrusterCmdData);
+        if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
-            thrusterDutyCycleBuf[1] = tempThrusterData * (-1);
+            thrusterDutyCycleBuf[1] = tempThrusterCmdData * (-1);
             thrusterDirBuf[1] = -1;
         }
         else
         {
             // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[1] = tempThrusterData;
+            thrusterDutyCycleBuf[1] = tempThrusterCmdData;
             thrusterDirBuf[1] = 1;
         }
 
 
         // starboard fore thruster
-        tempThrusterData = pcCmdData.Data.Thruster_Fore_R;
-        _lm.LogStrInt("starboard fore thruster: ", tempThrusterData);
-        if (tempThrusterData < 0)
+        tempThrusterCmdData = pcCmdData.Data.Thruster_Fore_R;
+        _lm.LogStrInt("starboard fore thruster: ", tempThrusterCmdData);
+        if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
-            thrusterDutyCycleBuf[2] = tempThrusterData * (-1);
+            thrusterDutyCycleBuf[2] = tempThrusterCmdData * (-1);
             thrusterDirBuf[2] = -1;
         }
         else
         {
             // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[2] = tempThrusterData;
+            thrusterDutyCycleBuf[2] = tempThrusterCmdData;
             thrusterDirBuf[2] = 1;
         }
 
 
         // starboard aft thruster
-        tempThrusterData = pcCmdData.Data.Thruster_Aft_R;
-        _lm.LogStrInt("starboard aft thruster: ", tempThrusterData);
-        if (tempThrusterData < 0)
+        tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_R;
+        _lm.LogStrInt("starboard aft thruster: ", tempThrusterCmdData);
+        if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
-            thrusterDutyCycleBuf[3] = tempThrusterData * (-1);
+            thrusterDutyCycleBuf[3] = tempThrusterCmdData * (-1);
             thrusterDirBuf[3] = -1;
         }
         else
         {
             // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[3] = tempThrusterData;
+            thrusterDutyCycleBuf[3] = tempThrusterCmdData;
             thrusterDirBuf[3] = 1;
         }
 
-
+#ifdef ROLL_THRUSTER_MANUAL_CONTROL
         // port roll thruster
-        tempThrusterData = pcCmdData.Data.Thruster_Roll_L;
-        _lm.LogStrInt("port roll thruster: ", tempThrusterData);
-        if (tempThrusterData < 0)
+        tempThrusterCmdData = pcCmdData.Data.Thruster_Roll_L;
+        _lm.LogStrInt("port roll thruster: ", tempThrusterCmdData);
+        if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
-            thrusterDutyCycleBuf[4] = tempThrusterData * (-1);
+            thrusterDutyCycleBuf[4] = tempThrusterCmdData * (-1);
             thrusterDirBuf[4] = -1;
         }
         else
         {
             // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[4] = tempThrusterData;
+            thrusterDutyCycleBuf[4] = tempThrusterCmdData;
             thrusterDirBuf[4] = 1;
         }
 
 
         // starboard roll thruster
-        tempThrusterData = pcCmdData.Data.Thruster_Roll_R;
-        _lm.LogStrInt("starboard roll thruster: ", tempThrusterData);
-        if (tempThrusterData < 0)
+        tempThrusterCmdData = pcCmdData.Data.Thruster_Roll_R;
+        _lm.LogStrInt("starboard roll thruster: ", tempThrusterCmdData);
+        if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
-            thrusterDutyCycleBuf[5] = tempThrusterData * (-1);
+            thrusterDutyCycleBuf[5] = tempThrusterCmdData * (-1);
             thrusterDirBuf[5] = -1;
         }
         else
         {
             // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[5] = tempThrusterData;
+            thrusterDutyCycleBuf[5] = tempThrusterCmdData;
             thrusterDirBuf[5] = 1;
         }
+#else
+        // read the depth sensor
+        /*
+        We read it earlier than the other sensors just for the sake of the 
+        depth controller.
+        */
+        depthCurrentInches = mIMU.readDepth();
+        depthTargetInches = pcCmdData.Data.target_depth;
+        tempThrusterCmdData = 
+            depthController(depthCurrentInches, depthTargetInches);
+
+        if (tempThrusterCmdData < 0)
+        {
+            // negative duty cycle requested
+            thrusterDutyCycleBuf[4] = tempThrusterCmdData * (-1);
+            thrusterDutyCycleBuf[5] = tempThrusterCmdData * (-1);
+            thrusterDirBuf[4] = -1;
+            thrusterDirBuf[5] = -1;
+        }
+        else
+        {
+            // positive or zero duty cycle requested
+            thrusterDutyCycleBuf[4] = tempThrusterCmdData;
+            thrusterDutyCycleBuf[5] = tempThrusterCmdData;
+            thrusterDirBuf[4] = 1;
+            thrusterDirBuf[5] = 1;
+        }
+#endif
 
         // send the duty cycles and directions to the h bridges
         mCU.setThrusters(thrusterDutyCycleBuf, thrusterDirBuf);
 
 
         // check torpedo commands
-        tempPneumaticData = pcCmdData.Data.Torpedo1_Fire;
-        _lm.LogStrInt("torpedo 1: ", tempPneumaticData);
-        if (tempPneumaticData)
+        tempPneumaticCmdData = pcCmdData.Data.Torpedo1_Fire;
+        _lm.LogStrInt("torpedo 1: ", tempPneumaticCmdData);
+        if (tempPneumaticCmdData)
         {
             mCU.fireTorpedoN(1);
         }
 
-        tempPneumaticData = pcCmdData.Data.Torpedo2_Fire;
-        _lm.LogStrInt("torpedo 2: ", tempPneumaticData);
-        if (tempPneumaticData)
+        tempPneumaticCmdData = pcCmdData.Data.Torpedo2_Fire;
+        _lm.LogStrInt("torpedo 2: ", tempPneumaticCmdData);
+        if (tempPneumaticCmdData)
         {
             mCU.fireTorpedoN(2);
         }
 
 
         // check marker dropper commands
-        tempPneumaticData = pcCmdData.Data.Marker1_Drop;
-        _lm.LogStrInt("marker 1: ", tempPneumaticData);
-        if (tempPneumaticData)
+        tempPneumaticCmdData = pcCmdData.Data.Marker1_Drop;
+        _lm.LogStrInt("marker 1: ", tempPneumaticCmdData);
+        if (tempPneumaticCmdData)
         {
             mCU.dropMarkerN(1);
         }
 
-        tempPneumaticData = pcCmdData.Data.Marker2_Drop;
-        _lm.LogStrInt("marker 2: ", tempPneumaticData);
-        if (tempPneumaticData)
+        tempPneumaticCmdData = pcCmdData.Data.Marker2_Drop;
+        _lm.LogStrInt("marker 2: ", tempPneumaticCmdData);
+        if (tempPneumaticCmdData)
         {
             mCU.dropMarkerN(1);
         }
 
         // check claw command
-        tempPneumaticData = pcCmdData.Data.Claw_Latch;
-        _lm.LogStrInt("claw: ", tempPneumaticData);
-        if (tempPneumaticData)
+        tempPneumaticCmdData = pcCmdData.Data.Claw_Latch;
+        _lm.LogStrInt("claw: ", tempPneumaticCmdData);
+        if (tempPneumaticCmdData)
         {
             mCU.clawOpen();
         }
@@ -269,9 +396,8 @@ void RoboSubController::Run()
         {
             mCU.clawClose();
         }
-        
-        // read the depth sensor
-        depthInches = mIMU.readDepth();
+
+        // now grab the sensor data, serialize it, and spit it back to the PC
 
         // read the accelerometer
         mIMU.getAccelAll(&myAccelData);
@@ -297,7 +423,7 @@ void RoboSubController::Run()
         subSensorData.Data.Gyro_X = myGyroData.X;
         subSensorData.Data.Gyro_Y = myGyroData.Y;
         subSensorData.Data.Gyro_Z = myGyroData.Z;
-        subSensorData.Data.Depth = depthInches;
+        subSensorData.Data.Depth = depthCurrentInches;
         subSensorData.SerializeToString(subSensorDataBuffer);
 
         // the arduino Serial write(buf, len) function requires a uint8_t* for
