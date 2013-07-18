@@ -3,129 +3,145 @@
 #include "kb.h"
 #include "image_kb.h"
 
+
 KB::KB()
 {
-        // Multiple Tasks
-        startGateComplete = false;
-        buoyTaskComplete = false;
-        obstacleCourse1Complete = false;
-        torpedoTaskComplete = false;
-        binsTaskComplete = false;
-        obstacleCourse2Complete = false;
+    //////////////////
+    // MISSION PLAN // 
+    //////////////////
 
-        targetInRange = false; // Torpedos, Bins
-        attemptTask = false;
+    // Buoy Colors
+    buoyPrimary = RED;
 
-        // Start Gate  // Used for Obstacle Course Too
-        pillar1Found = false;
-        pillar2Found = false;
+    // Torpedo Targets
+    torpedoPrimary   = BLUE;
+    torpedoSecondary = GREEN;
 
-        // Paths
-        path1found = false;
-        path2found = false;
-        path3found = false;
-        path4found = false;
-        path5found = false;
-        path6found = false;
-        path7found = false;
+    // Bin Targets
+    binPrimary   = TEN;
+    binSecondary = THIRTY_SEVEN;
 
-        // Buoys
-        correctHeading = false;
-        buoy1Found = false;
-        buoy2Found = false;
-        buoy3Found = false;
-        buoy1Complete = false;
-        buoy2Complete = false;
-        buoy3Complete = false;
-        buoy1Color = DEFAULT;
-        buoy2Color = DEFAULT; 
-        buoy3Color = DEFAULT;
-        buoy1Hit   = false;
-        buoy2Hit   = false;
-        buoy3Hit   = false;
-        
-        // Parking Obstacle
-        horizBarFound = false;
-        leftBarFound = false;
-        rightBarFound = false;
+    ////////////////////
+    // TASK COMPLETE? // 
+    ////////////////////
 
-        // re use gate pillar booleans
+    // Multiple Tasks
+    startComplete    = false;
+    startGateComplete = false;
+    buoyTaskComplete = false;
+    obstacleCourse1Complete = false;
+    torpedoTaskComplete = false;
+    binsTaskComplete = false;
+    obstacleCourse2Complete = false;
 
-        // Torpedoes
-        primaryTorpedoTargetComplete = false;
-        secondaryTorpedoTargetComplete = false;
-        int torpedoDistance = 0;
+    targetInRange = false; // Torpedos, Bins
+    attemptTask = false;
 
-        // Bins
-        binsFound  = false;
-        binsPrimaryFound = false;
-        binsSecondaryFound = false;
-        primaryBinTargetComplete = false;
-        secondaryBinTargetComplete = false;
-        binDistance = false;
+    ///////////
+    // TASKS // 
+    ///////////
 
-        // Octaons
-        objectFound = false;
-        objectGrabbed = false;
-        objectDistance = 0;
-        pingerDistance = 0;
-        pingerHeading = 0; 
+    // Start Gate  // Used for Obstacle Course Too
+    pillar1Found = false;
+    pillar2Found = false;
+
+    // Paths
+    path1found = false;
+    path2found = false;
+    path3found = false;
+    path4found = false;
+    path5found = false;
+    path6found = false;
+    path7found = false;
+
+    // Buoys
+    correctHeading = false;
+    buoy1Found = false;
+    buoy2Found = false;
+    buoy3Found = false;
+    buoy1Complete = false;
+    buoy2Complete = false;
+    buoy3Complete = false;
+    buoy1Color = DEFAULT;
+    buoy2Color = DEFAULT; 
+    buoy3Color = DEFAULT;
+    buoy1Hit   = false;
+    buoy2Hit   = false;
+    buoy3Hit   = false;
+    
+    // Parking Obstacle
+    horizBarFound = false;
+    leftBarFound = false;
+    rightBarFound = false;
+
+    // re use gate pillar booleans
+
+    // Torpedoes
+    primaryTorpedoTargetComplete = false;
+    secondaryTorpedoTargetComplete = false;
+    int torpedoDistance = 0;
+
+    // Bins
+    binsFound  = false;
+    binsPrimaryFound = false;
+    binsSecondaryFound = false;
+    primaryBinTargetComplete = false;
+    secondaryBinTargetComplete = false;
+    binDistance = false;
+
+    // Octaons
+    objectFound = false;
+    objectGrabbed = false;
+    objectDistance = 0;
+    pingerDistance = 0;
+    pingerHeading = 0; 
 
 
 
-        // Positioning Variables
-        // Center point for target one
-        x1 = 0;  // pixels? 
-        y1 = 0;
-        z1 = 0;
-        heading1 = 0; // degrees
+    // Positioning Variables
+    // Center point for target one
+    x1 = 0;  // pixels? 
+    y1 = 0;
+    z1 = 0;
+    heading1 = 0; // degrees
 
-        // Center point for target two 
-        x2 = 0;
-        y2 = 0;
-        z2 = 0;
-        heading2 = 0;
-        
-        // Center point for target three
-        x3 = 0;
-        y3 = 0;
-        z3 = 0;
-        heading3 = 0;
+    // Center point for target two 
+    x2 = 0;
+    y2 = 0;
+    z2 = 0;
+    heading2 = 0;
+    
+    // Center point for target three
+    x3 = 0;
+    y3 = 0;
+    z3 = 0;
+    heading3 = 0;
 
-        // Center point for target three
-        x4 = 0;
-        y4 = 0;
-        z4 = 0;
-        heading4 = 0;
+    // Center point for target three
+    x4 = 0;
+    y4 = 0;
+    z4 = 0;
+    heading4 = 0;
 
-        // current depth and min depth for traveling
-        depth = 0;
-        minDepth = 1;
+    // current depth and min depth for traveling
+    depth = 0;
+    minDepth = 1;
 
-        // If needed can add other variable for storage
-            // buoys and bins might need more
-        
-        // TODO LIVE MISSION PLAN UPDATE
-        // Buoy Targets
-        buoy1Complete = false;
-        buoy1Found = false;
-        buoy2Complete = false;
-        buoy2Found = false;
-        buoy3Complete = false;
-        buoy3Found = false;
-        buoyGoalColor = DEFAULT;	// Either: set this if we know what color we want
-											// to make the buoys or set it when we collide
-											// with the first buoy so the rest of the buoys match
-        
-        // Torpedo Targets
-        torpedoPrimary   = DEFAULT;
-        torpedoSecondary = DEFAULT;
+    // If needed can add other variable for storage
+        // buoys and bins might need more
+    
+    // Buoy Targets
+    buoy1Complete = false;
+    buoy1Found = false;
+    buoy2Complete = false;
+    buoy2Found = false;
+    buoy3Complete = false;
+    buoy3Found = false;
+    buoyGoalColor = DEFAULT;	// Either: set this if we know what color we want
+                            // to make the buoys or set it when we collide
+                            // with the first buoy so the rest of the buoys match
 
-        // Bin Targets
-        binPrimary   = UNKNOWN;
-        binSecondary = UNKNOWN;
-
-//        return this;
+    // return this;
 }
 
 // update KB found based on image recognition
@@ -133,9 +149,15 @@ int KB::updateKB(IMAGE_KB *im)
 {
     // update found
     if(im->sgPillars[0].pillarSeen)
+    {
         pillar1Found = true;
+        x1 = im->sgPillars[0].pillarX;
+    }
     if(im->sgPillars[1].pillarSeen)
+    {
         pillar2Found = true;
+        x2 = im->sgPillars[1].pillarX;
+    }
 /*
     // Set Primary Buoy Target
     if(im->buoyGreenSeen && buoyPrimary == GREEN)
@@ -314,6 +336,26 @@ int KB::updateKB(IMAGE_KB *im)
         }
     }
 */
+
+
+
+    // Obstacle Course
+
+    if(im->horizBarSeen && !kb->horizBarFound)
+    {
+        kb->horizBarFound = true;  
+    }
+    if(im->leftBarSeen && !kb->leftBarFound)
+    {
+        kb->leftBarFound = true;
+    }
+    if(im->rightBarSeen && !kb->rightBarFound)
+    {
+        kb->rightBarFound = true;
+    }
+
+
+
     // Update Bins Found
 //    if(im->binsSeen)
 //        binsFound = true;

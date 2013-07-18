@@ -5,9 +5,6 @@
 
 #include "types.h"
 
-//enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN};
-//enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
-
 typedef struct BUOY {
 	bool buoySeen;
 	int buoyX;
@@ -49,7 +46,6 @@ class IMAGE_KB {
 
         void initializeIM(IMAGE_KB *im);
         IMAGE_KB();
-
 
         // Current Obstacle
         bool gateObstacle;
