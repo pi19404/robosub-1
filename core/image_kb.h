@@ -47,6 +47,13 @@ class IMAGE_KB {
         void initializeIM(IMAGE_KB *im);
         IMAGE_KB();
 
+        // Mission Plan
+        colors buoyPrimary;
+        colors torpedoPrimary;
+        colors torpedoSecondary;
+        images binPrimary;
+        images binSecondary;
+
         // Current Obstacle
         bool gateObstacle;
         bool pathObstacle;
@@ -92,6 +99,9 @@ class IMAGE_KB {
         int  rightBarX;
         int  rightBarY; // bottom of bar
         int  rightBarZ;
+
+        colors leftBarColor;
+        colors rightBarColor;
 
         // Torpedoes
         //bool primaryTorpedoTargetSeen;

@@ -16,6 +16,7 @@ class KB {
         int updateKB(IMAGE_KB *im); 
         void printKB(KB *kb);
         // Multiple Tasks
+        bool startComplete;
         bool startGateComplete;
         bool buoyTaskComplete;
         bool obstacleCourse1Complete;

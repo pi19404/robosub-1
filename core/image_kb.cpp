@@ -64,6 +64,8 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->rightBarX = 0;
     im->rightBarY = 0; // bottom of bar
     im->rightBarZ = 0;
+    im->leftBarColor = DEFAULT;
+    im->rightBarColor = DEFAULT;
 
     // Torpedoes
     im->torpedoTargets[0].targetSeen = false;

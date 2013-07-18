@@ -26,7 +26,7 @@ using namespace std;
 #define DOWN_FAST 4       // Move down at full speed
 #define DEPTH 5           // Default depth, 5 ft
 #define HEADING_FORWARD 0 // Default forward heading
-#define STOP 0            // STOP!! :D
+//#define STOP 0            // STOP!! :D
 
 void recv_callback( const ArduinoData& data )
 {
@@ -40,10 +40,6 @@ void send_callback( const RoboSubCommand& data )
     cout << data << endl;
 }
 
-// Initialize the control communication
-RoboSubController controller;
-controller.AttachDataReceivedCallback(recv_callback);
-controller.AttachDataSentCallback(send_callback);
 
 int main(int argc, char* argv[])
 {
@@ -321,17 +317,17 @@ int Bins(KB *kb, IMAGE_KB *im)
     return 0;
 }
 
-bool move( int x, int y, int depth, double heading, 
-           bool t1, bool t2, bool m1, bool m2, bool claw )
+bool move( int x, int y, int32_t depth, int32_t heading, 
+           bool t1, bool t2, bool m1, bool m2, bool c )
 {
     // Interpret inputs
-    static const unsigned int X = ThrustMode::STOP;
-    static const unsigned int Y = ThrustMode::STOP;
-    static const unsigned int torpedo1 = PneumMode::DEACTIVATED;
-    static const unsigned int torpedo2 = PneumMode::DEACTIVATED;
-    static const unsigned int marker1  = PneumMode::DEACTIVATED;
-    static const unsigned int marker2  = PneumMode::DEACTIVATED;
-    static const unsigned int claw     = PneumMode::DEACTIVATED;
+    unsigned int X = ThrustMode::STOP;
+    unsigned int Y = ThrustMode::STOP;
+    unsigned int torpedo1 = PneumMode::DEACTIVATED;
+    unsigned int torpedo2 = PneumMode::DEACTIVATED;
+    unsigned int marker1  = PneumMode::DEACTIVATED;
+    unsigned int marker2  = PneumMode::DEACTIVATED;
+    unsigned int claw = PneumMode::DEACTIVATED;
 
     if ( x < 0 )
     {
@@ -367,69 +363,36 @@ bool move( int x, int y, int depth, double heading,
     }
     if (c)
     {
-        claw = PneumMode::ACTIVATED;
+       claw = PneumMode::ACTIVATED;
     }
 
 	bool result = false;
-   cout << "X: " << x << " Y: " << y << " Z: " << z << " Heading: " << heading << endl;
+   //cout << "X: " << x << " Y: " << y << " Z: " << z << " Heading: " << heading << endl;
 
     string serial_dev;
     string baud_rate;
     string infile_name;
 
    /*
-    * Parse the command line
-    */
-    namespace po = boost::program_options;
-    po::options_description desc("Options");
-    desc.add_options()
-       ("help", "Show this help message.")
-       ("serial_port,s", po::value<std::string>(&serial_dev)->required()
-                       , "arduino serial port.")
-       ("baud_rate,b", po::value<std::string>(&baud_rate)->required()
-                     , "serial port baud rate.");
-
-
-    po::positional_options_description posOptions;
-    posOptions.add("infile", 1);
-
-    po::variables_map vm;
-
-    try 
-    {
-        po::store(po::command_line_parser(argc, argv).options(desc)
-                        .positional(posOptions).run(), vm);
-
-        if( vm.count("help") )
-        {
-            cout << desc << endl;
-            return 0;
-        }
-
-        po::notify(vm);
-    }
-    catch(exception& e)
-    {
-        cerr << "Error: " << e.what() << endl;
-        cout << desc << endl;
-        return 1;
-    }
-
-   /*
     * Run the Controller. 
     */
 
+    // Initialize the control communication
+    RoboSubController Controller;
+    Controller.AttachDataReceivedCallback(recv_callback);
+    Controller.AttachDataSentCallback(send_callback);
+
     Controller.Run(serial_dev, baud_rate);
     
-    Controller.SetThrustAll( x, //ThrustMode::STOP,     // X left right
-                             y, //ThrustMode::POS_FULL, // Y forward back
+    Controller.SetThrustAll( X, //ThrustMode::STOP,     // X left right
+                             Y, //ThrustMode::POS_FULL, // Y forward back
                              depth, //ThrustMode::NEG_FULL, // Depth
                              heading ); //ThrustMode::STOP );   // Heading
 
-    Controller.SetPneumAll( t1, //PneumMode::ACTIVATED,  // Torpedo1
-                            t2, //PneumMode::DEFAULT,    // Torpedo2
-                            m1, //PneumMode::DEFAULT,    // Marker1
-                            m2, //PneumMode::ACTIVATED,  // Marker2
+    Controller.SetPneumAll( torpedo1, //PneumMode::ACTIVATED,  // Torpedo1
+                            torpedo2, //PneumMode::DEFAULT,    // Torpedo2
+                            marker1, //PneumMode::DEFAULT,    // Marker1
+                            marker2, //PneumMode::ACTIVATED,  // Marker2
                             claw ); //PneumMode::ACTIVATED );// Claw
     
     Controller.SendCommand();
