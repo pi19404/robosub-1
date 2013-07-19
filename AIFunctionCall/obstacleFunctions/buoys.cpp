@@ -72,6 +72,7 @@ struct HARDDATA {
 
 int checkBuoys(Buoy buoys[3], int *numFound)
 {
+  // Forward Camera
   VideoCapture cap(0);
 
   // make sure the camera is functioning

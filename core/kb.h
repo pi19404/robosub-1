@@ -14,6 +14,10 @@ class KB {
     public:
         KB(); // Constructor
         int updateKB(IMAGE_KB *im); 
+        void updatePillars(IMAGE_KB *im);
+        void updateBuoys(IMAGE_KB *im);
+        void updateBins(IMAGE_KB *im);
+        void updateTorpedos(IMAGE_KB *im);
         void printKB(KB *kb);
         // Multiple Tasks
         bool startComplete;
@@ -65,6 +69,8 @@ class KB {
         // Torpedoes
         bool primaryTorpedoTargetComplete;
         bool secondaryTorpedoTargetComplete;
+        bool primaryTorpedoTargetFound;
+        bool secondaryTorpedoTargetFound;
         int  torpedoDistance;
 
         // Bins

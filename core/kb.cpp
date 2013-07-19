@@ -54,7 +54,7 @@ KB::KB()
         // Torpedoes
         primaryTorpedoTargetComplete = false;
         secondaryTorpedoTargetComplete = false;
-        int torpedoDistance = 0;
+        torpedoDistance = 0;
 
         // Bins
         binsFound  = false;
@@ -140,14 +140,16 @@ int KB::updateKB(IMAGE_KB *im)
 
 void KB::updatePillars(IMAGE_KB *im)
 {
-// update found
+    // update found
     if(im->sgPillars[0].pillarSeen)
         pillar1Found = true;
     if(im->sgPillars[1].pillarSeen)
+        pillar2Found = true;
 }
 
 void KB::updateBuoys(IMAGE_KB *im)
 {
+    int i = 0;
 	for(i = 0; i < 3; i++)
 	{
 /*		if(im->buoy[i].buoySeen)
@@ -162,6 +164,7 @@ void KB::updateBins(IMAGE_KB *im)
 {
 	int flag = 0;
 	int count = 0;
+    int i = 0;
 
 	for(i = 0; i < 4; i++)
 	{
@@ -208,19 +211,20 @@ void KB::updateBins(IMAGE_KB *im)
 void KB::updateTorpedos(IMAGE_KB *im)
 {
 	int flag = 0;
+    int i = 0;
 
 	for(i = 0; i < 4; i++)
 	{
 		if(im->torpedoTargets[i].targetSeen)
 		{
-			if(im->torpedoTargets[i].color == torpedoPrimary)
+			if(im->torpedoTargets[i].targetColor == torpedoPrimary)
 			{
 				primaryTorpedoTargetFound = true;
 				x1 = im->torpedoTargets[i].targetX;
 				y1 = im->torpedoTargets[i].targetY;
 				z1 = im->torpedoTargets[i].targetZ;
 			}
-			else if(im->torpedoTargets[i].color == torpedoSecondary)
+			else if(im->torpedoTargets[i].targetColor == torpedoSecondary)
 			{
 				secondaryTorpedoTargetFound = true;
 				x2 = im->torpedoTargets[i].targetX;

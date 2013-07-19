@@ -1,7 +1,7 @@
 /* Core AI file */
 
 #include "core.h"
-#include "../AIFunctionCall/checkImage.cpp"
+//#include "../AIFunctionCall/checkImage.cpp"
 #include "../control_sys/robosub_controller.h"
 
 #include <iostream>
@@ -25,12 +25,16 @@ using namespace std;
 #define DOWN 3            // Move down at a constant speed
 #define DOWN_FAST 4       // Move down at full speed
 #define DEPTH 5           // Default depth, 5 ft
+#define SURFACE 0         // Surface after the competition
 #define HEADING_FORWARD 0 // Default forward heading
 //#define STOP 0            // STOP!! :D
 
 void recv_callback( const ArduinoData& data )
 {
     cout << "Status Received from Arduino: " << endl;
+    myFile.open("sensor_data.txt");
+    myFile << data << endl;
+    myFile.close();
     cout << data << endl;
 }
 
@@ -52,6 +56,7 @@ int main(int argc, char* argv[])
     
 	im->initializeIM(im); // initialize the image KB
 
+
     // add error handling
     while(1)
         aiMainLoop(kb, im);
@@ -62,48 +67,100 @@ int main(int argc, char* argv[])
 int aiMainLoop(KB *kb, IMAGE_KB *im)
 {
 
-    kb->updateKB(im);     // Update the
+    //runVision(im);        // Run the vision algorithms
+    kb->updateKB(im);     // Update the AI's KB based on the Image KB
 	im->initializeIM(im); // reset the Image KB
     
+    cout << "looping" << endl;
     if (!kb->startComplete)
     {
         // Very beginning the sub should move forward and down to depth
-        move(0, FORWARD, DEPTH, 0, false, false, false, false, false);
+        for( i = 0; i < 20; i++)
+        {
+            // Send the command multiple times to make sure the microcontroller
+               // gets the command
+            move(0, FORWARD, DEPTH, 0, false, false, false, false, false);
+            usleep(50);
+        }
 
         kb->startComplete = true;
     }
     if (!kb->startGateComplete)
     {
+        v_startGate(im);
+        v_paths(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+
         StartGate(kb, im);
+        Paths(kb, im);
     }
     else if (!kb->buoyTaskComplete)
     {
+        v_buoys(im);
+        v_paths(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+
         Paths(kb, im);
         Buoys(kb, im);
     }
     else if (!kb->obstacleCourse1Complete)
     {
+        v_obstacleCourse(im);
+        v_paths(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+
         Paths(kb, im);
-        ObstacleCourse(kb);
+        ObstacleCourse(kb, im);
     }
     else if (!kb->torpedoTaskComplete)
     {
+        v_torpedos(im);
+        v_paths(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+
         Paths(kb, im);
-        Torpedos(kb);
+        Torpedos(kb, im);
     }
     else if (!kb->binsTaskComplete)
     {
+        v_bins(im);
+        v_paths(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+        
         Paths(kb, im);
         Bins(kb, im);
     }
     else if (!kb->obstacleCourse2Complete)
     {
+        v_obstacleCourse(im);
+        v_paths(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+
         Paths(kb, im);
-        ObstacleCourse(kb);
+        ObstacleCourse(kb, im);
+    }
+    /*else if (!kb->hydrophoneTaskComplete)
+    {
+        v_pickUp(im);
+        kb->updateKB(im);     // Update the AI's KB based on the Image KB
+        im->initializeIM(im); // reset the Image KB
+        
+        Hydrophones(kb, im);
+    }*/
+    else
+    {
+        // TODO add an exception to log errors and surface if errors occur
+        // Done with the competition. Surface and turn off
+        move(0, 0, SURFACE, 0, false, false, false, false, false);
     }
     return 0;
 }
-
 
 int StartGate(KB *kb, IMAGE_KB *im)
 {
@@ -236,7 +293,7 @@ int Buoys(KB *kb, IMAGE_KB *im)
     return 0;
 }
 
-int ObstacleCourse(KB *kb)
+int ObstacleCourse(KB *kb, IMAGE_KB *im)
 {
     // Find bars
 
@@ -284,7 +341,7 @@ int ObstacleCourse(KB *kb)
 }
 
 
-int Torpedos(KB *kb)
+int Torpedos(KB *kb, IMAGE_KB *im)
 {
     // Find targets
     // TODO
@@ -378,7 +435,7 @@ bool move( int x, int y, int32_t depth, int32_t heading,
     */
 
     // Initialize the control communication
-    RoboSubController Controller;
+    RoboSubController::RoboSubController Controller;
     Controller.AttachDataReceivedCallback(recv_callback);
     Controller.AttachDataSentCallback(send_callback);
 
