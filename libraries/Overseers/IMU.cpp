@@ -111,27 +111,42 @@ uint16_t IMU::readDepth(void)
         
     */
 
-    float tempF = 0.0;
-    int16_t depthDigital;
+//    float myF = 0.0;
+//    int16_t depthDigital = 0;
+    int16_t depthAnalog = 0;
+
+    int psi;
+    int depthInFeet;
 
     LogManager& mLogInstance = LogManager::GetInstance();
 
     // read directly from the pin connecting to the depth sensor;
-    mLogInstance.LogStrHex("IMU::readDepth - start reading = ", mDepthDataIn);
-    depthDigital = analogRead(DEPTH_PIN);
-    mLogInstance.LogStrHex("IMU::readDepth - depth data = ", mDepthDataIn);
+    mLogInstance.LogStrHex("IMU::readDepth - start reading = ", depthAnalog);
+    depthAnalog = analogRead(DEPTH_PIN);
+    mLogInstance.LogStrHex("IMU::readDepth - depth data = ", depthAnalog);
 
-    tempF = 14.7/0.0303;
-    mLogInstance.LogStrFloat("IMU::readDepth - 14.7/0.0303 = ", tempF);
-    tempF = (float)depthDigital - tempF;
-    mLogInstance.LogStrFloat("IMU::readDepth - depthdigital - that = ", tempF);
-    tempF = tempF * 0.0704;
-    mLogInstance.LogStrFloat("IMU::readDepth - that * 0.0704 = ", tempF);
-    tempF = tempF * 12.0;
-    mLogInstance.LogStrFloat("IMU::readDepth - that * 12.0 = ", tempF);
+    // calculate the psi reading from the analog reading
+    psi = depthAnalog * 0.0303;
+
+    // subtract atmospheric pressure at sea level
+    psi -= 14.7;
+
+    // calculate depth
+    depthInFeet = psi * 2.323;
+    mDepthDataInches = depthInFeet * 12;
+
+#ifdef BLUEBIRD
+    myF = 14.7/0.0303;
+    mLogInstance.LogStrFloat("IMU::readDepth - 14.7/0.0303 = ", myF);
+    myF = (float)depthAnalog - myF;
+    mLogInstance.LogStrFloat("IMU::readDepth - depthdigital - that = ", myF);
+    myF = myF * 0.0704;
+    mLogInstance.LogStrFloat("IMU::readDepth - that * 0.0704 = ", myF);
+    myF = myF * 12.0;
+    mLogInstance.LogStrFloat("IMU::readDepth - that * 12.0 = ", myF);
 
 //    mDepthDataIn = (((float)depthDigital - (14.7 / 0.0303)) * 0.0704) * 12;
-    mDepthDataIn = tempF;
+    mDepthDataIn = myF;
     mLogInstance.LogStrHex("IMU::readDepth - depth = ", mDepthDataIn);
 
 /*
@@ -144,8 +159,9 @@ uint16_t IMU::readDepth(void)
 //    snprintf(mLogString, LOG_STRING_LEN, 
 //        "IMU::readDepth - Read depth '%x'in from depth sensor.", mDepthDataIn);
 //    mLogInstance.LogStr(mLogString);
+#endif
 
     // return the depth data
-    return mDepthDataIn;
+    return mDepthDataInches;
 }
 

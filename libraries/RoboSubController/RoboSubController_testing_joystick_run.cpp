@@ -8,7 +8,17 @@
 
 // undefine this to enable the use of the depth controller in Run(), but note 
 // that the command data from the PC MUST HAVE A TARGET DEPTH FIELD FIRST
-#define ROLL_THRUSTER_MANUAL_CONTROL
+#undef ROLL_THRUSTER_MANUAL_CONTROL
+
+// define and undefine this flag for different effects
+/*
+Define this flag to cause Run to spit serialized sensor data back over the 
+serial line to the PC that sent it.
+
+Undefine it to cause Run() to spit the command data it received back over the
+serial line to the PC that sent it.
+*/
+#define SPIT_BACK_SENSOR_DATA
 
 // this value is used to cap the target depth at nothing dangeously deep for 
 // sub; after all, a calculation gone bad could cause the sub to think that the 
@@ -65,7 +75,7 @@ static int depthController(int currentDepthInches, int targetDepthInches)
     depth, multiply that number by a hand-wavy-approximation constant to 
     convert the error into desired duty cycle, and the return that value.
     */
-    const int kProportional = 5;
+    const int kProportional = 5;    // toy with this value until it works
     int errDepthInches;
     int newDutyCycle;
 
@@ -170,7 +180,7 @@ void RoboSubController::Run()
         // Only read when we have the "magic" number
         // this number indicates that we have control data
         _lm.LogStr("waiting for transmission start");
-        _lm.LogStrInt("max bytes: ", RoboSubControlData::NO_MAGIC_SIZE);
+        _lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
         while(Serial.peek() != RoboSubControlData::MAGIC)
         {
             // Discard this byte,
@@ -236,6 +246,20 @@ void RoboSubController::Run()
             thrusterDutyCycleBuf[0] = tempThrusterCmdData;
             thrusterDirBuf[0] = 1;
         }
+
+if (50 == tempThrusterCmdData)
+{
+    if (durpy)
+    {
+        mCU.clawOpen();
+        durpy = false;
+    }
+    else
+    {
+        mCU.clawClose();
+        durpy = true;
+    }
+}
 
 
         // port aft thruster
@@ -328,7 +352,7 @@ void RoboSubController::Run()
         depth controller.
         */
         depthCurrentInches = mIMU.readDepth();
-        depthTargetInches = pcCmdData.Data.target_depth;
+        depthTargetInches = pcCmdData.Data.TargetDepthInches;
         tempThrusterCmdData = 
             depthController(depthCurrentInches, depthTargetInches);
 
@@ -415,6 +439,8 @@ void RoboSubController::Run()
         myGyroData.Y = -5.5;
         myGyroData.Z = 6.6;
 */
+
+#ifdef SPIT_BACK_SENSOR_DATA
         // serialize the sensor data and send it back to the sub's PC
         String toSubPC;
         subSensorData.Data.Acl_X = myAccelData.X;
@@ -431,12 +457,13 @@ void RoboSubController::Run()
         // I decided to declare the buffer as char* and then cast it to 
         // uint8_t* here
         Serial.write((uint8_t *)subSensorDataBuffer, ArduinoData::SIZE);
-
+#else
         // "Pretty" print the joystick commands back to the serial line to 
         // ensure the data was sent correctly.
-//        String toPrint;
-//        pcCmdData.ToString(toPrint);
-//        Serial.print(toPrint);
+        String toPrint;
+        pcCmdData.ToString(toPrint);
+        Serial.print(toPrint);
+#endif
 
         // ??should there be a delay??
 //        delay(100);

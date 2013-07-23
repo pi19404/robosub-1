@@ -69,7 +69,7 @@ private:
     // the space for the depth sensor's data;
     // it is a simple analog device, so no handler is needed;
     // just read from the pin
-    int16_t mDepthDataIn;
+    int16_t mDepthDataInches;
 };
 
 #endif //__IMU_H__

@@ -115,6 +115,7 @@ struct RoboSubControlCommand : public Serializable
             Thruster_Aft_R(0),
             Thruster_Roll_L(0),
             Thruster_Roll_R(0),
+            TargetDepthInches(0),
             Torpedo1_Fire(false),
             Torpedo2_Fire(false),
             Marker1_Drop(false),
@@ -129,6 +130,8 @@ struct RoboSubControlCommand : public Serializable
                 Thruster_Roll_L, // Left Roll Thruster
                 Thruster_Roll_R; // Right Roll Thruster
 
+        int32_t TargetDepthInches;  // the depth that we want to go to
+
         bool Torpedo1_Fire, // Fire torpedo 1
              Torpedo2_Fire, // Fire torpedo 2
              Marker1_Drop,  // Drop Marker 1
@@ -138,7 +141,6 @@ struct RoboSubControlCommand : public Serializable
 
     static const char MAGIC = 0x22;
     static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + 1;
-    static const uint32_t NO_MAGIC_SIZE = sizeof(DATA);
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__

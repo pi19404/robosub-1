@@ -30,6 +30,8 @@ void RoboSubController::Run()
     // pause for a moment before beginning
     delay(2000);
 
+    // default all thrusters to forward (motor direction = 0) according to the
+    // commands required by the h bridge
     for(i = 0; i < NUM_THRUSTERS; i++)
     {
         dutyCycles[i] = 0;
@@ -94,12 +96,12 @@ void RoboSubController::Run()
         delay(4000);
 */
         _lm.LogStr("turning thrusters on");
-        dutyCycles[0] = 30;
-        dutyCycles[1] = 30;
-        dutyCycles[2] = 30;
-        dutyCycles[3] = 30;
-        dutyCycles[4] = 30;
-        dutyCycles[5] = 30;
+        dutyCycles[0] = 40;
+        dutyCycles[1] = 40;
+        dutyCycles[2] = 40;
+        dutyCycles[3] = 40;
+        dutyCycles[4] = 40;
+        dutyCycles[5] = 40;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(2000);
 

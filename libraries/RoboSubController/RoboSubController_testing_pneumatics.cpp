@@ -47,7 +47,10 @@ void RoboSubController::Run()
         delay(2000);
         mCU.dropMarkerN(2);
         delay(2000);
-
+        mCU.clawOpen();
+        delay(2000);
+        mCU.clawClose();
+        delay(2000);
 
 // all confirmed
 // REMEMBER TO TURN ON POWER BEFORE ATTEMPTING!

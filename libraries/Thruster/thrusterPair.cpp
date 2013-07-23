@@ -5,6 +5,10 @@
 #include "thrusterPair.h"
 #include "string.h"
 
+// this value is at the top of this file so that it can be easily edited for 
+// alternating use in water (high max duty cycle) and air (low max duty cycle)
+static const unsigned int MAX_DUTY = 90;
+
 thrusterPair::thrusterPair()
 {
     // initialize to invalid values
@@ -55,9 +59,9 @@ void thrusterPair::setMotor(int motorNum, int dutyCycle, int direction)
     {
         dutyCycle = 0;
     } 
-    else if (dutyCycle > 50)
+    else if (dutyCycle > MAX_DUTY)
     {
-        dutyCycle = 50;
+        dutyCycle = MAX_DUTY;
     }
 
     // set command based on motor number and direction
