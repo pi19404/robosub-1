@@ -69,7 +69,7 @@ struct ArduinoStatus : public Serializable
     {
         // Check beginning magic number
         const char * str2 = str;
-        if( !(str && (str[0] == MAGIC)) ) 
+        if( !(str && (*str != MAGIC)) ) 
         { 
             return; 
         }

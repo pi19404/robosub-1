@@ -15,6 +15,7 @@ ARDUINO_LIBS =  Wire \
                 Pneumatics \
                 Thruster \
                 Overseers \
+                Jays_Serial_Data \
                 Logging \
                 RoboSubController
 
@@ -36,10 +37,10 @@ SYS_INCLUDES += $(patsubst %,-I%,$(USER_LIB_PATH))
 ## also put the logging flag here, which says whether or not the log manager
 ## is active ##
 CPPFLAGS +=             \
--DLOGGING='1'           \
--DHAVE_ACCEL            \
--DACCEL_MODEL='ADXL345' \
--DHAVE_GYRO             \
--DGYRO_MODEL='L3G4200D' \
+-DLOGGING='0'           \
 -DROBOSUBCONTROLLER_RELEASE
+#-DHAVE_ACCEL            \
+#-DACCEL_MODEL='ADXL345' \
+#-DHAVE_GYRO             \
+#-DGYRO_MODEL='L3G4200D' \
 

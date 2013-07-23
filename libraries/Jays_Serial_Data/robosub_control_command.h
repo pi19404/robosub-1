@@ -52,6 +52,8 @@ struct RoboSubControlCommand : public Serializable
         _Serialize( &Data.Thruster_Roll_L, sz, &str2 );
         _Serialize( &Data.Thruster_Roll_R, sz, &str2 );
 
+        _Serialize( &Data.TargetDepthInches, sz, &str2 );
+
         // Pneumatics
         sz = sizeof(bool);
         _Serialize( &Data.Torpedo1_Fire, sz, &str2 );
@@ -61,7 +63,8 @@ struct RoboSubControlCommand : public Serializable
         _Serialize( &Data.Claw_Latch, sz, &str2 );
 
         // Checksum
-        *str2 = _ComputeChecksum(str, SIZE-1);
+        mCheckSum = _ComputeChecksum(str, SIZE-1);
+        *str2 = mCheckSum;
     }
 
     // DeserializeFromString
@@ -71,7 +74,7 @@ struct RoboSubControlCommand : public Serializable
     // \post the object will contain the deserialized data from str.
     void DeserializeFromString( const char *str )
     {
-        // Check beginning and ending magic numbers
+        // Check beginning magic number
         const char * str2 = str;
         if( !( str && (str[0] == MAGIC) ) ) 
         { 
@@ -87,6 +90,8 @@ struct RoboSubControlCommand : public Serializable
         _Deserialize( &Data.Thruster_Aft_R, sz, &str2 );
         _Deserialize( &Data.Thruster_Roll_L, sz, &str2 );
         _Deserialize( &Data.Thruster_Roll_R, sz, &str2 );
+
+        _Deserialize( &Data.TargetDepthInches, sz, &str2 );
 
         // Pneumatics
         sz = sizeof(bool);
@@ -139,8 +144,9 @@ struct RoboSubControlCommand : public Serializable
              Claw_Latch;    // Latch the Claw
     } Data;
 
+    uint8_t mCheckSum;
     static const char MAGIC = 0x22;
-    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + 1;
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + sizeof(mCheckSum);
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__

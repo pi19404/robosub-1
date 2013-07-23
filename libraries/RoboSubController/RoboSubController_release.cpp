@@ -1,8 +1,8 @@
 #ifdef ROBOSUBCONTROLLER_RELEASE
 
 #include <RoboSubController/RoboSubController.h>
-#include <Jay's_Serial_Data/robosub_control_data.h> // for commands from PC
-#include <Jay's_Serial_Data/arduino_data.h>         // for sensor data to PC
+#include <Jays_Serial_Data/robosub_control_data.h> // for commands from PC
+#include <Jays_Serial_Data/arduino_data.h>         // for sensor data to PC
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
@@ -18,7 +18,7 @@ serial line to the PC that sent it.
 Undefine it to cause Run() to spit the command data it received back over the
 serial line to the PC that sent it.
 */
-#define SPIT_BACK_SENSOR_DATA
+#undef SPIT_BACK_SENSOR_DATA
 
 // this value is used to cap the target depth at nothing dangeously deep for 
 // sub; after all, a calculation gone bad could cause the sub to think that the 
@@ -146,7 +146,7 @@ void RoboSubController::Run()
 
     // this buffer stores a serialized version of a bunch of sensor data so 
     // that it can be sent over the serial port to the sub's pc
-    char subSensorDataBuffer[ArduinoData::SIZE];
+    char subSensorDataBuffer[ArduinoStatus::SIZE];
 
     // this structure will store the non-serialized command data and has the 
     // functions to deserialize a serialized buffer of command data into 
@@ -177,16 +177,21 @@ void RoboSubController::Run()
 
     while( true )
     {
-if (durpy)
+while(1)
 {
-    mCU.clawOpen();
-    durpy = false;
+    if (durpy)
+    {
+        mCU.clawOpen();
+        durpy = false;
+    }
+    else
+    {
+        mCU.clawClose();
+        durpy = true;
+    }
+    delay(1000);
 }
-else
-{
-    mCU.clawClose();
-    durpy = true;
-}
+
         // Only read when we have the "magic" number
         // this number indicates that we have control data
         _lm.LogStr("waiting for transmission start");
@@ -212,6 +217,7 @@ else
             pcCmdDataBuffer[i] = static_cast<char>(c);
         }
 
+#ifdef BIRDYBIRDY
         // Verify received data is valid
 /*
         if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
@@ -257,21 +263,9 @@ else
             thrusterDirBuf[0] = 1;
         }
 
-/*
 if (50 == tempThrusterCmdData)
 {
-    if (durpy)
-    {
-        mCU.clawOpen();
-        durpy = false;
-    }
-    else
-    {
-        mCU.clawClose();
-        durpy = true;
-    }
 }
-*/
 
         // port aft thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_L;
@@ -481,6 +475,7 @@ if (50 == tempThrusterCmdData)
 
         // ??should there be a delay??
 //        delay(100);
+#endif
     }
 }
 

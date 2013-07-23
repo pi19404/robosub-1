@@ -45,6 +45,7 @@ struct RoboSubControlData : public RoboSubControlCommand
     	str +=  "  Thruster_Aft_R: " + String(Data.Thruster_Aft_R) + "\n";
     	str +=  "  Thruster_Roll_L: " + String(Data.Thruster_Roll_L) + "\n";
     	str +=  "  Thruster_Roll_R: " + String(Data.Thruster_Roll_R) + "\n";
+        str +=  "  Target_Depth_Inches: " + String(Data.TargetDepthInches) + "\n";
     	str +=  "  Torpedo1_Fire: " + String(Data.Torpedo1_Fire) + "\n";
     	str +=  "  Torpedo2_Fire: " + String(Data.Torpedo2_Fire) + "\n";
     	str +=  "  Marker1_Drop: " + String(Data.Marker1_Drop) + "\n";
