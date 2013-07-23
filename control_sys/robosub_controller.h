@@ -62,7 +62,7 @@ public:
     // \brief sets the total thrust for X,Y, Depth and Heading
     void SetThrustAll( const ThrustMode& modeX,
                        const ThrustMode& modeY,
-                       const int32_t modeDepth,
+                       const ThrustMode& modeDepth,
                        const ThrustMode& modeHeading );
 
     // SetPneumAll

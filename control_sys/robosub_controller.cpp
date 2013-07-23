@@ -137,7 +137,7 @@ RoboSubCommand& RoboSubController::Command()
 
 void RoboSubController::SetThrustAll( const ThrustMode& modeX,
                                       const ThrustMode& modeY,
-                                      const int32_t modeDepth,
+                                      const ThrustMode& modeDepth,
                                       const ThrustMode& modeHeading )
 {
     SetThrustX(modeX);
@@ -169,7 +169,7 @@ void RoboSubController::SetThrustY( const ThrustMode& mode )
     _SetThrustHelper( _Command.PowerY, mode );
 }
  
-void RoboSubController::SetThrustDepth( const int32_t mode )
+void RoboSubController::SetThrustDepth( const ThrustMode& mode )
 {
     _SetThrustHelper( _Command.Depth, mode );
 }
