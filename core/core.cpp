@@ -10,6 +10,7 @@
 #include <exception>
 
 #include <unistd.h>
+#include <time.h>
 
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>
@@ -80,7 +81,7 @@ int aiMainLoop(KB *kb, IMAGE_KB *im)
             // Send the command multiple times to make sure the microcontroller
                // gets the command
             move(0, FORWARD, DEPTH, 0, false, false, false, false, false);
-            usleep(50);
+            usleep(100);
         }
 
         kb->startComplete = true;
