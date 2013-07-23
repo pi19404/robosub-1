@@ -2,7 +2,7 @@
 
 #include <RoboSubController/RoboSubController.h>
 #include <Jays_Serial_Data/robosub_control_data.h> // for commands from PC
-#include <Jays_Serial_Data/arduino_data.h>         // for sensor data to PC
+#include <Jays_Serial_Data/arduino_status.h>         // for sensor data to PC
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
@@ -159,7 +159,7 @@ void RoboSubController::Run()
     // functions to serialize this data into a serialized character buffer and 
     // (if necessary) deserialize a serialized buffer of sensor data back into 
     // non-serialized sensor data and store that data in itself
-    ArduinoData subSensorData;
+    ArduinoStatus subSensorData;
 
     // these buffers store duty cycles and directions that are retrieved from
     // the deserialized command data sent from the sub's PC
@@ -172,11 +172,20 @@ void RoboSubController::Run()
     memset(pcCmdDataBuffer, 0, RoboSubControlData::SIZE);
     memset(thrusterDutyCycleBuf, 0, sizeof(thrusterDutyCycleBuf));
     memset(thrusterDirBuf, 0, sizeof(thrusterDirBuf));
-    memset(thrusterDutyCycleBuf, 0, sizeof(thrusterDutyCycleBuf));
-    memset(thrusterDirBuf, 0, sizeof(thrusterDirBuf));
 
     while( true )
     {
+        // Only read when we have the "magic" number
+        // this number indicates that we have control data
+        _lm.LogStr("waiting for transmission start");
+        _lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
+        while(Serial.peek() != RoboSubControlData::MAGIC)
+        {
+            // Discard this byte,
+            // we don't want it
+            Serial.read();
+        }
+
 while(1)
 {
     if (durpy)
@@ -192,17 +201,6 @@ while(1)
     delay(1000);
 }
 
-        // Only read when we have the "magic" number
-        // this number indicates that we have control data
-        _lm.LogStr("waiting for transmission start");
-        _lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
-        while(Serial.peek() != RoboSubControlData::MAGIC)
-        {
-            // Discard this byte,
-            // we don't want it
-            Serial.read();
-        }
-
         // Wait until all of the control data is in the buffer
         _lm.LogStr("waiting for serial data");
         while(Serial.available() < RoboSubControlData::SIZE);
@@ -216,6 +214,7 @@ while(1)
             int c = Serial.read();
             pcCmdDataBuffer[i] = static_cast<char>(c);
         }
+
 
 #ifdef BIRDYBIRDY
         // Verify received data is valid
@@ -468,9 +467,9 @@ if (50 == tempThrusterCmdData)
 #else
         // "Pretty" print the joystick commands back to the serial line to 
         // ensure the data was sent correctly.
-        String toPrint;
-        pcCmdData.ToString(toPrint);
-        Serial.print(toPrint);
+//        String toPrint;
+//        pcCmdData.ToString(toPrint);
+//        Serial.print(toPrint);
 #endif
 
         // ??should there be a delay??

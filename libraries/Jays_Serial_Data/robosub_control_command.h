@@ -51,8 +51,7 @@ struct RoboSubControlCommand : public Serializable
         _Serialize( &Data.Thruster_Aft_R, sz, &str2 );
         _Serialize( &Data.Thruster_Roll_L, sz, &str2 );
         _Serialize( &Data.Thruster_Roll_R, sz, &str2 );
-
-        _Serialize( &Data.TargetDepthInches, sz, &str2 );
+        _Serialize( &Data.Target_depth_inches, sz, &str2 );
 
         // Pneumatics
         sz = sizeof(bool);
@@ -63,8 +62,8 @@ struct RoboSubControlCommand : public Serializable
         _Serialize( &Data.Claw_Latch, sz, &str2 );
 
         // Checksum
-        mCheckSum = _ComputeChecksum(str, SIZE-1);
-        *str2 = mCheckSum;
+        mchecksum = _ComputeChecksum(str, SIZE-1);
+        *str2 = mchecksum;
     }
 
     // DeserializeFromString
@@ -74,7 +73,7 @@ struct RoboSubControlCommand : public Serializable
     // \post the object will contain the deserialized data from str.
     void DeserializeFromString( const char *str )
     {
-        // Check beginning magic number
+        // Check beginning and ending magic numbers
         const char * str2 = str;
         if( !( str && (str[0] == MAGIC) ) ) 
         { 
@@ -90,8 +89,7 @@ struct RoboSubControlCommand : public Serializable
         _Deserialize( &Data.Thruster_Aft_R, sz, &str2 );
         _Deserialize( &Data.Thruster_Roll_L, sz, &str2 );
         _Deserialize( &Data.Thruster_Roll_R, sz, &str2 );
-
-        _Deserialize( &Data.TargetDepthInches, sz, &str2 );
+        _Deserialize( &Data.Target_depth_inches, sz, &str2 );
 
         // Pneumatics
         sz = sizeof(bool);
@@ -120,7 +118,7 @@ struct RoboSubControlCommand : public Serializable
             Thruster_Aft_R(0),
             Thruster_Roll_L(0),
             Thruster_Roll_R(0),
-            TargetDepthInches(0),
+            Target_depth_inches(0),
             Torpedo1_Fire(false),
             Torpedo2_Fire(false),
             Marker1_Drop(false),
@@ -133,9 +131,8 @@ struct RoboSubControlCommand : public Serializable
                 Thruster_Aft_L,  // Left-Rear Drive Thruster
                 Thruster_Aft_R,  // Right-Rear Drive Thruster
                 Thruster_Roll_L, // Left Roll Thruster
-                Thruster_Roll_R; // Right Roll Thruster
-
-        int32_t TargetDepthInches;  // the depth that we want to go to
+                Thruster_Roll_R, // Right Roll Thruster
+                Target_depth_inches; // Depth in inches
 
         bool Torpedo1_Fire, // Fire torpedo 1
              Torpedo2_Fire, // Fire torpedo 2
@@ -144,9 +141,9 @@ struct RoboSubControlCommand : public Serializable
              Claw_Latch;    // Latch the Claw
     } Data;
 
-    uint8_t mCheckSum;
+    uint8_t mchecksum;
     static const char MAGIC = 0x22;
-    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + sizeof(mCheckSum);
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + sizeof(mchecksum);
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__

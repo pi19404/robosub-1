@@ -1,7 +1,7 @@
 #ifndef __ARDUINO_STATUS_H__
 #define __ARDUINO_STATUS_H__
 ///////////////////////////////////////////////////////////////////////////////
-// \file arduino_status.h
+// \file robosub_control_command.h
 ///////////////////////////////////////////////////////////////////////////////
 // Author: Jay Sidhu <jaypal.sidhu@gmail.com>
 // Project: Control System Communication
@@ -38,7 +38,7 @@ struct ArduinoStatus : public Serializable
     {
         if( !str ){ return; }
      
-        // Write beginning magic number  
+        // Write magic number   
         char *str2 = str;
         *str2 = MAGIC;
         ++str2;
@@ -55,9 +55,6 @@ struct ArduinoStatus : public Serializable
         // Depth Sensor
         sz = sizeof(uint32_t);
         _Serialize( &Data.Depth, sz, &str2 );
-
-        // Checksum
-        *str2 = _ComputeChecksum(str, SIZE-1);
     }
 
     // DeserializeFromString
@@ -67,9 +64,9 @@ struct ArduinoStatus : public Serializable
     // \post the object will contain the deserialized data from str.
     void DeserializeFromString( const char *str )
     {
-        // Check beginning magic number
+        // Check magic number
         const char * str2 = str;
-        if( !(str && (*str != MAGIC)) ) 
+        if( str && (*str != MAGIC) )
         { 
             return; 
         }
@@ -88,14 +85,6 @@ struct ArduinoStatus : public Serializable
         sz = sizeof(uint32_t);
         _Deserialize( &Data.Depth, sz, &str2 );
     }
-
-    // SerializedIsValid
-    // \brief determines whether the data is valid using the properties of the
-    //          checksum.
-    // \param sp ptr to the string containing the serialized data
-    // \param sz the size of the data in bytes
-    // \return true if valid, false otherwise
-    using Serializable::SerializedIsValid;
 
     struct DATA 
     {
@@ -122,7 +111,7 @@ struct ArduinoStatus : public Serializable
     } Data;
 
     static const char MAGIC = 0x25;
-    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + 1;
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA);
 };
 
 #endif //__ARDUINO_STATUS_H__
