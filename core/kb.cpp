@@ -5,6 +5,8 @@
 
 KB::KB()
 {
+	int i = 0;
+	
         // Multiple Tasks
         startGateComplete = false;
         buoyTaskComplete = false;
@@ -21,13 +23,18 @@ KB::KB()
         pillar2Found = false;
 
         // Paths
-        path1found = false;
-        path2found = false;
-        path3found = false;
-        path4found = false;
-        path5found = false;
-        path6found = false;
-        path7found = false;
+        //path1found = false;
+        //path2found = false;
+        //path3found = false;
+        //path4found = false;
+        //path5found = false;
+        //path6found = false;
+        //path7found = false;
+
+	for(i = 0; i < 8; i++)
+	{
+		pathFound[i] = false;	
+	}
 
         // Buoys
         correctHeading = false;
@@ -132,6 +139,7 @@ KB::KB()
 int KB::updateKB(IMAGE_KB *im)
 {
 	updatePillars(im);
+	updatePaths(im);
 	updateBuoys(im);
 	updateBins(im);
 	updateTorpedos(im);
@@ -140,28 +148,63 @@ int KB::updateKB(IMAGE_KB *im)
 
 void KB::updatePillars(IMAGE_KB *im)
 {
-// update found
+/*// update found
     if(im->sgPillars[0].pillarSeen)
         pillar1Found = true;
-    if(im->sgPillars[1].pillarSeen)
+    if(im->sgPillars[1].pillarSeen)*/
+	int i = 0;
+
+	for(i = 0; i < 2; i++)
+	{
+		if(im->sgPillars[i].pillarSeen)
+		{
+			if(i == 0)
+			{
+				pillar1Found = true;
+				x1 = im->sgPillars[i].pillarX;
+			}
+			else
+			{
+				pillar2Found = true;
+				x2 = im->sgPillars[i].pillarX;
+			}
+		}
+	}
+
+	
 }
 
 void KB::updateBuoys(IMAGE_KB *im)
 {
+	int i = 0, count = 0;
+
 	for(i = 0; i < 3; i++)
 	{
-/*		if(im->buoy[i].buoySeen)
+		if(im->buoy[i].buoySeen && !buoyComplete[i])
 		{
-			
-		}*/	
+			count += 1;
+
+			if(im->buoy[i].isCylinder)
+			{
+				if(im->buoy[i].buoyColor == buoyGoalColor)
+				{
+					buoyColor[i] = im->buoy[i].buoyColor;
+					buoyFound[i] = true;
+					x1 = im->buoy[i].buoyX;
+					y1 = im->buoy[i].buoyY;
+					z1 = im->buoy[i].buoyZ; 
+				}
+			}
+		}	
 	}	
+
+	numBuoysSeen = count;
 }
 
 
 void KB::updateBins(IMAGE_KB *im)
 {
-	int flag = 0;
-	int count = 0;
+	int flag = 0, count = 1, i = 0;
 
 	for(i = 0; i < 4; i++)
 	{
@@ -207,7 +250,7 @@ void KB::updateBins(IMAGE_KB *im)
 
 void KB::updateTorpedos(IMAGE_KB *im)
 {
-	int flag = 0;
+	int flag = 0, i = 0;
 
 	for(i = 0; i < 4; i++)
 	{
@@ -216,6 +259,8 @@ void KB::updateTorpedos(IMAGE_KB *im)
 			if(im->torpedoTargets[i].color == torpedoPrimary)
 			{
 				primaryTorpedoTargetFound = true;
+				im->torpedoTargets[i].isPrimary = true;
+				im->torpedoTargets[i].isSecondary = false;
 				x1 = im->torpedoTargets[i].targetX;
 				y1 = im->torpedoTargets[i].targetY;
 				z1 = im->torpedoTargets[i].targetZ;
@@ -223,6 +268,8 @@ void KB::updateTorpedos(IMAGE_KB *im)
 			else if(im->torpedoTargets[i].color == torpedoSecondary)
 			{
 				secondaryTorpedoTargetFound = true;
+				im->torpedoTargets[i].isSecondary = true;
+				im->torpedoTargets[i].isPrimary = false;
 				x2 = im->torpedoTargets[i].targetX;
 				y2 = im->torpedoTargets[i].targetY;
 				z2 = im->torpedoTargets[i].targetZ;
@@ -230,16 +277,36 @@ void KB::updateTorpedos(IMAGE_KB *im)
 			else if(flag == 0)
 			{
 				flag = 1;
+				im->torpedoTargets[i].isPrimary = false;
+				im->torpedoTargets[i].isSeconary = false;
 				x3 = im->torpedoTargets[i].targetX;
 				y3 = im->torpedoTargets[i].targetY;
 				z3 = im->torpedoTargets[i].targetZ;
 			}
 			else
 			{
+				im->torpedoTargets[i].isPrimary = false;
+				im->torpedoTargets[i].isSeconary = false;
 				x4 = im->torpedoTargets[i].targetX;
 				y4 = im->torpedoTargets[i].targetY;
 				z4 = im->torpedoTargets[i].targetZ;
 			}
+		}
+	}
+}
+
+
+void KB::updatePaths(IMAGE_KB *im)
+{
+	int i = 0, j = 0;
+
+	for(i = 0; i < 8; i++)
+	{
+		if((im->paths[i].pathSeen == true) && (pathFound[i] == false))
+		{
+			pathFound[i] = true;
+			x1 = im->paths.rightPathX;
+			heading1 = im->paths[i].rightPathHeading;
 		}
 	}
 }

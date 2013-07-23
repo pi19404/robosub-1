@@ -14,6 +14,7 @@ typedef struct BUOY {
 	int buoyY;
 	int buoyZ;
 	colors buoyColor;
+	bool isCylinder;
 }Buoy;
 
 typedef struct TORPEDO_TARGET {
@@ -22,6 +23,8 @@ typedef struct TORPEDO_TARGET {
 	int targetY;
 	int targetZ;
 	colors targetColor;
+	bool isPrimary;
+	bool isSecondary;
 }TorpedoTarget;
 
 typedef struct BIN {
@@ -43,6 +46,14 @@ typedef struct SGPILLAR {
 	bool pillarSeen;
 	int pillarX;
 }SGPillar;
+
+typedef struct PATH {
+	int pathNum;
+	bool pathSeen;
+	int rightPathX;
+	double rightPathHeading;
+}Path;
+	
 
 class IMAGE_KB {
     public:
@@ -68,12 +79,13 @@ class IMAGE_KB {
 //        int  pillar1X, pillar2X;
 
         // Paths
-        bool pathSeen;
+	Path paths[8];
+//        bool pathSeen;
         //bool twoPaths;
         //int  leftPathX;
-        int  rightPathX;
+  //      int  rightPathX;
 		//double  leftPathHeading;
-		double  rightPathHeading;
+	//	double  rightPathHeading;
 
         // Buoys
 		Buoy buoys[3];

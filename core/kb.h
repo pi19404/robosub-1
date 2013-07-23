@@ -1,4 +1,4 @@
-/* Knowledge Base Class */
+// Knowledge Base Class */
 
 #ifndef __KB__
 #define __KB__
@@ -19,6 +19,8 @@ class KB {
 	void updateBuoys(IMAGE_KB *im);
 	void updateBins(IMAGE_KB *im);
 	void updateTorpedos(IMAGE_KB *im);
+	void updatePaths(IMAGE_KB *im);
+
         // Multiple Tasks
         bool startGateComplete;
         bool buoyTaskComplete;
@@ -35,28 +37,34 @@ class KB {
         bool pillar2Found;
 
         // Paths
-        bool path1found;
-        bool path2found;
-        bool path3found;
-        bool path4found;
-        bool path5found;
-        bool path6found;
-        bool path7found;
+        //bool path1found;
+        //bool path2found;
+        //bool path3found;
+        //bool path4found;
+        //bool path5found;
+        //bool path6found;
+        //bool path8found;
+        bool pathfound[8];
+        
 
         // Buoys
         bool correctHeading;
-        bool buoy1Found;
-        bool buoy2Found;
-        bool buoy3Found;
-        bool buoy1Complete;
-        bool buoy2Complete;
-        bool buoy3Complete;
-        colors buoy1Color;
-        colors buoy2Color;
-        colors buoy3Color;
-	bool buoy1Hit;
-	bool buoy2Hit;
-	bool buoy3Hit;
+        //bool buoy1Found;
+        //bool buoy2Found;
+        //bool buoy3Found;
+        bool buoyFound[3];
+        //bool buoy1Complete;
+        //bool buoy2Complete;
+        //bool buoy3Complete;
+        bool buoyComplete[3];
+        //colors buoy1Color;
+        //colors buoy2Color;
+        //colors buoy3Color;
+        colors buoyColor[3];
+	//bool buoy1Hit;
+	//bool buoy2Hit;
+	//bool buoy3Hit;
+	bool buoyHit[3];
         
         // Parking Obstacle
         bool horizBarFound;
