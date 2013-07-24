@@ -62,8 +62,7 @@ struct RoboSubControlCommand : public Serializable
         _Serialize( &Data.Claw_Latch, sz, &str2 );
 
         // Checksum
-        mchecksum = _ComputeChecksum(str, SIZE-1);
-        *str2 = mchecksum;
+        *str2 = _ComputeChecksum(str, SIZE-1);
     }
 
     // DeserializeFromString
@@ -141,9 +140,8 @@ struct RoboSubControlCommand : public Serializable
              Claw_Latch;    // Latch the Claw
     } Data;
 
-    uint8_t mchecksum;
     static const char MAGIC = 0x22;
-    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + sizeof(mchecksum);
+    static const uint32_t SIZE = sizeof(MAGIC) + sizeof(DATA) + 1;  // +1 for the checksum byte
 };
 
 #endif //__ROBOSUB_CONTROL_COMMAND_H__

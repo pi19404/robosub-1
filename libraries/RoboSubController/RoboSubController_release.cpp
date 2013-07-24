@@ -186,21 +186,6 @@ void RoboSubController::Run()
             Serial.read();
         }
 
-while(1)
-{
-    if (durpy)
-    {
-        mCU.clawOpen();
-        durpy = false;
-    }
-    else
-    {
-        mCU.clawClose();
-        durpy = true;
-    }
-    delay(1000);
-}
-
         // Wait until all of the control data is in the buffer
         _lm.LogStr("waiting for serial data");
         while(Serial.available() < RoboSubControlData::SIZE);
@@ -216,9 +201,7 @@ while(1)
         }
 
 
-#ifdef BIRDYBIRDY
         // Verify received data is valid
-/*
         if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
         {
             // The data was malformed, so, discard it
@@ -234,11 +217,21 @@ while(1)
                 mCU.clawClose();
                 durpy = true;
             }
-
-            continue;
+            delay(1000);
         }
+/*    
+            if (durpy)
+            {
+                mCU.clawOpen();
+                durpy = false;
+            }
+            else
+            {
+                mCU.clawClose();
+                durpy = true;
+            }
 */
-
+#ifdef BIRDYBIRDY
         // Deserialize the read in bytes into
         // the command objec
         _lm.LogStr("deserializing string");
