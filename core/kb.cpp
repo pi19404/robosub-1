@@ -208,13 +208,16 @@ void KB::updateBins(IMAGE_KB *im)
 
 	for(i = 0; i < 4; i++)
 	{
-		count += 1;
 
 		if(im->bins[i].binSeen)
 		{
+			count += 1;
+
 			if(im->bins[i].binImage == binPrimary)
 			{
 				primaryTorpedoTargetFound = true;
+				im->bins[i].isPrimary = true;
+				im->bins[i].isSecondary = false;
 				x1 = im->bins[i].binX;
 				y1 = im->bins[i].binY;
 				z1 = im->bins[i].binZ;
@@ -222,6 +225,8 @@ void KB::updateBins(IMAGE_KB *im)
 			else if(im->bins[i].binImage == binSecondary)
 			{
 				secondaryTorpedoTargetFound = true;
+				im->bins[i].isSecondary = true;
+				im->bins[i].isPrimary = false;
 				x2 = im->bins[i].binX;
 				y2 = im->bins[i].binY;
 				z2 = im->bins[i].binZ;
@@ -229,12 +234,16 @@ void KB::updateBins(IMAGE_KB *im)
 			else if(flag == 0)
 			{
 				flag = 1;
+				im->bins[i].isPrimary = false;
+				im->bins[i].isSecondary = false;
 				x3 = im->bins[i].binX;
 				y3 = im->bins[i].binY;
 				z3 = im->bins[i].binZ;
 			}
 			else
 			{
+				im->bins[i].isPrimary = false;
+				im->bins[i].isSecondary = false;
 				x4 = im->bins[i].binX;
 				y4 = im->bins[i].binY;
 				z4 = im->bins[i].binZ;

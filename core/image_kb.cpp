@@ -129,6 +129,16 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
 	 im->bins[3].binY = 0;
 	 im->bins[3].binZ = 0;
 
+	 im->bins[0].isPrimary = false;
+	 im->bins[1].isPrimary = false;
+	 im->bins[2].isPrimary = false;
+	 im->bins[3].isPrimary = false;
+
+	 im->bins[0].isSecondary = false;
+	 im->bins[1].isSecondary = false;
+	 im->bins[2].isSecondary = false;
+	 im->bins[3].isSecondary = false;
+
     // Manipulation
     im->wheelSeen   = false;
     im->shifterSeen = false;

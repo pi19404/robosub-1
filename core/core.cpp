@@ -330,6 +330,56 @@ int Bins(KB *kb, IMAGE_KB *im)
         // Move directly above secondary target 
         // Aim
         // Drop marker 2
+	int i = 0;
+
+	if(!kb->primaryBinTargetCompleted)
+	{
+		if(kb->binsPrimaryFound)
+		{
+			//Find location of primary
+			for(i = 0; (im->bins[i].isPrimary == false) && (i < 4); i++);
+
+			//extra error checking
+			if((i < 4) && (im->bins[i].binSeen == true))
+			{
+				//Move toward target
+				move(im->bins[i].binX, im->bins[i].binY, im->bins[i].binZ, HEADING_FORWARD);
+				
+				if(im->bins[i].binZ < 2)
+				{
+					//DROP!!
+
+					//Move backwards out of the way
+					move(im->bins[i].binX, im->bins[i].binY, REVERSE, HEADING_FORWARD);
+					kb->primaryBinTargetCompleted = true;
+				}
+			}
+		}	
+	}
+
+	if(!kb->secondaryBinTargetCompleted)
+	{
+		if(kb->binsSecondaryFound)
+		{
+			for(i = 0; (im->bins[i].isSecondary == false) && (i < 4); i++);
+
+			if((i < 4) && (im->bins[i].binSeen == true))
+			{
+				move(im->bins[i].binX, im->bins[i].binY, im->bins[i].binZ, HEADING_FORWARD);
+
+				if(im->bins[i].binZ < 2)
+				{
+					//DROP!!
+					
+					//move backwards out of the way 
+					move(im->bins[i].binX, im->bins[i].binY, REVERSE, HEADING_FORWARD);
+					kb->secondaryBinTargetCompleted = true;
+				}
+				
+			}
+		}
+	}
+
     return 0;
 }
 
