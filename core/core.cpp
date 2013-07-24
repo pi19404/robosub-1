@@ -45,7 +45,6 @@ void send_callback( const RoboSubCommand& data )
     cout << data << endl;
 }
 
-
 int main(int argc, char* argv[])
 {
     // Setup
@@ -56,8 +55,6 @@ int main(int argc, char* argv[])
     im = new IMAGE_KB();
     
 	im->initializeIM(im); // initialize the image KB
-
-
     // add error handling
     while(1)
         aiMainLoop(kb, im);
@@ -165,13 +162,21 @@ int aiMainLoop(KB *kb, IMAGE_KB *im)
 
 int StartGate(KB *kb, IMAGE_KB *im)
 {
+    /*if(im->sgPillars[0].pillarSeen && !kb->pillar1Found)
+    {
+        kb->pillar1Found = true;
+    }
+    if(im->sgPillars[1].pillarSeen && !kb->pillar2Found)
+    {
+        kb->pillar2Found = true;
+    }*/
     if(kb->pillar1Found && kb->pillar2Found && ( im->sgPillars[0].pillarSeen || im->sgPillars[1].pillarSeen))
     {
         // don't need to rotate, so heading is 0
         // y is set to 1 to move forward
         // update x and z from image recognition
 
-        move(kb->x1,kb->y1,kb->z1,kb->heading1, false, false, false, false, false);
+        move(kb->x1,kb->y1,kb->z1,kb->heading1);
     }
     if(kb->pillar1Found && kb->pillar2Found && !im->sgPillars[0].pillarSeen && !im->sgPillars[1].pillarSeen)
     {
@@ -184,112 +189,94 @@ int StartGate(KB *kb, IMAGE_KB *im)
 
 int Paths(KB *kb, IMAGE_KB *im)
 {
+
+    int i = 0;
     // get all from image recognition
 
-    //follow path
-    if (im->pathSeen)
+    /*if (im->twoPaths)
     {
-        move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading, false, false, false, false, false);
+        // follow the right one // Verify the right one is on the right
+        if(im->leftPathX > im->rightPathX)
+        {
+            move(im->leftPathX, DEPTH, FORWARD, im->leftPathHeading);
+        }
+        else
+        {
+            move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
+        }
+    }*/
+    // else just follow path
+    /*if (im->pathSeen)
+    {
+        move(im->rightPathX, DEPTH, FORWARD, im->rightPathHeading);
+    }*/
+
+    //Find first false in pathFound. 
+    for(i = 0; (kb->pathFound[i] == true) && (i < 8); i++);
+
+    //Back up counter to the last true in the array. Move on this last true.
+    if(i > 0)
+    {
+	i -= 1;	
+        move(im->paths[i].rightPathX, DEPTH, FORWARD, im->paths[i].rightPathHeading);
     }
+
     return 0;
 }
 
 int Buoys(KB *kb, IMAGE_KB *im)
 { 
-    // Look for all buoys (want to see all three at once)
+    int i = 0, buoyHitCount = 0;
 
-    if ( !kb->buoy1Hit && !kb->buoy2Hit && !kb->buoy3Hit )   // buoy 1,2,3 haven't all been hit continue with buoy task
+    if (!kb->buoyTaskComplete)   // buoy 1,2,3 haven't all been hit continue with buoy task
     {
-        if ( im->buoys[0].buoySeen && im->buoys[1].buoySeen && im->buoys[2].buoySeen )
-        {
-            // Once all three are found: Pick the farthest left buoy not hit yet. 
-            if ( !kb->buoy1Hit )
-            {
-                // Move towards that buoy
-                move( im->buoys[0].buoyX, im->buoys[0].buoyY, im->buoys[0].buoyZ, HEADING_FORWARD, false, false, false, false, false );
-                // Once in range (about 2 ft away)
-                if ( im->buoys[0].buoyZ < 2 )
-                {
-                    // Wait ( ie stop moving )
-                    move( 0, 0, 0, 0, false, false, false, false, false ); // Might need to shorty reverse to stop forward momentum
-                    // Check the color of the buoy, // learn the cycle? 
-                    if ( im->buoys[0].buoyColor == kb->buoyGoalColor )
-                    {
-                        // As soon as the correct color appears, move forward to hit it
-                        move( im->buoys[0].buoyX, im->buoys[0].buoyY, FORWARD, HEADING_FORWARD, false, false, false, false, false );
-                        // TODO wait enough time for buoy to be hit
-                        /*wait()*/
-						kb->buoy1Hit = true;
-                        // Once the buoy is hit, reverse
-                        move( im->buoys[0].buoyX, im->buoys[0].buoyY, REVERSE, HEADING_FORWARD, false, false, false, false, false );
-                    }
-                }
-            }
-            else if ( !kb->buoy2Hit )
-            {
-                // Move towards that buoy
-                move( im->buoys[1].buoyX, im->buoys[1].buoyY, im->buoys[1].buoyZ, HEADING_FORWARD, false, false, false, false, false );
-                // Once in range (about 2 ft away)
-                if ( im->buoys[1].buoyZ < 2 )
-                {
-                    // Wait ( ie stop moving )
-                    move( 0, 0, 0, 0, false, false, false, false, false); // Might need to shorty reverse to stop forward momentum
-                    // Check the color of the buoy, // learn the cycle? 
-                    if ( im->buoys[1].buoyColor == kb->buoyGoalColor )
-                    {
-                        // As soon as the correct color appears, move forward to hit it
-                        move( im->buoys[1].buoyX, im->buoys[1].buoyY, FORWARD, HEADING_FORWARD, false, false, false, false, false );
-                        // TODO wait enough time for buoy to be hit
-                        /*wait()*/
-						kb->buoy2Hit = true;
-                        // Once the buoy is hit, reverse
-                        move( im->buoys[1].buoyX, im->buoys[1].buoyY, REVERSE, HEADING_FORWARD, false, false, false, false, false );
-                    }
-                }
-            }
-            else if ( !kb->buoy3Hit )
-            {
-                // Move towards that buoy
-                move( im->buoys[2].buoyX, im->buoys[2].buoyY, im->buoys[2].buoyZ, HEADING_FORWARD, false, false, false, false, false );
-                // Once in range (about 2 ft away)
-                if ( im->buoys[2].buoyZ < 2 )
-                {
-                    // Wait ( ie stop moving )
-                    move( 0, 0, 0, 0, false, false, false, false, false ); // Might need to shorty reverse to stop forward momentum
-                    // Check the color of the buoy, // learn the cycle?
-                    if ( im->buoys[2].buoyColor == kb->buoyGoalColor )
-                    {
-                        // As soon as the correct color appears, move forward to hit it
-                        move( im->buoys[2].buoyX, im->buoys[2].buoyY, FORWARD, HEADING_FORWARD, false, false, false, false, false );
-                        // TODO wait enough time for buoy to be hit
-                        /*wait()*/
-						kb->buoy3Hit = true;
-                        // Once the buoy is hit, reverse
-                        move( im->buoys[2].buoyX, im->buoys[2].buoyY, REVERSE, HEADING_FORWARD, false, false, false, false, false );
-                    }
-                }
-            }
-        }
-		else // all 3 not seen
+
+	for(i = 0; i < 3; i++)
+	{
+		if(im->buoys[i].buoySeen && !kb->buoyHit[i] && im->buoys[i].isCylinder)
 		{
-			// TODO add error handling for if, for example
-			// , we dont see all three: we see only 1 or we never see any
-            // continue moving till we see all 3
+			//move towards first buoy	
+			move(im->buoys[i].buoyX, im->buoys[i].buoyY, im->buoys[i].buoyZ, HEADING_FORWARD);
+			
+			//stop when buoy is in range (about 2 ft away)
+			if(im->buoys[i].buoyZ < 2)
+			{	
+				//stop moving / wait
+				move(0, 0, 0, 0);
+				
+				if(im->buoys[i].buoyColor == kb->buoyGoalColor)
+				{
+					//Move towards buoy at full force if color is correct.
+					move(im->buoys[i].buoyX, im->buoys[i].buoyY, FORWARD, HEADING_FORWARD);
+					//record hit information, then move backwards			
+					kb->buoyHit[i] = true;
+					buoyHitCount++;
+					move(im->buoys[i].buoyX, im->buoys[i].buoyY, REVERSE, HEADING_FORWARD);
+				}
+			}
 		}
-    }
-    else // All three buoys hit
-    {
+		else if(im->buoys[i].buoySeen && kb->buoyHit[i] && im->buoys[i].isCylinder)
+		{
+			buoyHitCount++;
+		}
+	
+
+	if(buoyHitCount == 2)
+	{
 		kb->buoyTaskComplete = true;
-        // Move back TODO add the timings in here
-        move( 0, 0, REVERSE, HEADING_FORWARD, false, false, false, false, false );
-		/*wait()*/
-        // Move up above the buoys
-        move( 0, UP, 0, HEADING_FORWARD, false, false, false, false, false );
-		/*wait()*/
-        // Move forward over the buoys
-        move( 0, 0, FORWARD, HEADING_FORWARD, false, false, false, false, false );
-		/*wait()*/
-    }
+		
+		kb->buoyTaskComplete = true;
+		// Move back TODO add the timings in here
+		move( 0, 0, REVERSE, HEADING_FORWARD );
+			/*wait()*/
+		// Move up above the buoys
+		move( 0, UP, 0, HEADING_FORWARD );
+			/*wait()*/
+		// Move forward over the buoys
+		move( 0, 0, FORWARD, HEADING_FORWARD );
+			/*wait()*/
+	}
+
 
     return 0;
 }
@@ -297,6 +284,18 @@ int Buoys(KB *kb, IMAGE_KB *im)
 int ObstacleCourse(KB *kb, IMAGE_KB *im)
 {
     // Find bars
+    if(im->horizBarSeen && !kb->horizBarFound)
+    {
+        kb->horizBarFound = true;  
+    }
+    if(im->leftBarSeen && !kb->leftBarFound)
+    {
+        kb->leftBarFound = true;
+    }
+    if(im->rightBarSeen && !kb->rightBarFound)
+    {
+        kb->rightBarFound = true;
+    }
 
     if(kb->horizBarFound && kb->leftBarFound && kb->rightBarFound &&
         ( im->horizBarSeen || im->leftBarSeen || im->rightBarSeen ) )
@@ -318,7 +317,7 @@ int ObstacleCourse(KB *kb, IMAGE_KB *im)
             else
             {
                 // Move to the gate but not through it yet
-                move(0,0,0,0, false, false, false, false, false);
+                move(0,0,0,0);
             }
         }
         else 
@@ -344,8 +343,8 @@ int ObstacleCourse(KB *kb, IMAGE_KB *im)
 
 int Torpedos(KB *kb, IMAGE_KB *im)
 {
-    // Find targets
     // TODO
+    // Find targets
     // Find primary target
         // Move to position in front of small hexagon
         // Aim
@@ -356,6 +355,55 @@ int Torpedos(KB *kb, IMAGE_KB *im)
         // First torpedo 2
     
     // Move towards paths or bins if not already complete
+	int i = 0;
+
+	if(!kb->primaryTorpedoTargetCompleted)
+	{
+		if(kb->primaryTorpedoTargetFound)
+		{
+			//Find location of primary
+			for(i = 0; (im->torpedoTargets[i].isPrimary == false) && (i < 4); i++);
+
+			//extra error checking
+			if((i < 4) && (im->torpedoTargets[i].targetSeen == true))
+			{
+				//Move toward target
+				move(im->torpedoTargets[i].targetX, im->torpedoTargets[i].targetY, im->torpedoTargets[i].targetZ, HEADING_FORWARD);
+				
+				if(im->torpedoTargets[i].targetZ < 2)
+				{
+					//FIREEEEEEE
+
+					//Move backwards out of the way
+					move(im->torpedoTargets[i].targetX, im->torpedoTargets[i].targetY, REVERSE, HEADING_FORWARD);
+					kb->primaryTorpedoTargetCompleted = true;
+				}
+			}
+		}	
+	}
+
+	if(!kb->secondaryTorpedoTargetCompleted)
+	{
+		if(kb->secondaryTorpedoTargetFound)
+		{
+			for(i = 0; (im->torpedoTargets[i].isSecondary == false) && (i < 4); i++);
+
+			if((i < 4) && (im->torpedoTargets[i].targetSeen == true))
+			{
+				move(im->torpedoTargets[i].targetX, im->torpedoTargets[i].targetY, im->torpedoTargets[i].targetZ, HEADING_FORWARD);
+
+				if(im->torpedoTargets[i].targetZ < 2)
+				{
+					//FIREEEEE
+					
+					//move backwards out of the way 
+					move(im->torpedoTargets[i].targetX, im->torpedoTargets[i].targetY, REVERSE, HEADING_FORWARD);
+					kb->secondaryTorpedoTargetCompleted = true;
+				}
+				
+			}
+		}
+	}
 
     return 0;
 }
@@ -372,6 +420,56 @@ int Bins(KB *kb, IMAGE_KB *im)
         // Move directly above secondary target 
         // Aim
         // Drop marker 2
+	int i = 0;
+
+	if(!kb->primaryBinTargetCompleted)
+	{
+		if(kb->binsPrimaryFound)
+		{
+			//Find location of primary
+			for(i = 0; (im->bins[i].isPrimary == false) && (i < 4); i++);
+
+			//extra error checking
+			if((i < 4) && (im->bins[i].binSeen == true))
+			{
+				//Move toward target
+				move(im->bins[i].binX, im->bins[i].binY, im->bins[i].binZ, HEADING_FORWARD);
+				
+				if(im->bins[i].binZ < 2)
+				{
+					//DROP!!
+
+					//Move backwards out of the way
+					move(im->bins[i].binX, im->bins[i].binY, REVERSE, HEADING_FORWARD);
+					kb->primaryBinTargetCompleted = true;
+				}
+			}
+		}	
+	}
+
+	if(!kb->secondaryBinTargetCompleted)
+	{
+		if(kb->binsSecondaryFound)
+		{
+			for(i = 0; (im->bins[i].isSecondary == false) && (i < 4); i++);
+
+			if((i < 4) && (im->bins[i].binSeen == true))
+			{
+				move(im->bins[i].binX, im->bins[i].binY, im->bins[i].binZ, HEADING_FORWARD);
+
+				if(im->bins[i].binZ < 2)
+				{
+					//DROP!!
+					
+					//move backwards out of the way 
+					move(im->bins[i].binX, im->bins[i].binY, REVERSE, HEADING_FORWARD);
+					kb->secondaryBinTargetCompleted = true;
+				}
+				
+			}
+		}
+	}
+
     return 0;
 }
 

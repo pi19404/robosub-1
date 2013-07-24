@@ -7,6 +7,8 @@
 void IMAGE_KB::initializeIM(IMAGE_KB *im)
 {
     // Current Obstacle
+    int i = 0;
+
     im->gateObstacle    = false;
     im->pathObstacle    = false;
     im->buoyObstacle    = false;
@@ -24,12 +26,19 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->sgPillars[1].pillarX    = 0;
 
     // Paths
-    im->pathSeen        = false;
+    for(i = 0; i < 8; i++)
+    {
+	im->paths[i].pathSeen = false;
+	im->paths[i].pathNum = i + 1;
+	im->paths[i].rightPathX = 0;
+	im->paths[i].rightPathHeading = 0.0;
+    }
+//    im->pathSeen        = false;
     //im->twoPaths         = false;
     //im->leftPathX        = 0;
-    im->rightPathX       = 0; // if only one path use the right path variable
+  //  im->rightPathX       = 0; // if only one path use the right path variable
     //im->leftPathHeading  = 0;
-    im->rightPathHeading = 0; // if only one path use the right path variable
+   // im->rightPathHeading = 0; // if only one path use the right path variable
 
 
     // Buoys
@@ -86,6 +95,23 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
     im->torpedoTargets[3].targetY = 0;
     im->torpedoTargets[3].targetZ = 0;
 
+    im->torpedoTargets[0].targetColor = RED;
+    im->torpedoTargets[1].targetColor = BLUE;
+    im->torpedoTargets[2].targetColor = YELLOW;
+    im->torpedoTargets[3].targetColor = GREEN;
+
+    im->torpedoTargets[0].isPrimary = false;
+    im->torpedoTargets[1].isPrimary = false;
+    im->torpedoTargets[2].isPrimary = false;
+    im->torpedoTargets[3].isPrimary = false;
+
+    im->torpedoTargets[0].isSecondary = false;
+    im->torpedoTargets[1].isSecondary = false;
+    im->torpedoTargets[2].isSecondary = false;
+    im->torpedoTargets[3].isSecondary = false;
+
+    
+
     // Bins
     im->bins[0].binSeen = false;
 	 im->bins[1].binSeen = false;
@@ -104,6 +130,16 @@ void IMAGE_KB::initializeIM(IMAGE_KB *im)
 	 im->bins[3].binX = 0;
 	 im->bins[3].binY = 0;
 	 im->bins[3].binZ = 0;
+
+	 im->bins[0].isPrimary = false;
+	 im->bins[1].isPrimary = false;
+	 im->bins[2].isPrimary = false;
+	 im->bins[3].isPrimary = false;
+
+	 im->bins[0].isSecondary = false;
+	 im->bins[1].isSecondary = false;
+	 im->bins[2].isSecondary = false;
+	 im->bins[3].isSecondary = false;
 
     // Manipulation
     im->wheelSeen   = false;
