@@ -25,12 +25,17 @@
  *
 */
 
-int hueLow = 10;
-int hueHigh = 25;
-int satLow = 43;
-int satHigh = 100;
-int valueLow = 54;
-int valueHigh = 100;
+//int hueLow = 10;
+//int hueHigh = 25;
+//int satLow = 43;
+//int satHigh = 100;
+//int valueLow = 54;
+//int valueHigh = 100;
+
+int greenLow = 10;
+int greenHigh = 90;
+int blueLow = 100;
+int blueHigh 190;
 
 bool checkPath(double *angleDegrees)
 {
@@ -56,9 +61,13 @@ bool checkPath(double *angleDegrees)
   // http://stackoverflow.com/questions/8753833/exact-skin-color-hsv-range
   // http://www.yafla.com/yaflaColor/ColorRGBHSL.aspx
   // This should match orange things
+  //inRange( hsv,
+  //         Scalar((hueLow/360.0)*255, (satLow/100.0)*255, (valueLow/100.0)*255, 0),
+  //         Scalar((hueHigh/360.0)*255,(satHigh/100.0)*255, (valueHigh/100.0)*255, 0),
+  //         mask );
   inRange( hsv,
-           Scalar((hueLow/360.0)*255, (satLow/100.0)*255, (valueLow/100.0)*255, 0),
-           Scalar((hueHigh/360.0)*255,(satHigh/100.0)*255, (valueHigh/100.0)*255, 0),
+           Scalar(blueLow * 1.0, greenLow * 1.0, 0.0, 0),
+           Scalar(blueHigh * 1.0, greenHigh * 1.0, 0.0, 0),
            mask );
   dilate(mask,mask,nullMat,nullPoint, 1);
   erode(mask,mask,nullMat,nullPoint, 1);
@@ -70,7 +79,8 @@ bool checkPath(double *angleDegrees)
 
   // I used the example in the docs for HoughLinesP.
 
-  if(rectangles.size() == 0)
+  if(rectangles.size() == 0 || rectangles.front().width < 8 ||
+      rectangles.front().height < 8)
     pathSeen = false;
   else
   {
@@ -80,7 +90,7 @@ bool checkPath(double *angleDegrees)
     {
       rectangles.pop_front();
       Rect tmp = rectangles.front();
-      if(tmp.x > path.x) // always choose the right path
+      if(tmp.x > path.x && tmp.width > 8 && tmp.height > 8) // always choose the right path
         path = tmp;
 
     }
