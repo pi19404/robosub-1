@@ -18,7 +18,7 @@ main(int argc, char** argv)
    namedWindow(wndname, CV_WINDOW_AUTOSIZE);
    namedWindow("frame", CV_WINDOW_AUTOSIZE);
    namedWindow("after", CV_WINDOW_AUTOSIZE);
-   VideoCapture cap("/home/cevans/Videos/Obstacle_Clips/twoPathsInV-Shape640x480.mp4");
+   VideoCapture cap("/home/cevans/Videos/Obstacle_Clips/pathOutOfStartGate640x480.mp4");
    if (!cap.isOpened())
    {
       printf("video didn't open\n");

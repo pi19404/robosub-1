@@ -42,14 +42,12 @@ int satHigh = 95;
 int valueLow = 75;
 int valueHigh = 85;
 
-//Expect red to be exactly the same. Don't try to filter based on red.
-//int redLow = 202;
-//int redHigh = 208;
-int greenLow = 0;
-int greenHigh = 70;
-int blueLow = 110;
-int blueHigh = 180;
-int topBorder = 200;
+int redLow = 190;
+int redHigh = 210;
+int greenLow = 10;
+int greenHigh = 90;
+int blueLow = 100;
+int blueHigh = 190;
 
 bool checkPath(double *angleDegrees, VideoCapture cap)
 {
@@ -64,6 +62,7 @@ bool checkPath(double *angleDegrees, VideoCapture cap)
   Mat image;
   Mat hsv;
   Mat mask;
+  Mat maskRed;
   Mat maskBlue;
   Mat maskGreen;
   Mat lineDetect;
@@ -73,6 +72,7 @@ bool checkPath(double *angleDegrees, VideoCapture cap)
   vector<vector<Point> > contours;
   namedWindow("frame", CV_WINDOW_AUTOSIZE);
   namedWindow("mask", CV_WINDOW_AUTOSIZE);
+  //namedWindow("red", CV_WINDOW_AUTOSIZE);
   //namedWindow("blue", CV_WINDOW_AUTOSIZE);
   //namedWindow("green", CV_WINDOW_AUTOSIZE);
 
@@ -88,21 +88,24 @@ bool checkPath(double *angleDegrees, VideoCapture cap)
   //         Scalar((hueLow/360.0)*255, (satLow/100.0)*255, (valueLow/100.0)*255, 0),
   //         Scalar((hueHigh/360.0)*255,(satHigh/100.0)*255, (valueHigh/100.0)*255, 0),
   //         mask );
-  inRange( hsv, 
-           Scalar(blueLow * 1.0, 0.0, 0.0, 0),
-           Scalar(blueHigh * 1.0, 255.0, 255.0, 0),
-           maskBlue );
+//  inRange( hsv,
+//           Scalar(0.0, 0.0, redLow * 1.0, 0),
+//           Scalar(255.0, 255.0, redHigh * 1.0, 0),
+//           maskRed );
+  //inRange( hsv, 
+  //         Scalar(blueLow * 1.0, 0.0, 0.0, 0),
+  //         Scalar(blueHigh * 1.0, 255.0, 255.0, 0),
+  //         maskBlue );
   inRange( hsv,
            Scalar(blueLow * 1.0, greenLow * 1.0, 0.0, 0),
            Scalar(blueHigh * 1.0, greenHigh * 1.0, 255.0, 0),
            mask );
+  //imshow("red", maskRed);
   //imshow("blue", maskBlue);
   //imshow("green", maskGreen);
-  //bitwise_and(maskBlue, maskGreen, mask, 0);
 
   dilate(mask,mask,nullMat,nullPoint, 1);
   erode(mask,mask,nullMat,nullPoint, 1);
-  //crop(mask, 0, 0, 640, 5);
   imshow("mask", mask);
   medianBlur(mask,mask,1);
   std::list<Rect> rectangles = getSortedRectangles(mask, contours);		
@@ -114,22 +117,9 @@ bool checkPath(double *angleDegrees, VideoCapture cap)
   // for some reason.
 
   // I used the example in the docs for HoughLinesP.
-  //
-  /*
-  list<Rect>::iterator iter;
 
-  for (iter = rectangles.begin(); i != rectangles.end(); iter++ )
-  {
-    if (iter.width < 5 || iter.height < 5)
-    {
-      rectanges.pop(i);
-      i--;
-    }
-  }
-  */
-
-  if(rectangles.size() == 0 || rectangles.front().width < 5 ||
-     rectangles.front().height < 5)
+  if(rectangles.size() == 0 || rectangles.front().width < 8 ||
+     rectangles.front().height < 8)
   {
     printf("didn't find path\n");
     pathSeen = false;
@@ -143,7 +133,7 @@ bool checkPath(double *angleDegrees, VideoCapture cap)
     {
       rectangles.pop_front();
       Rect tmp = rectangles.front();
-      if(tmp.x > path.x) // always choose the right path
+      if(tmp.x > path.x && tmp.width > 8 && tmp.height > 8) // always choose the right path
         path = tmp;
 
     }
