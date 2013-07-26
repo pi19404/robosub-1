@@ -34,7 +34,7 @@ int valueHigh = 100;
 
 bool checkPath(double *angleDegrees)
 {
-  /* Get the first camera */
+  /* Get the downward facing camera TODO */
   VideoCapture cap(0); // open the default camera
   if(!cap.isOpened())  // check if we succeeded
       return -1;

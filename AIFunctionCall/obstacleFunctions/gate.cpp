@@ -112,6 +112,7 @@ float approxDistance(float percentOfScreen, float targetWidthCM)
 
 bool checkGate(float *leftPostX, float *rightPostX, float *z_distance)
 {
+  // Forward Camera
   VideoCapture cap(0);
 
   // make sure the camera is functioning

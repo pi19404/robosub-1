@@ -5,6 +5,7 @@
 ********************************************************************/    
 
 // Utility function, defines how to sort the rectangles
+// Returns true if first is larger, false otherwise
 bool compareRectArea (Rect first, Rect second)
 {
 	if ((first.width * first.height) >

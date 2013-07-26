@@ -1,10 +1,14 @@
-#include "../core/image_kb.h"
+#ifndef __VISION__
+#define __VISION__
+
+//#include "../core/image_kb.h"
+#include "checkImage.h"
+#include "../core/core.h"
 
 // only need this when testing
 #ifdef TEST
-#include "../core/image_kb.cpp"
+//#include "../core/image_kb.cpp"
 #endif
-
 
 //#include "match.cpp"
 #include "utilities/headers.cpp"
@@ -13,9 +17,8 @@
 #include "obstacleFunctions/buoys.cpp"
 #include "obstacleFunctions/path.cpp"
 
-void updateKB(IMAGE_KB *kb)
+void v_startGate(IMAGE_KB *im)
 {
-
 #ifdef DEBUG
   printf("checking gate\n");
 #endif
@@ -25,18 +28,18 @@ void updateKB(IMAGE_KB *kb)
   float leftPostX = 0, rightPostX = 0, distance = 0;
 
   // Find the gate
-  if(kb->gateObstacle && checkGate(&leftPostX, &rightPostX, &distance))
+  if(im->gateObstacle && checkGate(&leftPostX, &rightPostX, &distance))
   {
     // left and right pillar are seen
-    kb->sgPillars[0].pillarSeen = true; // left
-    kb->sgPillars[1].pillarSeen = true; // right
+    im->sgPillars[0].pillarSeen = true; // left
+    im->sgPillars[1].pillarSeen = true; // right
 
     // set their X coordinates
-    kb->sgPillars[0].pillarX = leftPostX;
-    kb->sgPillars[1].pillarX = rightPostX;
+    im->sgPillars[0].pillarX = leftPostX;
+    im->sgPillars[1].pillarX = rightPostX;
 
     // set the distance
-    kb->startGateCenterDistance = distance;
+    im->startGateCenterDistance = distance;
 
 #ifdef DEBUG
     printf("leftX = %f\n", leftPostX);
@@ -45,7 +48,23 @@ void updateKB(IMAGE_KB *kb)
 #endif
 
   }
+}
 
+void v_path(IMAGE_KB *im)
+{
+#ifdef DEBUG
+  printf("checking path\n");
+#endif
+  double pathDegrees = 0;
+
+  if(im->pathObstacle && checkPath(&pathDegrees))
+  {
+    im->rightPathHeading = pathDegrees;
+  }
+}
+
+void v_buoys(IMAGE_KB *im)
+{
   // Find buoys
 #ifdef DEBUG
   printf("checking buoys\n");
@@ -53,25 +72,21 @@ void updateKB(IMAGE_KB *kb)
 
   Buoy buoys[3];
   int numBuoys = 0;
-  if(kb->buoyObstacle && checkBuoys(buoys, &numBuoys))
+
+  if(im->buoyObstacle && checkBuoys(buoys, &numBuoys))
   {
     for(int i = 0; i < numBuoys; i++)
     {
-      kb->buoys[i].buoySeen = true;
-      kb->buoys[i].buoyX = buoys[i].buoyX;
-      kb->buoys[i].buoyY = buoys[i].buoyY;
-      kb->buoys[i].buoyZ = buoys[i].buoyZ;
-      kb->buoys[i].buoyColor = buoys[i].buoyColor;
+      im->buoys[i].buoySeen = true;
+      im->buoys[i].buoyX = buoys[i].buoyX;
+      im->buoys[i].buoyY = buoys[i].buoyY;
+      im->buoys[i].buoyZ = buoys[i].buoyZ;
+      im->buoys[i].buoyColor = buoys[i].buoyColor;
     }
-    kb->numBuoysSeen = numBuoys;
-  }
-
-  double pathDegrees = 0;
-  if(kb->pathObstacle && checkPath(&pathDegrees))
-  {
-    kb->rightPathHeading = pathDegrees;
+    im->numBuoysSeen = numBuoys;
   }
 }
+
 
 // only need a main function when testing, otherwise the AI just includes
 // this file and calls the function
@@ -98,4 +113,5 @@ int main()
 
   return 0;
 }
+#endif
 #endif

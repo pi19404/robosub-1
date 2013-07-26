@@ -5,6 +5,8 @@
 
 KB::KB()
 {
+	int i = 0;
+	
         // Multiple Tasks
         startGateComplete = false;
         buoyTaskComplete = false;
@@ -21,13 +23,18 @@ KB::KB()
         pillar2Found = false;
 
         // Paths
-        path1found = false;
-        path2found = false;
-        path3found = false;
-        path4found = false;
-        path5found = false;
-        path6found = false;
-        path7found = false;
+        //path1found = false;
+        //path2found = false;
+        //path3found = false;
+        //path4found = false;
+        //path5found = false;
+        //path6found = false;
+        //path7found = false;
+
+	for(i = 0; i < 8; i++)
+	{
+		pathFound[i] = false;	
+	}
 
         // Buoys
         correctHeading = false;
@@ -54,7 +61,7 @@ KB::KB()
         // Torpedoes
         primaryTorpedoTargetComplete = false;
         secondaryTorpedoTargetComplete = false;
-        int torpedoDistance = 0;
+        torpedoDistance = 0;
 
         // Bins
         binsFound  = false;
@@ -131,466 +138,186 @@ KB::KB()
 // update KB found based on image recognition
 int KB::updateKB(IMAGE_KB *im)
 {
-    // update found
-    if(im->sgPillars[0].pillarSeen)
-        pillar1Found = true;
-    if(im->sgPillars[1].pillarSeen)
-        pillar2Found = true;
-/*
-    // Set Primary Buoy Target
-    if(im->buoyGreenSeen && buoyPrimary == GREEN)
-    {
-        buoyPrimaryFound = true;
-        if(im->target1color == GREEN)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2color == GREEN)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3color == GREEN)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-    }
-    if(im->buoyRedSeen && buoyPrimary == RED)
-    {
-        buoyPrimaryFound = true;
-        if(im->target1color == RED)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2color == RED)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3color == RED)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-    }
-    if(im->buoyYellowSeen && buoyPrimary == YELLOW)
-    {
-        buoyPrimaryFound = true;
-        if(im->target1color == YELLOW)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2color == YELLOW)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3color == YELLOW)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-    }
-    // Set Secondary Target
-    if(kb->buoyPrimaryComplete)
-    {
-        if(im->buoyGreenSeen && buoySecondary == GREEN)
-        {
-            buoySecondaryFound = true;
-            if(im->target1color == GREEN)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2color == GREEN)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3color == GREEN)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4color == GREEN)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-        }
-        if(im->buoyRedSeen && buoySecondary == RED)
-        {
-            buoySecondaryFound = true;
-            if(im->target1color == RED)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2color == RED)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3color == RED)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4color == RED)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-        }
-        if(im->buoyYellowSeen && buoySecondary == YELLOW)
-        {
-            buoySecondaryFound = true;
-            if(im->target1color == YELLOW)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2color == YELLOW)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3color == YELLOW)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4color == YELLOW)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-        }
-    }
-*/
-    // Update Bins Found
-//    if(im->binsSeen)
-//        binsFound = true;
-
-    if(im->bins[0].binSeen/*swordSeen*/ && binPrimary == SWORD)
-    {
-        binsPrimaryFound = true;
-
-        if(im->target1image == SWORD)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2image == SWORD)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3image == SWORD)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-        if(im->target4image == SWORD)
-        {
-            x1 = im->x4;
-            y1 = im->y4;
-            z1 = im->z4;
-            heading1 = im->heading4;
-        }
-
-    }
-    if(im->bins[1].binSeen && binPrimary == SHIELD)
-    {
-        binsPrimaryFound = true;
-        if(im->target1image == SHIELD)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2image == SHIELD)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3image == SHIELD)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-        if(im->target4image == SHIELD)
-        {
-            x1 = im->x4;
-            y1 = im->y4;
-            z1 = im->z4;
-            heading1 = im->heading4;
-        }
-
-    }
-    if(im->bins[2].binSeen && binPrimary == NET)
-    {
-        binsPrimaryFound = true;
-        if(im->target1image == NET)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2image == NET)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3image == NET)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-        if(im->target4image == NET)
-        {
-            x1 = im->x4;
-            y1 = im->y4;
-            z1 = im->z4;
-            heading1 = im->heading4;
-        }
-
-    }
-    if(im->bins[3].binSeen && binPrimary == TRIDENT)
-    {
-        binsPrimaryFound = true;
-        if(im->target1image == TRIDENT)
-        {
-            x1 = im->x1;
-            y1 = im->y1;
-            z1 = im->z1;
-            heading1 = im->heading1;
-        }
-        if(im->target2image == TRIDENT)
-        {
-            x1 = im->x2;
-            y1 = im->y2;
-            z1 = im->z2;
-            heading1 = im->heading2;
-        }
-        if(im->target3image == TRIDENT)
-        {
-            x1 = im->x3;
-            y1 = im->y3;
-            z1 = im->z3;
-            heading1 = im->heading3;
-        }
-        if(im->target4image == TRIDENT)
-        {
-            x1 = im->x4;
-            y1 = im->y4;
-            z1 = im->z4;
-            heading1 = im->heading4;
-        }
-
-    }
-
-
-    if(binsPrimaryFound)
-    {
-        if(im->bins[0].binSeen && binSecondary == SWORD)
-        {
-            binsSecondaryFound = true;
-
-            if(im->target1image == SWORD)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2image == SWORD)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3image == SWORD)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4image == SWORD)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-
-        }
-        if(im->bins[1].binSeen && binSecondary == SHIELD)
-        {
-            binsSecondaryFound = true;
-            if(im->target1image == SHIELD)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2image == SHIELD)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3image == SHIELD)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4image == SHIELD)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-
-        }
-        if(im->bins[2].binSeen && binSecondary == NET)
-        {
-            binsSecondaryFound = true;
-            if(im->target1image == NET)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2image == NET)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3image == NET)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4image == NET)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-
-        }
-        if(im->bins[3].binSeen && binSecondary == TRIDENT)
-        {
-            binsSecondaryFound = true;
-            if(im->target1image == TRIDENT)
-            {
-                x2 = im->x1;
-                y2 = im->y1;
-                z2 = im->z1;
-                heading2 = im->heading1;
-            }
-            if(im->target2image == TRIDENT)
-            {
-                x2 = im->x2;
-                y2 = im->y2;
-                z2 = im->z2;
-                heading2 = im->heading2;
-            }
-            if(im->target3image == TRIDENT)
-            {
-                x2 = im->x3;
-                y2 = im->y3;
-                z2 = im->z3;
-                heading2 = im->heading3;
-            }
-            if(im->target4image == TRIDENT)
-            {
-                x2 = im->x4;
-                y2 = im->y4;
-                z2 = im->z4;
-                heading2 = im->heading4;
-            }
-        }
-    }
-
+	updatePillars(im);
+	updatePaths(im);
+	updateBuoys(im);
+	updateBins(im);
+	updateTorpedos(im);
 	return 1; // should it return this or something else?
 }
+
+void KB::updatePillars(IMAGE_KB *im)
+{
+/*// update found
+    if(im->sgPillars[0].pillarSeen)
+        pillar1Found = true;
+    if(im->sgPillars[1].pillarSeen)*/
+	int i = 0;
+
+	for(i = 0; i < 2; i++)
+	{
+		if(im->sgPillars[i].pillarSeen)
+		{
+			if(i == 0)
+			{
+				pillar1Found = true;
+				x1 = im->sgPillars[i].pillarX;
+			}
+			else
+			{
+				pillar2Found = true;
+				x2 = im->sgPillars[i].pillarX;
+			}
+		}
+	}
+
+}
+
+void KB::updateBuoys(IMAGE_KB *im)
+{
+	int i = 0, count = 0;
+
+	for(i = 0; i < 3; i++)
+	{
+		if(im->buoy[i].buoySeen && !buoyComplete[i])
+		{
+			count += 1;
+
+			if(im->buoy[i].isCylinder)
+			{
+				if(im->buoy[i].buoyColor == buoyGoalColor)
+				{
+					buoyColor[i] = im->buoy[i].buoyColor;
+					buoyFound[i] = true;
+					x1 = im->buoy[i].buoyX;
+					y1 = im->buoy[i].buoyY;
+					z1 = im->buoy[i].buoyZ; 
+				}
+			}
+		}	
+	}	
+
+	numBuoysSeen = count;
+}
+
+void KB::updateBins(IMAGE_KB *im)
+{
+	int flag = 0, count = 1, i = 0;
+
+	for(i = 0; i < 4; i++)
+	{
+
+		if(im->bins[i].binSeen)
+		{
+			count += 1;
+
+			if(im->bins[i].binImage == binPrimary)
+			{
+				primaryTorpedoTargetFound = true;
+				im->bins[i].isPrimary = true;
+				im->bins[i].isSecondary = false;
+				x1 = im->bins[i].binX;
+				y1 = im->bins[i].binY;
+				z1 = im->bins[i].binZ;
+			}
+			else if(im->bins[i].binImage == binSecondary)
+			{
+				secondaryTorpedoTargetFound = true;
+				im->bins[i].isSecondary = true;
+				im->bins[i].isPrimary = false;
+				x2 = im->bins[i].binX;
+				y2 = im->bins[i].binY;
+				z2 = im->bins[i].binZ;
+			}
+			else if(flag == 0)
+			{
+				flag = 1;
+				im->bins[i].isPrimary = false;
+				im->bins[i].isSecondary = false;
+				x3 = im->bins[i].binX;
+				y3 = im->bins[i].binY;
+				z3 = im->bins[i].binZ;
+			}
+			else
+			{
+				im->bins[i].isPrimary = false;
+				im->bins[i].isSecondary = false;
+				x4 = im->bins[i].binX;
+				y4 = im->bins[i].binY;
+				z4 = im->bins[i].binZ;
+			}
+		}
+	}
+	
+	if(count == 4)
+	{
+		binsFound = true;
+	}
+}
+
+void KB::updateTorpedos(IMAGE_KB *im)
+{
+	int flag = 0, i = 0;
+
+	for(i = 0; i < 4; i++)
+	{
+		if(im->torpedoTargets[i].targetSeen)
+		{
+			if(im->torpedoTargets[i].color == torpedoPrimary)
+			{
+				primaryTorpedoTargetFound = true;
+				im->torpedoTargets[i].isPrimary = true;
+				im->torpedoTargets[i].isSecondary = false;
+				x1 = im->torpedoTargets[i].targetX;
+				y1 = im->torpedoTargets[i].targetY;
+				z1 = im->torpedoTargets[i].targetZ;
+			}
+			else if(im->torpedoTargets[i].color == torpedoSecondary)
+			{
+				secondaryTorpedoTargetFound = true;
+				im->torpedoTargets[i].isSecondary = true;
+				im->torpedoTargets[i].isPrimary = false;
+				x2 = im->torpedoTargets[i].targetX;
+				y2 = im->torpedoTargets[i].targetY;
+				z2 = im->torpedoTargets[i].targetZ;
+			}
+			else if(flag == 0)
+			{
+				flag = 1;
+				im->torpedoTargets[i].isPrimary = false;
+				im->torpedoTargets[i].isSeconary = false;
+				x3 = im->torpedoTargets[i].targetX;
+				y3 = im->torpedoTargets[i].targetY;
+				z3 = im->torpedoTargets[i].targetZ;
+			}
+			else
+			{
+				im->torpedoTargets[i].isPrimary = false;
+				im->torpedoTargets[i].isSeconary = false;
+				x4 = im->torpedoTargets[i].targetX;
+				y4 = im->torpedoTargets[i].targetY;
+				z4 = im->torpedoTargets[i].targetZ;
+			}
+		}
+	}
+}
+
+
+void KB::updatePaths(IMAGE_KB *im)
+{
+	int i = 0, j = 0;
+
+	for(i = 0; i < 8; i++)
+	{
+		if((im->paths[i].pathSeen == true) && (pathFound[i] == false))
+		{
+			pathFound[i] = true;
+			x1 = im->paths.rightPathX;
+			heading1 = im->paths[i].rightPathHeading;
+		}
+	}
+}
+
 
 void KB::printKB(KB *kb)
 {

@@ -5,15 +5,13 @@
 
 #include "types.h"
 
-//enum colors {DEFAULT, RED, BLUE, YELLOW, GREEN};
-//enum images {UNKNOWN, SWORD, TRIDENT, SHIELD, NET};
-
 typedef struct BUOY {
 	bool buoySeen;
 	int buoyX;
 	int buoyY;
 	int buoyZ;
 	colors buoyColor;
+	bool isCylinder;
 }Buoy;
 
 typedef struct TORPEDO_TARGET {
@@ -22,6 +20,8 @@ typedef struct TORPEDO_TARGET {
 	int targetY;
 	int targetZ;
 	colors targetColor;
+	bool isPrimary;
+	bool isSecondary;
 }TorpedoTarget;
 
 typedef struct BIN {
@@ -44,12 +44,26 @@ typedef struct SGPILLAR {
 	int pillarX;
 }SGPillar;
 
+typedef struct PATH {
+	int pathNum;
+	bool pathSeen;
+	int rightPathX;
+	double rightPathHeading;
+}Path;
+	
+
 class IMAGE_KB {
     public:
 
         void initializeIM(IMAGE_KB *im);
         IMAGE_KB();
 
+        // Mission Plan
+        colors buoyPrimary;
+        colors torpedoPrimary;
+        colors torpedoSecondary;
+        images binPrimary;
+        images binSecondary;
 
         // Current Obstacle
         bool gateObstacle;
@@ -68,12 +82,13 @@ class IMAGE_KB {
 //        int  pillar1X, pillar2X;
 
         // Paths
-        bool pathSeen;
+	Path paths[8];
+//        bool pathSeen;
         //bool twoPaths;
         //int  leftPathX;
-        int  rightPathX;
+  //      int  rightPathX;
 		//double  leftPathHeading;
-		double  rightPathHeading;
+	//	double  rightPathHeading;
 
         // Buoys
 		Buoy buoys[3];
@@ -96,6 +111,9 @@ class IMAGE_KB {
         int  rightBarX;
         int  rightBarY; // bottom of bar
         int  rightBarZ;
+
+        colors leftBarColor;
+        colors rightBarColor;
 
         // Torpedoes
         //bool primaryTorpedoTargetSeen;
