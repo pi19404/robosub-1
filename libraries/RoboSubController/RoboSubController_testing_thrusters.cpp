@@ -51,7 +51,7 @@ void RoboSubController::Run()
     motorDirections[4] = 1;
     motorDirections[5] = 1;
 
-    _lm.LogStr("starting up drive thrusters at 50% and roll at 0");
+    //_lm.LogStr("starting up drive thrusters at 50% and roll at 0");
     mCU.setThrusters(dutyCycles, motorDirections);
 */
 
@@ -59,43 +59,43 @@ void RoboSubController::Run()
     {
         // periodically turn the thrusters on and off
 /*
-        _lm.LogStr("turning port thrusters on");
+        //_lm.LogStr("turning port thrusters on");
         dutyCycles[0] = 30;
         dutyCycles[1] = 30;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(2000);
 
-        _lm.LogStr("turning port thrusters off");
+        //_lm.LogStr("turning port thrusters off");
         dutyCycles[0] = 0;
         dutyCycles[1] = 0;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(4000);
 
-        _lm.LogStr("turning starboard thrusters on");
+        //_lm.LogStr("turning starboard thrusters on");
         dutyCycles[2] = 20;
         dutyCycles[3] = 20;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(2000);
 
-        _lm.LogStr("turning starboard thrusters off");
+        //_lm.LogStr("turning starboard thrusters off");
         dutyCycles[2] = 0;
         dutyCycles[3] = 0;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(4000);
 
-        _lm.LogStr("turning roll thrusters on");
+        //_lm.LogStr("turning roll thrusters on");
         dutyCycles[4] = 30;
         dutyCycles[5] = 30;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(2000);
 
-        _lm.LogStr("turning roll thrusters off");
+        //_lm.LogStr("turning roll thrusters off");
         dutyCycles[4] = 0;
         dutyCycles[5] = 0;
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(4000);
 */
-        _lm.LogStr("turning thrusters on");
+        //_lm.LogStr("turning thrusters on");
         dutyCycles[0] = 40;
         dutyCycles[1] = 40;
         dutyCycles[2] = 40;
@@ -105,7 +105,7 @@ void RoboSubController::Run()
         mCU.setThrusters(dutyCycles, motorDirections);
         delay(2000);
 
-        _lm.LogStr("turning thrusters off");
+        //_lm.LogStr("turning thrusters off");
         dutyCycles[0] = 0;
         dutyCycles[1] = 0;
         dutyCycles[2] = 0;

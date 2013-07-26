@@ -55,6 +55,15 @@ struct ArduinoStatus : public Serializable
         // Depth Sensor
         sz = sizeof(uint32_t);
         _Serialize( &Data.Depth, sz, &str2 );
+        
+        sz = sizeof(uint8_t);
+			_Serialize( &Data.Thruster0, sz, &str2 );
+			_Serialize( &Data.Thruster1, sz, &str2 );
+			_Serialize( &Data.Thruster2, sz, &str2 );
+			_Serialize( &Data.Thruster3, sz, &str2 );
+			_Serialize( &Data.Thruster4, sz, &str2 );
+			_Serialize( &Data.Thruster5, sz, &str2 );
+
     }
 
     // DeserializeFromString
@@ -80,10 +89,18 @@ struct ArduinoStatus : public Serializable
         _Deserialize( &Data.Gyro_X, sz, &str2 );
         _Deserialize( &Data.Gyro_Y, sz, &str2 );
         _Deserialize( &Data.Gyro_Z, sz, &str2 );
-
+        
         // Depth Sensor
         sz = sizeof(uint32_t);
         _Deserialize( &Data.Depth, sz, &str2 );
+        
+			sz = sizeof(uint8_t);
+			_Deserialize( &Data.Thruster0, sz, &str2 );
+			_Deserialize( &Data.Thruster1, sz, &str2 );
+			_Deserialize( &Data.Thruster2, sz, &str2 );
+			_Deserialize( &Data.Thruster3, sz, &str2 );
+			_Deserialize( &Data.Thruster4, sz, &str2 );
+			_Deserialize( &Data.Thruster5, sz, &str2 );
     }
 
     struct DATA 
@@ -96,7 +113,13 @@ struct ArduinoStatus : public Serializable
             Gyro_X(0.0),
             Gyro_Y(0.0),
             Gyro_Z(0.0),
-            Depth(0)
+            Depth(0),
+            Thruster0(0),
+            Thruster1(0),
+            Thruster2(0),
+            Thruster3(0),
+            Thruster4(0),
+            Thruster5(0)
         { }
 
         float Acl_X,  // Accelerometer X-axis value
@@ -105,6 +128,13 @@ struct ArduinoStatus : public Serializable
               Gyro_X, // Gyroscope X-axis value
               Gyro_Y, // Gyroscope Y-axis value
               Gyro_Z; // Gyroscope Z-axis value
+              
+        uint8_t Thruster0,
+        			Thruster1,
+        			Thruster2,
+        			Thruster3,
+        			Thruster4,
+        			Thruster5;
  
      uint32_t Depth;  // The Depth sensor reading
 

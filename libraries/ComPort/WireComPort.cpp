@@ -70,7 +70,7 @@ void WireComPort::read(uint8_t* wrdata, uint8_t w_nBytes, uint8_t* rddata, uint8
         if( (millis() - start) >= mTimeOut )
         {
             LogManager& _lm = LogManager::GetInstance();
-            _lm.LogStr("-I2C Read TimeOut for Device: 0x" + String(mDevice, HEX) );
+            //_lm.LogStr("-I2C Read TimeOut for Device: 0x" + String(mDevice, HEX) );
             break;
         }
     }

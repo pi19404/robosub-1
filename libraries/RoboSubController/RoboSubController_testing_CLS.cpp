@@ -30,7 +30,7 @@ void RoboSubController::Run()
     while( true )
     {
         sprintf(buffer, "i = '%d'\n", i);
-        _lm.LogStr(buffer);
+        //_lm.LogStr(buffer);
         mLittleScreen.writeStrToCLS(buffer);
         i++;
         delay(500);

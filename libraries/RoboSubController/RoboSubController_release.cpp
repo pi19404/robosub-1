@@ -6,6 +6,18 @@
 #include <Configurations/DeviceConfig.h>
 #include <Logging/LogManager.h>
 
+#define LED0	70
+#define LED1	71
+#define LED2	73
+#define LED3	74
+#define LED4	76
+#define LED5	77
+#define LED6	79
+#define LED7	81
+#define LED8	83
+#define LED9	85
+
+
 // undefine this to enable the use of the depth controller in Run(), but note 
 // that the command data from the PC MUST HAVE A TARGET DEPTH FIELD FIRST
 #undef ROLL_THRUSTER_MANUAL_CONTROL
@@ -18,7 +30,7 @@ serial line to the PC that sent it.
 Undefine it to cause Run() to spit the command data it received back over the
 serial line to the PC that sent it.
 */
-#undef SPIT_BACK_SENSOR_DATA
+#define SPIT_BACK_SENSOR_DATA
 
 // this value is used to cap the target depth at nothing dangeously deep for 
 // sub; after all, a calculation gone bad could cause the sub to think that the 
@@ -75,7 +87,7 @@ static int depthController(int currentDepthInches, int targetDepthInches)
     depth, multiply that number by a hand-wavy-approximation constant to 
     convert the error into desired duty cycle, and the return that value.
     */
-    const int kProportional = 5;    // toy with this value until it works
+    const int kProportional = 3;    // toy with this value until it works
     int errDepthInches;
     int newDutyCycle;
 
@@ -126,8 +138,69 @@ static int depthController(int currentDepthInches, int targetDepthInches)
     return newDutyCycle;
 }
 
+void RoboSubController::DisplayByte(unsigned int bytesRx)
+{
+	digitalWrite(LED9, (bytesRx & (1 << 0)) != 0);
+	digitalWrite(LED8, (bytesRx & (1 << 1)) != 0);
+	digitalWrite(LED7, (bytesRx & (1 << 2)) != 0);
+	digitalWrite(LED6, (bytesRx & (1 << 3)) != 0);
+	digitalWrite(LED5, (bytesRx & (1 << 4)) != 0);
+	digitalWrite(LED4, (bytesRx & (1 << 5)) != 0);
+	digitalWrite(LED3, (bytesRx & (1 << 6)) != 0);
+	digitalWrite(LED2, (bytesRx & (1 << 7)) != 0);
+	digitalWrite(LED1, (bytesRx & (1 << 8)) != 0);
+	digitalWrite(LED0, (bytesRx & (1 << 9)) != 0);
+}
+
+void RoboSubController::twoSecFlash()
+{
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+	delay(100);
+	DisplayByte(0xFFFF);
+	delay(100);
+	DisplayByte(0x0000);
+}
+
+
 void RoboSubController::Run()
 {
+
     // a generic integer for loops and stuff
     int i = 0;
 
@@ -139,6 +212,11 @@ void RoboSubController::Run()
     uint16_t depthTargetInches;
     ACCEL_DATA myAccelData;
     GYRO_DATA myGyroData;
+    
+    unsigned int pinValue = 0;
+    unsigned int bytesRx = 0;
+
+	unsigned int toggle = 0;
 
     // this buffer stores incoming data from the sub's PC, which tell the sub 
     // what to do
@@ -173,75 +251,92 @@ void RoboSubController::Run()
     memset(thrusterDutyCycleBuf, 0, sizeof(thrusterDutyCycleBuf));
     memset(thrusterDirBuf, 0, sizeof(thrusterDirBuf));
 
+    pinMode(70, OUTPUT);
+    pinMode(71, OUTPUT);
+    pinMode(73, OUTPUT);
+    pinMode(74, OUTPUT);
+    pinMode(76, OUTPUT);
+    pinMode(77, OUTPUT);
+    pinMode(79, OUTPUT);
+    pinMode(81, OUTPUT);
+    pinMode(83, OUTPUT);
+    pinMode(85, OUTPUT);
+
+    digitalWrite(70, LOW);
+    digitalWrite(71, LOW);
+    digitalWrite(73, LOW);
+    digitalWrite(74, LOW);
+    digitalWrite(76, LOW);
+    digitalWrite(77, LOW);
+    digitalWrite(79, LOW);
+    digitalWrite(81, LOW);
+    digitalWrite(83, LOW);
+    digitalWrite(85, LOW);
+
     while( true )
     {
+	DisplayByte(0x0000);
+
+     //   delay(100);
+    //    mCU.stopThrusters();
         // Only read when we have the "magic" number
         // this number indicates that we have control data
-        _lm.LogStr("waiting for transmission start");
-        _lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
-        while(Serial.peek() != RoboSubControlData::MAGIC)
-        {
-            // Discard this byte,
-            // we don't want it
-            Serial.read();
+        //_lm.LogStr("waiting for transmission start");
+        //_lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
+        while(true) {
+		if (Serial.available()) {
+			if(Serial.peek() != RoboSubControlData::MAGIC) {
+				// Discard the non-magic byte we just recieved
+				Serial.read();
+			} else {
+				break;
+			}
+		}
         }
 
+       
         // Wait until all of the control data is in the buffer
-        _lm.LogStr("waiting for serial data");
-        while(Serial.available() < RoboSubControlData::SIZE);
+
+	digitalWrite(LED0, true);			
+
+        //_lm.LogStr("waiting for serial data");
+        while(Serial.available() < RoboSubControlData::SIZE)
+        {
+		// Do nothing, keep checking
+        }
+
+	digitalWrite(LED1, HIGH);			
 
         // Read byte by byte, since this version of
         // Arduino does not have a readBytes() function for
         // the Serial object.
-        _lm.LogStr("reading serial data");
+        //_lm.LogStr("reading serial data");
         for(i = 0; i < RoboSubControlData::SIZE; ++i)
         {
             int c = Serial.read();
             pcCmdDataBuffer[i] = static_cast<char>(c);
         }
 
-
+	digitalWrite(LED2, HIGH);			
         // Verify received data is valid
         if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
         {
             // The data was malformed, so, discard it
-            _lm.LogStr("error - control Data malformed, retrying...");
+            //_lm.LogStr("error - control Data malformed, retrying...");
+				continue;
+        }	
+	digitalWrite(LED3, HIGH);			
 
-            if (durpy)
-            {
-                mCU.clawOpen();
-                durpy = false;
-            }
-            else
-            {
-                mCU.clawClose();
-                durpy = true;
-            }
-            delay(1000);
-        }
-/*    
-            if (durpy)
-            {
-                mCU.clawOpen();
-                durpy = false;
-            }
-            else
-            {
-                mCU.clawClose();
-                durpy = true;
-            }
-*/
-#ifdef BIRDYBIRDY
         // Deserialize the read in bytes into
         // the command objec
-        _lm.LogStr("deserializing string");
+        //_lm.LogStr("deserializing string");
         pcCmdData.DeserializeFromString(pcCmdDataBuffer);
 
         // access the individual items in the serialized data structure
-
+			
         // port fore thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Fore_L;
-        _lm.LogStrInt("port fore thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("port fore thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -255,13 +350,9 @@ void RoboSubController::Run()
             thrusterDirBuf[0] = 1;
         }
 
-if (50 == tempThrusterCmdData)
-{
-}
-
         // port aft thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_L;
-        _lm.LogStrInt("port aft thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("port aft thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -275,10 +366,9 @@ if (50 == tempThrusterCmdData)
             thrusterDirBuf[1] = 1;
         }
 
-
         // starboard fore thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Fore_R;
-        _lm.LogStrInt("starboard fore thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("starboard fore thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -292,10 +382,9 @@ if (50 == tempThrusterCmdData)
             thrusterDirBuf[2] = 1;
         }
 
-
         // starboard aft thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_R;
-        _lm.LogStrInt("starboard aft thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("starboard aft thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -309,10 +398,11 @@ if (50 == tempThrusterCmdData)
             thrusterDirBuf[3] = 1;
         }
 
+
 #ifdef ROLL_THRUSTER_MANUAL_CONTROL
         // port roll thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Roll_L;
-        _lm.LogStrInt("port roll thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("port roll thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -329,7 +419,7 @@ if (50 == tempThrusterCmdData)
 
         // starboard roll thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Roll_R;
-        _lm.LogStrInt("starboard roll thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("starboard roll thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -348,26 +438,37 @@ if (50 == tempThrusterCmdData)
         We read it earlier than the other sensors just for the sake of the 
         depth controller.
         */
-        depthCurrentInches = mIMU.readDepth();
-        depthTargetInches = pcCmdData.Data.TargetDepthInches;
-        tempThrusterCmdData = 
-            depthController(depthCurrentInches, depthTargetInches);
 
-        if (tempThrusterCmdData < 0)
+        depthCurrentInches = mIMU.readDepth();
+        depthTargetInches = pcCmdData.Data.Target_depth_inches;
+        tempThrusterCmdData = depthController(depthCurrentInches, depthTargetInches);
+
+        // positive or zero duty cycle requested
+        if(depthTargetInches == 0)
         {
-            // negative duty cycle requested
-            thrusterDutyCycleBuf[4] = tempThrusterCmdData * (-1);
-            thrusterDutyCycleBuf[5] = tempThrusterCmdData * (-1);
+            thrusterDutyCycleBuf[4] = 0;
+            thrusterDutyCycleBuf[5] = 0;
             thrusterDirBuf[4] = -1;
             thrusterDirBuf[5] = -1;
         }
         else
         {
-            // positive or zero duty cycle requested
-            thrusterDutyCycleBuf[4] = tempThrusterCmdData;
-            thrusterDutyCycleBuf[5] = tempThrusterCmdData;
-            thrusterDirBuf[4] = 1;
-            thrusterDirBuf[5] = 1;
+            if (tempThrusterCmdData < 0)
+            {
+                // negative duty cycle requested
+                thrusterDutyCycleBuf[4] = tempThrusterCmdData * (-1);
+                thrusterDutyCycleBuf[5] = tempThrusterCmdData * (-1);
+                thrusterDirBuf[4] = 1;
+                thrusterDirBuf[5] = 1;
+            }
+            else
+            {
+                // positive or zero duty cycle requested
+                thrusterDutyCycleBuf[4] = tempThrusterCmdData;
+                thrusterDutyCycleBuf[5] = tempThrusterCmdData;
+                thrusterDirBuf[4] = -1;
+                thrusterDirBuf[5] = -1;
+            }
         }
 #endif
 
@@ -377,14 +478,14 @@ if (50 == tempThrusterCmdData)
 
         // check torpedo commands
         tempPneumaticCmdData = pcCmdData.Data.Torpedo1_Fire;
-        _lm.LogStrInt("torpedo 1: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("torpedo 1: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.fireTorpedoN(1);
         }
 
         tempPneumaticCmdData = pcCmdData.Data.Torpedo2_Fire;
-        _lm.LogStrInt("torpedo 2: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("torpedo 2: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.fireTorpedoN(2);
@@ -393,14 +494,14 @@ if (50 == tempThrusterCmdData)
 
         // check marker dropper commands
         tempPneumaticCmdData = pcCmdData.Data.Marker1_Drop;
-        _lm.LogStrInt("marker 1: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("marker 1: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.dropMarkerN(1);
         }
 
         tempPneumaticCmdData = pcCmdData.Data.Marker2_Drop;
-        _lm.LogStrInt("marker 2: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("marker 2: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.dropMarkerN(1);
@@ -408,7 +509,7 @@ if (50 == tempThrusterCmdData)
 
         // check claw command
         tempPneumaticCmdData = pcCmdData.Data.Claw_Latch;
-        _lm.LogStrInt("claw: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("claw: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.clawOpen();
@@ -417,7 +518,6 @@ if (50 == tempThrusterCmdData)
         {
             mCU.clawClose();
         }
-
         // now grab the sensor data, serialize it, and spit it back to the PC
 
         // read the accelerometer
@@ -439,6 +539,8 @@ if (50 == tempThrusterCmdData)
         myGyroData.Y = 5.5;
         myGyroData.Z = -6.6;
 #endif
+		
+			digitalWrite(LED7, HIGH);			
 
 #ifdef SPIT_BACK_SENSOR_DATA
         // serialize the sensor data and send it back to the sub's PC
@@ -449,6 +551,12 @@ if (50 == tempThrusterCmdData)
         subSensorData.Data.Gyro_X = myGyroData.X;
         subSensorData.Data.Gyro_Y = myGyroData.Y;
         subSensorData.Data.Gyro_Z = myGyroData.Z;
+        subSensorData.Data.Thruster0 = 0;
+        subSensorData.Data.Thruster1 = 0;
+        subSensorData.Data.Thruster2 = 0;
+        subSensorData.Data.Thruster3 = 0;
+        subSensorData.Data.Thruster4 = 0;
+        subSensorData.Data.Thruster5 = 0;
         subSensorData.Data.Depth = depthCurrentInches;
         subSensorData.SerializeToString(subSensorDataBuffer);
 
@@ -456,7 +564,9 @@ if (50 == tempThrusterCmdData)
         // the buffer pointer, but Jay's serialization code requires char*, so
         // I decided to declare the buffer as char* and then cast it to 
         // uint8_t* here
-        Serial.write((uint8_t *)subSensorDataBuffer, ArduinoData::SIZE);
+        Serial.write((uint8_t *)subSensorDataBuffer, ArduinoStatus::SIZE);
+			digitalWrite(LED9, HIGH);			
+        Serial.flush();
 #else
         // "Pretty" print the joystick commands back to the serial line to 
         // ensure the data was sent correctly.
@@ -466,10 +576,9 @@ if (50 == tempThrusterCmdData)
 #endif
 
         // ??should there be a delay??
-//        delay(100);
-#endif
+        delay(500);
+//#endif
     }
 }
-
 #endif  // ROBOSUBCONTROLLER_RELEASE
 

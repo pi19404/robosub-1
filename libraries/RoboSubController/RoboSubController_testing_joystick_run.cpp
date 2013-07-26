@@ -179,8 +179,8 @@ void RoboSubController::Run()
     {
         // Only read when we have the "magic" number
         // this number indicates that we have control data
-        _lm.LogStr("waiting for transmission start");
-        _lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
+        //_lm.LogStr("waiting for transmission start");
+        //_lm.LogStrInt("max bytes: ", RoboSubControlData::SIZE);
         while(Serial.peek() != RoboSubControlData::MAGIC)
         {
             // Discard this byte,
@@ -189,13 +189,13 @@ void RoboSubController::Run()
         }
 
         // Wait until all of the control data is in the buffer
-        _lm.LogStr("waiting for serial data");
+        //_lm.LogStr("waiting for serial data");
         while(Serial.available() < RoboSubControlData::SIZE);
 
         // Read byte by byte, since this version of
         // Arduino does not have a readBytes() function for
         // the Serial object.
-        _lm.LogStr("reading serial data");
+        //_lm.LogStr("reading serial data");
         for(i = 0; i < RoboSubControlData::SIZE; ++i)
         {
             int c = Serial.read();
@@ -207,7 +207,7 @@ void RoboSubController::Run()
         if( !RoboSubControlData::SerializedIsValid(pcCmdDataBuffer, RoboSubControlData::SIZE) )
         {
             // The data was malformed, so, discard it
-            _lm.LogStr("error - control Data malformed, retrying...");
+            //_lm.LogStr("error - control Data malformed, retrying...");
 
             if (durpy)
             {
@@ -226,14 +226,14 @@ void RoboSubController::Run()
 
         // Deserialize the read in bytes into
         // the command objec
-        _lm.LogStr("deserializing string");
+        //_lm.LogStr("deserializing string");
         pcCmdData.DeserializeFromString(pcCmdDataBuffer);
 
         // access the individual items in the serialized data structure
 
         // port fore thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Fore_L;
-        _lm.LogStrInt("port fore thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("port fore thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -264,7 +264,7 @@ if (50 == tempThrusterCmdData)
 
         // port aft thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_L;
-        _lm.LogStrInt("port aft thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("port aft thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -281,7 +281,7 @@ if (50 == tempThrusterCmdData)
 
         // starboard fore thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Fore_R;
-        _lm.LogStrInt("starboard fore thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("starboard fore thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -298,7 +298,7 @@ if (50 == tempThrusterCmdData)
 
         // starboard aft thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Aft_R;
-        _lm.LogStrInt("starboard aft thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("starboard aft thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -315,7 +315,7 @@ if (50 == tempThrusterCmdData)
 #ifdef ROLL_THRUSTER_MANUAL_CONTROL
         // port roll thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Roll_L;
-        _lm.LogStrInt("port roll thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("port roll thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -332,7 +332,7 @@ if (50 == tempThrusterCmdData)
 
         // starboard roll thruster
         tempThrusterCmdData = pcCmdData.Data.Thruster_Roll_R;
-        _lm.LogStrInt("starboard roll thruster: ", tempThrusterCmdData);
+        //_lm.LogStrInt("starboard roll thruster: ", tempThrusterCmdData);
         if (tempThrusterCmdData < 0)
         {
             // negative duty cycle requested
@@ -380,14 +380,14 @@ if (50 == tempThrusterCmdData)
 
         // check torpedo commands
         tempPneumaticCmdData = pcCmdData.Data.Torpedo1_Fire;
-        _lm.LogStrInt("torpedo 1: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("torpedo 1: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.fireTorpedoN(1);
         }
 
         tempPneumaticCmdData = pcCmdData.Data.Torpedo2_Fire;
-        _lm.LogStrInt("torpedo 2: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("torpedo 2: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.fireTorpedoN(2);
@@ -396,14 +396,14 @@ if (50 == tempThrusterCmdData)
 
         // check marker dropper commands
         tempPneumaticCmdData = pcCmdData.Data.Marker1_Drop;
-        _lm.LogStrInt("marker 1: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("marker 1: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.dropMarkerN(1);
         }
 
         tempPneumaticCmdData = pcCmdData.Data.Marker2_Drop;
-        _lm.LogStrInt("marker 2: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("marker 2: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.dropMarkerN(1);
@@ -411,7 +411,7 @@ if (50 == tempThrusterCmdData)
 
         // check claw command
         tempPneumaticCmdData = pcCmdData.Data.Claw_Latch;
-        _lm.LogStrInt("claw: ", tempPneumaticCmdData);
+        //_lm.LogStrInt("claw: ", tempPneumaticCmdData);
         if (tempPneumaticCmdData)
         {
             mCU.clawOpen();

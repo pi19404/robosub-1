@@ -25,6 +25,8 @@ public:
     RoboSubController( ComPort&, float );
 
     void Run();
+    void DisplayByte(unsigned int);
+    void twoSecFlash();
 
 private:
     bool m_RUN;
