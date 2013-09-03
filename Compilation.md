@@ -17,6 +17,7 @@ the code.
     robosub/build $ ./robosub
 
 If you do NOT want to have debug logging enabled, the cmake line should be
+
     robosub/build $ cmake ../src -DUSE_DEBUG_LOGGING=OFF -DCMAKE_BUILD_TYPE=Debug
 
 The build type `Debug` will produce slower code, but it will be suitable for tools
@@ -46,7 +47,7 @@ First download and build gtest.
 
 Note: At this point, GTEST_ROOT must be declared, there must be a folder named
 $GTEST_ROOT/build, and you must have down an out-of-tree build from inside of
-$GTEST_ROOT/build! It is convenient to place the "export GTEST_ROOT=..."
+$GTEST_ROOT/build! It is convenient to place the `export GTEST_ROOT=...`
 line in your ~/.bashrc file.
 
     $ cd $AI
