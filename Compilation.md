@@ -11,12 +11,12 @@ to install each component.
 
     3. Perform an out-of-source build.
 
-        $ cd opencv*
-        $ mkdir build
-        $ cd build
-        $ cmake ..
-        $ make
-        $ sudo make install
+            $ cd opencv*
+            $ mkdir build
+            $ cd build
+            $ cmake ..
+            $ make
+            $ sudo make install
 
 2.  Boost
     This can be installed via apt-get.
@@ -70,7 +70,7 @@ using the CMakeLists.txt in the parent directory of the tests directory.
 This is organized in this way so that the build is able to see both the
 testing code and the project source code.
 
-    $ cd $AI
+    $ cd robosub
     robosub $ mkdir build
     robosub $ cd build
     robosub/build $ cmake ..
