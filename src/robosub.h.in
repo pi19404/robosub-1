@@ -1,0 +1,6 @@
+// Copyright: Robosub Club of the Palouse 2013 under the GPL v3
+
+// the configured options and settings for ROBOSUB
+#define ROBOSUB_VERSION_MAJOR @ROBOSUB_VERSION_MAJOR@
+#define ROBOSUB_VERSION_MINOR @ROBOSUB_VERSION_MINOR@
+
