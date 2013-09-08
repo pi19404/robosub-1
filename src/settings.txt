@@ -1,0 +1,4 @@
+# This module should dictate some global settings. It should
+# specify whether logging occurs, how frequently sensors broadcast
+# updates, port mappings for all of our modules, etc.
+
