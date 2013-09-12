@@ -1,0 +1,29 @@
+{'decision':
+    {'port': {'debug': 'tcp://localhost:9001', 'release': ''},
+     'listen': ['sensor/vision', 'sensor/hydrophone', 'sensor/depth']},
+ 'movement/directive':
+    {'port': {'debug': 'tcp://localhost:9002', 'release': ''},
+     'listen': ['decision', 'sensor/speed']},
+ 'movement/stabalization':
+    {'port': {'debug': 'tcp://localhost:9003', 'release': ''},
+     'listen': ['movement/directive', 'sensor/accelerometer', 'sensor/depth']},
+ 'movement/physical':
+    {'port': {'debug': 'tcp://localhost:9004', 'release': ''},
+     'listen': ['movement/stabalization']},
+ 'sensor/vision':
+    {'port': {'debug': 'tcp://localhost:9005', 'release': ''}},
+ 'sensor/hydrophone':
+    {'port': {'debug': 'tcp://localhost:9006', 'release': ''}},
+ 'sensor/depth':
+    {'port': {'debug': 'tcp://localhost:9007', 'release': ''}},
+ 'sensor/accelerometer':
+    {'port': {'debug': 'tcp://localhost:9008', 'release': ''}},
+ 'sensor/speed':
+    {'port': {'debug': 'tcp://localhost:9009', 'release': ''}},
+ 'util/logging':
+    {'port': {'debug': 'tcp://localhost:9010', 'release': ''},
+     'listen':
+        ['decision', 'movement/directive', 'movement/stabalization',
+         'movement/physical', 'sensor/vision', 'sensor/hydrophon',
+         'sensor/depth', 'sensor/accelerometer', 'sensor/speed']}}
+
