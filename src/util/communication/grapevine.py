@@ -11,40 +11,50 @@ class Communicator():
     class _Refresher(threading.Thread):
         def __init__(self, communicator, update_frequency):
             threading.Thread.__init__(self)
+
+        def run(self):
             while True:
                 time.sleep(update_frequency)
                 communicator._refresh()
 
-    def __init__(self, module_name):
-
+    def __init__(self, module_name, mode='debug'):
         self.module_name = module_name
         comm_json_path = os.path.join(
                 os.path.abspath('../..'), 'communication_settings.json')
         self.settings = json.load(open(comm_json_path, 'r'))
 
-        self.message_queues = {mname: [] for mname in self.listening()}
+        # Prepare our publisher
+        self.publisher = {}
+        self.publisher['context'] = zmq.Context(1)
+        self.publisher['context'].bind(
+                self.settings[module_name]['port'][mode])
+
+        # Prepare our subscribers
+        self.subscribers = {mname: {} for mname in self.listening()}
+        for key, val in self.subscribers.items():
+            val['context'] = zmq.Context(1)
+            val['context'].bind(self.settings[key]['port'][mode])
+            val['queue'] = []
+
+        # Start a new thread that will continually update our message queues.
         self._refresher = Communicator._Refresher(communicator=self,
                                                   update_frequency=0.01)
         self._refresher.start()
 
     def _refresh(self):
-        for mname in self.message_queues.keys():
-            mqueue = self.message_queues[mname]
+        for key, val in self.subscribers.items():
             while True:
                 message = None
                 try:
-                    # Don't block while waiting for a message. Raises an
-                    # exception on failure.
-                    # TODO: what subscriber? Not yet defined.
-                    message = subscriber.recv_json(zmq.DONTWAIT)
+                    message = val['context'].recv_json(zmq.DONTWAIT)
                 except zmq.core.error.ZMQError:
                     break
 
                 if message:
-                    mqueue.append(message)
-                    if len(mqueue) > self.settings['message_buffer_length']:
-                        mqueue = mqueue[
-                                -self.settings['message_buffer_length']:]
+                    val.append(message)
+                    mb_len = 'message_buffer_length'
+                    if len(val['queue']) > self.settings[mb_len]:
+                        val['queue'] = val['queue'][-self.settings[mb_len]:]
 
     def listening(self):
         """Returns a list of modules this Communicator is listening to."""
