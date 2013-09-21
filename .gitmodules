@@ -1,0 +1,12 @@
+[submodule "ai"]
+	path = ai
+	url = /home/logan/Programming/historic_ai
+[submodule "arduino"]
+	path = arduino
+	url = /home/logan/Programming/historic_arduino
+[submodule "microcontroller_ctrl_sys"]
+	path = microcontroller_ctrl_sys
+	url = /home/logan/Programming/historic_microcontroller_ctrl_sys
+[submodule "sub_pc_ctrl_sys"]
+	path = sub_pc_ctrl_sys
+	url = /home/logan/Programming/historic_sub_pc_ctrl_sys
