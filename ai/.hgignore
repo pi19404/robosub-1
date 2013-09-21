@@ -1,0 +1,15 @@
+syntax: regexp
+.*\.pyc$
+.*\.sw[op]$
+.*~$
+.*\.o$
+.*\.a$
+.*\.orig$
+.*\.out$
+.*\.pdf$
+robosub$
+.*CMakeFiles/.*
+.*\.cmake$
+CMakeCache.txt
+^build/.*
+
