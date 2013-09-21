@@ -1,0 +1,7 @@
+arduino_2011-2012.tar.gz
+
+syntax: glob
+*.o
+*~
+*.swp
+build-cli/*
