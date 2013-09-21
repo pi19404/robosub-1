@@ -1,0 +1,15 @@
+run nmap to see whose on the Anon network (if not that network, the following 
+IP address is subject to change) on port 24 (??significance??)
+nmap -n -sP 192.168.1.0/24
+
+copy your compressed microcontroller code folder to the sub's PC
+scp microcontroller_ctrl_sys.tar.bz2 robosub@192.168.1.4:/home/robosub
+
+if make error,
+add export MPIDE_DIR=/home/robosub/mpide to .bashrc (restart terminal 
+afterwards) adding this will cause the terminal to run the export command when
+a terminal is started
+
+make clean (ALWAYS make clean when sending code to another machine!!)
+make
+make upload
