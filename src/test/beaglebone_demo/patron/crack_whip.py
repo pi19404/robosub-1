@@ -28,7 +28,7 @@ def main():
             elif 0.90 <= x and x <= 0.95:
                 x_val = 0b01000
             else:
-                x_val = 0b10001
+                x_val = 0b10000
             print x, x_val
 
         com.publish_message({'x_val': x_val, 'y_val': i})
