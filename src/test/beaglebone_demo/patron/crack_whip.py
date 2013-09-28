@@ -15,6 +15,8 @@ def main():
     while True:
         i += 1
         com.publish_message({'x_val': i, 'y_val': i})
+#        accel_vals = com.get_last_message("test/beaglebone_demo/minion")
+#        print accel_vals
         time.sleep(0.05)  # Any faster and we can't see the bottom light.
 
 if __name__ == '__main__':

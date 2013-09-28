@@ -1,5 +1,5 @@
 {
-    "mode": "release",
+    "mode": "debug",
     "publisher_high_water_mark": 1024,
     "publisher_buffer_length": 1024,
     "test/beaglebone_demo/peon": {
@@ -12,6 +12,10 @@
     "test/beaglebone_demo/patron": {
         "port": 10015,
         "ip": "10.99.66.182"
+    },
+    "test/beaglebone_demo/minion": {
+        "port": 10016,
+        "ip": "10.99.66.85"
     }
 }
 

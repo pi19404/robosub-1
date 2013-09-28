@@ -19,16 +19,17 @@ class Gefingerpoken(object):
         return ADC.read(self.x_pin), ADC.read(self.y_pin), ADC.read(self.z_pin)
 
 def main():
-  # com = grapevine.Communicator(
-  #         module_name="test/beaglebone_demo/minion",
-  #         comm_json_path="../demo_config.json")
+    com = grapevine.Communicator(
+            module_name="test/beaglebone_demo/minion",
+            comm_json_path="../demo_config.json")
     finger = Gefingerpoken()
 
     while True:
-  #     val = com.get_last_message("test/beaglebone_demo/patron")
-  #     if val and val['lights']:
-  #         blinken.set_int(int(val['lights']))
-        print "x: {0:.3} y: {1:.3} z: {2:.3}".format(*finger.prod())
+        vals = finger.prod()
+        com.publish_message({
+                'x_val': vals[0],
+                'y_val': vals[1],
+                'z_val': vals[2]})
         time.sleep(0.1)
 
 if __name__ == '__main__':
