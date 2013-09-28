@@ -4,14 +4,14 @@
     "publisher_buffer_length": 1024,
     "test/beaglebone_demo/peon": {
         "port": 10014,
-        "ip": "tcp://10.99.66.85",
+        "ip": "10.99.66.85",
         "listen": [
             "test/beaglebone_demo/patron"
         ]
     },
     "test/beaglebone_demo/patron": {
         "port": 10015,
-        "ip": "tcp://10.99.66.182"
+        "ip": "10.99.66.182"
     }
 }
 
