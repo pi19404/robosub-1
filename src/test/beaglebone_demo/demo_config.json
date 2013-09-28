@@ -11,7 +11,13 @@
     },
     "test/beaglebone_demo/patron": {
         "port": 10015,
-        "ip": "10.99.66.182"
+        "ip": "10.99.66.196",
+        "listen": [
+            "test/beaglebone_demo/minion"
+        ]
+    },
+    "test/beaglebone_demo/minion": {
+        "port": 10016,
+        "ip": "10.99.66.85"
     }
 }
-
