@@ -3,21 +3,21 @@
     "publisher_high_water_mark": 4,
     "publisher_buffer_length": 4,
     "util/communication/test/mock_foo": {
-        "port": 10014,
+        "port": 20070,
         "ip": "tcp://127.0.0.1",
         "listen": [
             "util/communication/test/mock_bar"
         ]
     },
     "util/communication/test/mock_bar": {
-        "port": 10015,
+        "port": 20071,
         "ip": "tcp://127.0.0.1",
         "listen": [
             "util/communication/test/mock_foo"
         ]
     },
     "util/communication/test/mock_baz": {
-        "port": 10016,
+        "port": 20072,
         "ip": "tcp://127.0.0.1",
         "listen": [
             "util/communication/test/mock_foo",
