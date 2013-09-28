@@ -3,19 +3,19 @@
     "publisher_high_water_mark": 1024,
     "publisher_buffer_length": 1024,
     "movement/physical": {
-        "port": 9004,
+        "port": 20054,
         "ip": "127.0.0.1",
         "listen": [
             "movement/stabalization"
         ]
     },
     "sensor/vision": {
-        "port": 9005,
+        "port": 20055,
         "ip": "127.0.0.1",
         "listen": []
     },
     "util/logging": {
-        "port": 9006,
+        "port": 20056,
         "ip": "127.0.0.1",
         "listen": [
             "decision",
@@ -23,14 +23,14 @@
             "movement/stabalization",
             "movement/physical",
             "sensor/vision",
-            "sensor/hydrophon",
+            "sensor/hydrophone",
             "sensor/depth",
             "sensor/accelerometer",
             "sensor/speed"
         ]
     },
     "movement/directive": {
-        "port": 9007,
+        "port": 20057,
         "ip": "127.0.0.1",
         "listen": [
             "decision",
@@ -38,7 +38,7 @@
         ]
     },
     "movement/stabalization": {
-        "port": 9008,
+        "port": 20058,
         "ip": "127.0.0.1",
         "listen": [
             "movement/directive",
@@ -47,17 +47,17 @@
         ]
     },
     "sensor/hydrophone": {
-        "port": 9009,
+        "port": 20059,
         "ip": "127.0.0.1",
         "listen": []
     },
     "sensor/depth": {
-        "port": 9010,
+        "port": 20060,
         "ip": "127.0.0.1",
         "listen": []
     },
     "decision": {
-        "port": 9011,
+        "port": 20061,
         "ip": "127.0.0.1",
         "listen": [
             "sensor/vision",
@@ -66,12 +66,12 @@
         ]
     },
     "sensor/accelerometer": {
-        "port": 9012,
+        "port": 20062,
         "ip": "127.0.0.1",
         "listen": []
     },
     "sensor/speed": {
-        "port": 9013,
+        "port": 20063,
         "ip": "127.0.0.1",
         "listen": []
     }

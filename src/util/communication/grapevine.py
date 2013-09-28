@@ -37,7 +37,7 @@ class Communicator(object):
                     self.communicator._refresh(module_name)
                 time.sleep(self.update_frequency)
 
-    def __init__(self, module_name, mode='debug',
+    def __init__(self, module_name, mode=None,
                  subscriber_buffer_length=1024,
                  subscriber_high_water_mark=1024, comm_json_path=None):
         """
@@ -51,11 +51,12 @@ class Communicator(object):
 
         """
         self.module_name = module_name
-        self.mode = mode
         if not comm_json_path:
             comm_json_path = os.path.join(
                     os.path.abspath('../..'), 'communication_settings.json')
         self.settings = json.load(open(comm_json_path, 'r'))
+        if not mode:
+            self.mode = self.settings['mode']
 
         # Make sure a location for sockets exists.
         if mode == 'debug':
@@ -121,8 +122,6 @@ class Communicator(object):
             return "ipc:///tmp/robosub/{port}.ipc".format(
                     port=self.settings[module_name]['port'])
         elif self.mode == 'release':
-            # TODO: Once we have a multiple computer environment, test this
-            # to make sure that it works.
             return "tcp://{ip}:{port}".format(
                     ip=self.settings[module_name]['ip'],
                     port=self.settings[module_name]['port'])
