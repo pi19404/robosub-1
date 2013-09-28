@@ -14,7 +14,7 @@ def main():
     i = 0
     while True:
         i += 1
-        com.publish_message({'lights': i})
+        com.publish_message({'x_val': i, 'y_val': i})
         time.sleep(0.05)  # Any faster and we can't see the bottom light.
 
 if __name__ == '__main__':
