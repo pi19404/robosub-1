@@ -11,7 +11,7 @@
 ## stabalization
 * This layer will accept commands from the directive layer, and it will
    accomidate those commands if it can do so while satisfying some constraints.
-   * One constraint is that we keep a flat orientation. If we descent, this
+   * One constraint is that we keep a flat orientation. If we descend, this
       layer should make sure we do not tilt while doing so.
    * If we send a command and a slighly different command is executed (for
       example, because current is making us strafe) then this layer should
