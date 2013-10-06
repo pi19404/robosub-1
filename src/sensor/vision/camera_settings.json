@@ -1,0 +1,76 @@
+{
+    "cameras": {
+        "front": {
+            "dev": "video0",
+            "enable": true,
+            "log": true,
+            "fps": {
+                "min": 4,
+                "max": 10
+            },
+            "resolution": {
+                "min": {
+                    "width": 640,
+                    "height": 480
+                },
+                "max": {
+                    "width": 640,
+                    "height": 480
+                }
+            }
+        },
+        "down": {
+            "dev": "video1",
+            "enable": false,
+            "log": true,
+            "fps": {
+                "min": 4,
+                "max": 10
+            },
+            "resolution": {
+                "min": {
+                    "width": 640,
+                    "height": 480
+                },
+                "max": {
+                    "width": 640,
+                    "height": 480
+                }
+            }
+        },
+        "left": {
+            "dev": "video2",
+            "enable": false,
+            "log": true,
+            "fps": {
+                "min": 4,
+                "max": 10
+            },
+            "resolution": {
+                "min": {
+                    "width": 640,
+                    "height": 480
+                },
+                "max": {
+                    "width": 640,
+                    "height": 480
+                }
+            }
+        },
+        "right": {
+            "dev": "video3",
+            "enable": false,
+            "log": true,
+            "resolution": {
+                "min": {
+                    "width": 640,
+                    "height": 480
+                },
+                "max": {
+                    "width": 640,
+                    "height": 480
+                }
+            }
+        }
+    }
+}
