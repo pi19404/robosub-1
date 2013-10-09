@@ -1,5 +1,5 @@
 {
-    "mode": "release",
+    "mode": "debug",
     "publisher_high_water_mark": 4,
     "publisher_buffer_length": 4,
     "util/communication/test/mock_foo": {
