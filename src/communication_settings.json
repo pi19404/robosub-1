@@ -22,11 +22,7 @@
             "movement/directive",
             "movement/stabalization",
             "movement/physical",
-            "sensor/vision",
-            "sensor/hydrophone",
-            "sensor/depth",
-            "sensor/accelerometer",
-            "sensor/speed"
+            "sensor/vision"
         ]
     },
     "movement/directive": {
@@ -46,32 +42,23 @@
             "sensor/depth"
         ]
     },
-    "sensor/hydrophone": {
+    "sensor/serial/accelerometer": {
         "port": 20059,
         "ip": "127.0.0.1",
         "listen": []
     },
-    "sensor/depth": {
+    "sensor/serial/gyroscope": {
         "port": 20060,
         "ip": "127.0.0.1",
         "listen": []
     },
-    "decision": {
+    "sensor/serial/compass": {
         "port": 20061,
-        "ip": "127.0.0.1",
-        "listen": [
-            "sensor/vision",
-            "sensor/hydrophone",
-            "sensor/depth"
-        ]
-    },
-    "sensor/accelerometer": {
-        "port": 20062,
         "ip": "127.0.0.1",
         "listen": []
     },
-    "sensor/speed": {
-        "port": 20063,
+    "decision": {
+        "port": 20062,
         "ip": "127.0.0.1",
         "listen": []
     }
