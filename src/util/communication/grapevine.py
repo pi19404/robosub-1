@@ -9,6 +9,7 @@ Initialization settings are found in robosub/src/communication_settings.json
 import Queue
 import json
 import os
+import sys
 import threading
 import time
 import zmq
@@ -52,14 +53,16 @@ class Communicator(object):
         """
         self.module_name = module_name
         if not comm_json_path:
+            up_dir = lambda path: os.path.split(path)[0]
             comm_json_path = os.path.join(
-                    os.path.abspath('../..'), 'communication_settings.json')
+                    up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
+                    'communication_settings.json')
         self.settings = json.load(open(comm_json_path, 'r'))
         if not mode:
             self.mode = self.settings['mode']
 
         # Make sure a location for sockets exists.
-        if mode == 'debug':
+        if self.mode == 'debug':
             if not os.path.isdir('/tmp/robosub'):
                 os.mkdir('/tmp/robosub')
 

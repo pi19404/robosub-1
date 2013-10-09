@@ -57,8 +57,17 @@
         "ip": "127.0.0.1",
         "listen": []
     },
-    "decision": {
+    "sensor/serial/test/display_messages": {
         "port": 20062,
+        "ip": "127.0.0.1",
+        "listen": [
+            "sensor/serial/accelerometer",
+            "sensor/serial/gyroscope",
+            "sensor/serial/compass"
+        ]
+    },
+    "decision": {
+        "port": 20063,
         "ip": "127.0.0.1",
         "listen": []
     }
