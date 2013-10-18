@@ -20,7 +20,7 @@ def main():
             i += 1
             print msg
         print i, 'messages received'
-        com.publish_message("can you hear me now?")
+        com.publish_message("can you hear me now? No really can you hear me?")
         time.sleep(UPDATE_FREQUENCY)
 
 if __name__ == '__main__':

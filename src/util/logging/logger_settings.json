@@ -1,0 +1,12 @@
+{
+	"mode": "release",
+    "publisher_high_water_mark": 4,
+    "publisher_buffer_length": 4,
+    "util/logging/logger": {
+        "port": 20075,
+        "ip": "127.0.0.1",
+        "listen": [
+			"util/logging/test/mock_log"
+        ]
+    }
+}
