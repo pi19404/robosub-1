@@ -6,12 +6,18 @@
         "port": 20075,
         "ip": "127.0.0.1",
         "listen": [
-			"util/logging/test/mock_log"
+			"util/logging/test/mock_depth",
+			"util/logging/test/mock_motorspeed"
         ]
 	},   
 
-    "util/logging/test/mock_log": {
+    "util/logging/test/mock_depth": {
 	"port": 20076,
+	"ip": "127.0.0.1",
+	"listen": []
+},
+    "util/logging/test/mock_motorspeed": {
+	"port": 20077,
 	"ip": "127.0.0.1",
 	"listen": []
 	}
