@@ -1,6 +1,11 @@
 #Daniel Retherford
 #RoboSub Movement Program
 
+##TODO
+##
+##Maintain depth check, control power to motors, Add ability to incremental power increase/decrease, improve the shut off function
+##
+
 #Imported Libraries
 from msvcrt import getch
 import time
@@ -71,10 +76,15 @@ def main():
             elif key == 80: # down arrow
                 userForwardBackwardChange("backwards")
 
-            #Code to shut down all moters
-            elif key == 27:
-                print("motors are shutting off")
-                
+        #Code to shut down all moters
+        #Outside of if block because there is no speical key needed
+        if key == 27:
+            print("sub motors shutting down")
+            while True:
+                keyBreak = ord(getch())
+                if keyBreak == 32:
+                    print("sub motors turning on")
+                    break
 if __name__ == "__main__":
     main()
         
