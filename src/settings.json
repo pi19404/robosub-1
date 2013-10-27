@@ -1,0 +1,65 @@
+{
+    "communication": {
+        "publisher_high_water_mark": 1024,
+        "publisher_buffer_length": 1024,
+        "movement/physical": {
+            "port": 20054,
+            "listen": [
+                "movement/stabalization"
+            ]
+        },
+        "sensor/vision": {
+            "port": 20055,
+            "listen": []
+        },
+        "util/logging": {
+            "port": 20056,
+            "listen": [
+                "decision",
+                "movement/directive",
+                "movement/stabalization",
+                "movement/physical",
+                "sensor/vision"
+            ]
+        },
+        "movement/directive": {
+            "port": 20057,
+            "listen": [
+                "sensor/vision"
+            ]
+        },
+        "movement/stabalization": {
+            "port": 20058,
+            "listen": [
+                "movement/directive",
+                "sensor/accelerometer",
+                "sensor/depth"
+            ]
+        },
+        "sensor/accelerometer": {
+            "port": 20059,
+            "listen": []
+        },
+        "sensor/gyroscope": {
+            "port": 20060,
+            "listen": []
+        },
+        "sensor/compass": {
+            "port": 20061,
+            "listen": []
+        },
+        "sensor/serial/test/display_messages": {
+            "port": 20062,
+            "listen": [
+                "sensor/serial/accelerometer",
+                "sensor/serial/gyroscope",
+                "sensor/serial/compass"
+            ]
+        },
+        "decision": {
+            "port": 20063,
+            "listen": []
+        }
+    }
+}
+
