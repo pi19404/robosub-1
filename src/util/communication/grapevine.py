@@ -2,7 +2,7 @@
 
 """This defines the python communication interface.
 
-Initialization settings are found in robosub/src/communication_settings.json
+Initialization settings are found in robosub/src/settings.json
 
 """
 
@@ -55,8 +55,8 @@ class Communicator(object):
             up_dir = lambda path: os.path.split(path)[0]
             comm_json_path = os.path.join(
                     up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
-                    'communication_settings.json')
-        self.settings = json.load(open(comm_json_path, 'r'))
+                    'settings.json')
+        self.settings = json.load(open(comm_json_path, 'r'))["communication"]
         if not os.path.isdir('/tmp/robosub'):
             os.mkdir('/tmp/robosub')
 

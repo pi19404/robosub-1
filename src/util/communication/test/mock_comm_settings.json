@@ -1,28 +1,30 @@
 {
-    "mode": "debug",
-    "publisher_high_water_mark": 4,
-    "publisher_buffer_length": 4,
-    "util/communication/test/mock_foo": {
-        "port": 20070,
-        "ip": "127.0.0.1",
-        "listen": [
-            "util/communication/test/mock_bar"
-        ]
-    },
-    "util/communication/test/mock_bar": {
-        "port": 20071,
-        "ip": "127.0.0.1",
-        "listen": [
-            "util/communication/test/mock_foo"
-        ]
-    },
-    "util/communication/test/mock_baz": {
-        "port": 20072,
-        "ip": "127.0.0.1",
-        "listen": [
-            "util/communication/test/mock_foo",
-            "util/communication/test/mock_bar"
-        ]
+    "communication": {
+        "mode": "debug",
+        "publisher_high_water_mark": 4,
+        "publisher_buffer_length": 4,
+        "util/communication/test/mock_foo": {
+            "port": 20070,
+            "ip": "127.0.0.1",
+            "listen": [
+                "util/communication/test/mock_bar"
+            ]
+        },
+        "util/communication/test/mock_bar": {
+            "port": 20071,
+            "ip": "127.0.0.1",
+            "listen": [
+                "util/communication/test/mock_foo"
+            ]
+        },
+        "util/communication/test/mock_baz": {
+            "port": 20072,
+            "ip": "127.0.0.1",
+            "listen": [
+                "util/communication/test/mock_foo",
+                "util/communication/test/mock_bar"
+            ]
+        }
     }
 }
 
