@@ -38,13 +38,12 @@ class Communicator(object):
                     self.communicator._refresh(module_name)
                 time.sleep(self.update_frequency)
 
-    def __init__(self, module_name, mode=None,
+    def __init__(self, module_name,
                  subscriber_buffer_length=1024,
                  subscriber_high_water_mark=1024, comm_json_path=None):
         """
         'module_name' must follow the folder path name convention that
             specifies a module.
-        'mode' must be 'debug' or 'release'.
         'subscriber_buffer_length' and 'subscriber_high_water_mark' control zmq
             memory settings.
         'comm_json_path' specifies an alternative (testing) communication
@@ -58,13 +57,8 @@ class Communicator(object):
                     up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
                     'communication_settings.json')
         self.settings = json.load(open(comm_json_path, 'r'))
-        if not mode:
-            self.mode = self.settings['mode']
-
-        # Make sure a location for sockets exists.
-        if self.mode == 'debug':
-            if not os.path.isdir('/tmp/robosub'):
-                os.mkdir('/tmp/robosub')
+        if not os.path.isdir('/tmp/robosub'):
+            os.mkdir('/tmp/robosub')
 
         # Prepare our publisher
         self.publisher = {}
@@ -121,15 +115,8 @@ class Communicator(object):
 
     def get_socket_name(self, module_name):
         """Determines the socket for module_name."""
-        if self.mode == 'debug':
-            return "ipc:///tmp/robosub/{port}.ipc".format(
-                    port=self.settings[module_name]['port'])
-        elif self.mode == 'release':
-            return "tcp://{ip}:{port}".format(
-                    ip=self.settings[module_name]['ip'],
-                    port=self.settings[module_name]['port'])
-        else:
-            assert False, "mode '{0}' not recognized".format(self.mode)
+        return "ipc:///tmp/robosub/{port}.ipc".format(
+                port=self.settings[module_name]['port'])
 
     def listening(self):
         """Returns a list of modules this Communicator is listening to."""
