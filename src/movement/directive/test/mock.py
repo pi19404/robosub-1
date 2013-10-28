@@ -13,20 +13,37 @@ def main(args):
             module_name=args.module_name,
             comm_json_path=args.comm_settings)
 
+    # These values represent the submarine's membership in 8 fuzzy sets.
+    # These sets come in pairs (left/right, back/forward, etc.) and represent
+    # where the submarine is in relation to where it wants to be.
+    # The roll and yaw sets are not available to directive module since
+    # they should be controlled by either the stabalization module, or by
+    # the awesome balancing skills of the mech-e's.
+    packet = {
+            'is_left': 0.0,
+            'is_right': 0.0,
+            'is_back': 1.0,
+            'is_forward': 0.0,
+            'is_low': 0.0,
+            'is_high': 0.0,
+            'is_rotated_left': 0.0,
+            'is_rotated_right': 0.0}
+
     while True:
-        com.publish_message({'message': None})
+        com.publish_message(packet)
         time.sleep(args.epoch)
         for mname in com.listening():
             recv_msg = com.get_last_message(mname)
             if recv_msg:
-                print recv_msg
+                pass
+                #print recv_msg
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
     parser.add_argument('-c', '--comm_settings', type=str,
             default=None,
             help='Communication file path.')
-    parser.add_argument('-e', '--epoch',  type=float,
+    parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
     parser.add_argument('-m', '--module_name', type=str,
@@ -36,6 +53,5 @@ def commandline():
 
 if __name__ == '__main__':
     args = commandline()
-    print args
     main(args)
 

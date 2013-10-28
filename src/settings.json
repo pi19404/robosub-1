@@ -33,8 +33,7 @@
             "port": 20058,
             "listen": [
                 "movement/directive",
-                "sensor/accelerometer",
-                "sensor/depth"
+                "sensor/accelerometer"
             ]
         },
         "sensor/accelerometer": {
