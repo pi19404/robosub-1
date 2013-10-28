@@ -5,7 +5,7 @@
 #   Frakenstein, or the Modern Prometheus
 #   by Mary Wollstonecraft Shelly
 
-# TODO(LPE) This is hideous. We really should have a proper daemon,
+# TODO This is hideous. We really should have a proper daemon,
 # perhaps leveraging the Pyro library.
 
 import argparse
@@ -49,17 +49,26 @@ by ties only dissoluble by the annihilation of one of us. You purpose to kill
 me. How dare you sport thus with life?
         """
     elif args.create:
+        # TODO This branch does not check to see if the programs are already
+        # running.
         FNULL = open(os.devnull, 'w')
         if not os.environ.get('PYTHONPATH'):
             os.environ['PYTHONPATH'] = os.path.abspath('.')
-        # TODO(LPE) This should check to see if any arguments are specified in
+
+        # TODO This should check to see if any arguments are specified in
         # the settings file.
         if args.create == 'release':
-            for fname in release_fnames:
-                Popen(['python', fname], stdout=FNULL, stderr=FNULL)
+            fnames = release_fnames
         elif args.create == 'mock':
-            for fname in mock_fnames:
-                Popen(['python', fname], stdout=FNULL, stderr=FNULL)
+            fnames = mock_fnames
+        else:
+            raise "--create argument not recognized: {0}".format(args.create)
+
+        for fname in fnames:
+            cmd = ['python', fname]
+            print "Executing:", cmd
+            Popen(cmd, stdout=FNULL, stderr=FNULL)
+
         FNULL.close()
         print "I beheld the wretch--the miserable monster whom I had created."
 

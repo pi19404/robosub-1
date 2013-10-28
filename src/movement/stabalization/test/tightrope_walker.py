@@ -14,7 +14,7 @@ def main(args):
             module_name=args.module_name,
             settings_path=args.settings_path)
 
-    # TODO(LPE) We need to settle on a good convention for these vectors.
+    # TODO We need to settle on a good convention for these vectors.
     # For now, I'm using these conventions:
     # vector:
     #   x is left and right
