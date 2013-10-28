@@ -12,14 +12,15 @@
             "port": 20055,
             "listen": []
         },
-        "util/logging": {
+        "util/logger": {
             "port": 20056,
             "listen": [
                 "decision",
                 "movement/directive",
                 "movement/stabalization",
                 "movement/physical",
-                "sensor/vision"
+                "sensor/vision",
+                "util/logger"
             ]
         },
         "movement/directive": {

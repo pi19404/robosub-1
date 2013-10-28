@@ -36,6 +36,5 @@ def commandline():
 
 if __name__ == '__main__':
     args = commandline()
-    print args
     main(args)
 
