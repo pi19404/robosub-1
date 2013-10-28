@@ -3,7 +3,9 @@
     "publisher_buffer_length": 1024,
     "sensor/vision": {
         "port": 20054,
-        "listen": []
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "util/logger": {
         "port": 20055,
@@ -14,38 +16,52 @@
             "movement/physical",
             "sensor/vision",
             "util/logger"
-        ]
+        ],
+        "release": {"path": "util/logging/logger.py"},
+        "mock": {"path": "util/logging/logger.py"}
     },
     "movement/directive": {
         "port": 20056,
         "listen": [
             "sensor/vision"
-        ]
+        ],
+        "release": {"path": null},
+        "mock": {"path": "movement/directive/test/despot.py"}
     },
     "movement/stabalization": {
         "port": 20057,
         "listen": [
             "movement/directive",
             "sensor/accelerometer"
-        ]
+        ],
+        "release": {"path": null},
+        "mock": {"path": "movement/stabalization/test/tightrope_walker.py"}
     },
     "movement/physical": {
         "port": 20058,
         "listen": [
             "movement/stabalization"
-        ]
+        ],
+        "release": {"path": null},
+        "mock": {"path": "movement/physical/test/jockey.py"}
     },
     "sensor/accelerometer": {
         "port": 20059,
-        "listen": []
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "sensor/gyroscope": {
         "port": 20060,
-        "listen": []
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "sensor/compass": {
         "port": 20061,
-        "listen": []
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "sensor/serial/test/display_messages": {
         "port": 20062,
@@ -53,11 +69,15 @@
             "sensor/serial/accelerometer",
             "sensor/serial/gyroscope",
             "sensor/serial/compass"
-        ]
+        ],
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "decision": {
         "port": 20063,
-        "listen": []
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     }
 }
 

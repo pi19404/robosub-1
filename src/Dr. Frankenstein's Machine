@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+# COPYRIGHT: Robosub Club of the Palouse under the GPL v3
+#
+# Some quotes from http://www.gutenberg.org/files/84/84-h/84-h.htm
+#   Frakenstein, or the Modern Prometheus
+#   by Mary Wollstonecraft Shelly
+
+# TODO(LPE) This is hideous. We really should have a proper daemon,
+# perhaps leveraging the Pyro library.
+
+import argparse
+import json
+import os
+import re
+from subprocess import check_output, check_call, Popen, CalledProcessError
+
+def main(args):
+    release_fnames = set()
+    mock_fnames = set()
+    settings = json.load(open(args.settings_path, 'r'))
+    for key, val in settings.items():
+        if isinstance(val, dict):
+            release_fnames.add(val['release']['path'])
+            mock_fnames.add(val['mock']['path'])
+
+    None in release_fnames and release_fnames.remove(None)
+    None in mock_fnames and mock_fnames.remove(None)
+
+    if args.kill:
+        running_raw = check_output(['ps', '-e', '-o', 'pid,cmd']).splitlines()
+        running = []
+        for entry in running_raw[1:]:
+            pid, cmd = entry.strip().split(' ', 1)
+            pid = pid.strip()
+            cmd = cmd.strip()
+            running.append([pid, cmd])
+        PID = 0
+        PROG = 1
+        for fname in release_fnames.union(mock_fnames):
+            for entry in running:
+                if re.search(fname, entry[PROG]):
+                    print "Killing '{0}' with pid {1}".format(
+                            entry[PROG], entry[PID])
+                    check_call(['kill', '-9', entry[PID]])
+
+        print """
+Yet you, my creator, detest and spurn me, thy creature, to whom thou art bound
+by ties only dissoluble by the annihilation of one of us. You purpose to kill
+me. How dare you sport thus with life?
+        """
+    elif args.create:
+        FNULL = open(os.devnull, 'w')
+        if not os.environ.get('PYTHONPATH'):
+            os.environ['PYTHONPATH'] = os.path.abspath('.')
+        # TODO(LPE) This should check to see if any arguments are specified in
+        # the settings file.
+        if args.create == 'release':
+            for fname in release_fnames:
+                Popen(['python', fname], stdout=FNULL, stderr=FNULL)
+        elif args.create == 'mock':
+            for fname in mock_fnames:
+                Popen(['python', fname], stdout=FNULL, stderr=FNULL)
+        FNULL.close()
+        print "I beheld the wretch--the miserable monster whom I had created."
+
+
+def commandline():
+    parser = argparse.ArgumentParser(description='Mock module.')
+    parser.add_argument('--settings_path', type=str,
+            default="./settings.json",
+            help='Settings file path.')
+    parser.add_argument('-c', '--create', type=str, default="mock",
+                        help="Would you also create for yourself and "
+                             "the world a demoniacal enemy? (mock|release)")
+    parser.add_argument('-k', '--kill', action='store_true',
+                        help="He was tried and condemned to death.")
+    parser.add_argument('-m', '--module_name', type=str,
+            default='movement/directive',
+            help='Module name.')
+    return parser.parse_args()
+
+
+if __name__ == '__main__':
+    main(commandline())
+

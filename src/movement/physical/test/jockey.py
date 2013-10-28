@@ -58,7 +58,7 @@ def cmd_thruster(thruster_id, magnitude, direction):
 
     # send the commmand to the microcontroller
     if DEBUG:
-        print 'raw_cmd:', [ord(x) for x in raw_cmd]
+        #print 'raw_cmd:', [ord(x) for x in raw_cmd]
         return
     else:
         cmd_thruster.ser.write(raw_cmd)
