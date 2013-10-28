@@ -56,7 +56,7 @@ class Communicator(object):
             settings_path = os.path.join(
                     up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
                     'settings.json')
-        self.settings = json.load(open(settings_path, 'r'))["communication"]
+        self.settings = json.load(open(settings_path, 'r'))
         if not os.path.isdir('/tmp/robosub'):
             os.mkdir('/tmp/robosub')
 
