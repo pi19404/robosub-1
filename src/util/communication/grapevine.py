@@ -40,23 +40,23 @@ class Communicator(object):
 
     def __init__(self, module_name,
                  subscriber_buffer_length=1024,
-                 subscriber_high_water_mark=1024, comm_json_path=None):
+                 subscriber_high_water_mark=1024, settings_path=None):
         """
         'module_name' must follow the folder path name convention that
             specifies a module.
         'subscriber_buffer_length' and 'subscriber_high_water_mark' control zmq
             memory settings.
-        'comm_json_path' specifies an alternative (testing) communication
+        'settings_path' specifies an alternative (testing) communication
             settings file.
 
         """
         self.module_name = module_name
-        if not comm_json_path:
+        if not settings_path:
             up_dir = lambda path: os.path.split(path)[0]
-            comm_json_path = os.path.join(
+            settings_path = os.path.join(
                     up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
                     'settings.json')
-        self.settings = json.load(open(comm_json_path, 'r'))["communication"]
+        self.settings = json.load(open(settings_path, 'r'))["communication"]
         if not os.path.isdir('/tmp/robosub'):
             os.mkdir('/tmp/robosub')
 
@@ -139,6 +139,7 @@ class Communicator(object):
         message['message_number'] = self.publisher['next_message_number']
         self.publisher['next_message_number'] += 1
         message['timestamp'] = time.time()
+        message['module_name'] = self.module_name
         self.publisher['socket'].send_json(message)
 
     def _refresh(self, module_name):

@@ -11,7 +11,7 @@ from util.communication.grapevine import Communicator
 def main(args):
     com = Communicator(
             module_name=args.module_name,
-            comm_json_path=args.comm_settings)
+            settings_path=args.settings_path)
 
     # These values represent the submarine's membership in 8 fuzzy sets.
     # These sets come in pairs (left/right, back/forward, etc.) and represent
@@ -40,9 +40,9 @@ def main(args):
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('-c', '--comm_settings', type=str,
+    parser.add_argument('--settings_path', type=str,
             default=None,
-            help='Communication file path.')
+            help='Settings file path.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')

@@ -6,7 +6,7 @@ import time
 
 # These values are temporary, for testing. They WILL change in the final product
 # It was recommended that these values should be placed in a dictionary
-control_byte = '\n'
+CONTROL_BYTE = '\n'
 ACL_1_X_addr = ord('X')
 ACL_1_Y_addr = ord('Y')
 ACL_1_Z_addr = ord('Z')
@@ -179,7 +179,7 @@ def cmd_rotate_cw():
     cmd_thruster(THRUSTER_STERN_SB, 25, 1)
     cmd_thruster(THRUSTER_STERN_PORT, 25, 0)
 
-def cmd_rotate_cw():
+def cmd_rotate_ccw():
     """causes the sub to rotate counter-clockwise"""
     cmd_thruster(THRUSTER_BOW_SB, 25, 1)
     cmd_thruster(THRUSTER_BOW_PORT, 25, 0)

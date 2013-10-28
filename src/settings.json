@@ -2,18 +2,12 @@
     "communication": {
         "publisher_high_water_mark": 1024,
         "publisher_buffer_length": 1024,
-        "movement/physical": {
-            "port": 20054,
-            "listen": [
-                "movement/stabalization"
-            ]
-        },
         "sensor/vision": {
-            "port": 20055,
+            "port": 20054,
             "listen": []
         },
         "util/logger": {
-            "port": 20056,
+            "port": 20055,
             "listen": [
                 "decision",
                 "movement/directive",
@@ -24,16 +18,22 @@
             ]
         },
         "movement/directive": {
-            "port": 20057,
+            "port": 20056,
             "listen": [
                 "sensor/vision"
             ]
         },
         "movement/stabalization": {
-            "port": 20058,
+            "port": 20057,
             "listen": [
                 "movement/directive",
                 "sensor/accelerometer"
+            ]
+        },
+        "movement/physical": {
+            "port": 20058,
+            "listen": [
+                "movement/stabalization"
             ]
         },
         "sensor/accelerometer": {
