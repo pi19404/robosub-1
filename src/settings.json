@@ -23,6 +23,7 @@
     "movement/directive": {
         "port": 20056,
         "listen": [
+            "decision",
             "sensor/vision"
         ],
         "release": {"path": null},

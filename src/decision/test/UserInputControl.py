@@ -1,90 +1,135 @@
-#Daniel Retherford
-#RoboSub Movement Program
+# COPYRIGHT: Robosub Club of the Palouse under the GPL v3
+"""
+Daniel Retherford
+RoboSub Movement Program
+"""
 
-##TODO
-##
-##Maintain depth check, control power to motors, Add ability to incremental power increase/decrease, improve the shut off function
-##
+# TODO
+# Maintain depth check, control power to motors, Add ability to incremental
+# power increase/decrease, improve the shut off function
 
-#Imported Libraries
-from msvcrt import getch
+import sys
 import time
 
+class _Getch:
+    """Gets a single character from standard input.
 
-#Functions
-#Controls the depth of the robo sub
+    Does not echo to the screen.
+
+    Source: ("http://code.activestate.com/recipes/"
+             "134892-getch-like-unbuffered-character-reading-from-stdin/")
+
+    Liscense: PSF
+    Created by Danny Yoo on Fri, 21 Jun 2002
+
+    """
+    def __init__(self):
+        try:
+            self.impl = _GetchWindows()
+        except ImportError:
+            self.impl = _GetchUnix()
+
+    def __call__(self): return self.impl()
+
+
+class _GetchUnix:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+
+class _GetchWindows:
+    def __init__(self):
+        import msvcrt
+
+    def __call__(self):
+        import msvcrt
+        return msvcrt.getch()
+
+
+getch = _Getch()
+
+
 def userChangeDepth(keyPress):
+    """Controls the depth of the robo sub"""
     x = 0
     speed = 2.0
     speedAdjustment = 2.3
     if keyPress == "down":
-        #Move sub down
+        # Move sub down
         for x in range(0, 3):
             print("Sub moving down at", speed)
             speed = speed + speedAdjustment
             time.sleep(1)
     elif keyPress == "up":
-        #Move sub up
+        # Move sub up
         for x in range(0, 3):
             print("Sub moving up at", speed)
             speed = speed + speedAdjustment
             time.sleep(1)
-    
-    speed = 2.0 #set back to original value
+
+    speed = 2.0 # set back to original value
     return
 
-#Controls the forward and backwards movement of the sub
 def userForwardBackwardChange(keyPress):
+    """Controls the forward and backwards movement of the sub"""
     if keyPress == "forward":
         print("Sub is moving forward at")
     elif keyPress == "backwards":
         print("Sub is moving backwards at")
     return
 
-#Controls the rotational movement left and right of the sub
 def userRotationChange(keyPress):
+    """Controls the rotational movement left and right of the sub"""
     if keyPress == "left":
         print("Sub is rotating to the left at")
     elif keyPress == "right":
         print("Sub is rotating to the right at")
 
 def main():
+    print """Usage:
++-------+-------+-------+-------+
+| q     | w     | e     | r     |
+|       |       |       |       |
+| QUIT  |FORWARD|  N/A  | RISE  |
+++------++------++------++-----++
+ | a     | s     | d     | f     |
+ | ROTATE|       | ROTATE|       |
+ | LEFT  |  BACK | RIGHT | FALL  |
+ +-------+-------+--=----+-------+
+"""
+
     while True:
-        #Used to capture the keypress
+        # Used to capture the keypress
         key = ord(getch())
-        #224 is the dafault special key for the keyboard
-        if key == 224: #Special keys (arrows, f keys, ins, del, etc.)
-            key = ord(getch())
+        print key
 
-            #Mini Code block bellow controls the up and down
-            if key == 81: #Down arrow
-                userChangeDepth("down")
-            elif key == 73: #Up arrow
-                userChangeDepth("up")
-            
-
-            #Code block below is code to control direction "left, right, forward, backward"
-            #Code is to rotate left and right    
-            elif key == 75: # left arrow
-                userRotationChange("left")
-            elif key == 77: # right arrow
-                userRotationChange("right")
-                
-            #Code is to move forward and backward
-            elif key == 72: # up arrow
-                userForwardBackwardChange("forward")
-            elif key == 80: # down arrow
-                userForwardBackwardChange("backwards")
-
-        #Code to shut down all moters
-        #Outside of if block because there is no speical key needed
-        if key == 27:
+        if key == ord('w'):
+            userForwardBackwardChange("forward")
+        elif key == ord('a'):
+            userRotationChange("left")
+        elif key == ord('s'):
+            userForwardBackwardChange("backwards")
+        elif key == ord('d'):
+            userRotationChange("right")
+        elif key == ord('r'):
+            userChangeDepth("up")
+        elif key == ord('f'):
+            userChangeDepth("down")
+        elif key == ord('q'):
             print("sub motors shutting down")
-            while True:
-                keyBreak = ord(getch())
-                if keyBreak == 32:
-                    print("sub motors turning on")
-                    break
+            sys.exit()
+
 if __name__ == "__main__":
     main()
-        
+
