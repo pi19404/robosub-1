@@ -8,8 +8,15 @@ RoboSub Movement Program
 # Maintain depth check, control power to motors, Add ability to incremental
 # power increase/decrease, improve the shut off function
 
+import argparse
+import math
+import os
 import sys
 import time
+from copy import deepcopy
+sys.path.append(os.path.abspath("../.."))
+from util.communication.grapevine import Communicator
+
 
 class _Getch:
     """Gets a single character from standard input.
@@ -60,43 +67,7 @@ class _GetchWindows:
 getch = _Getch()
 
 
-def userChangeDepth(keyPress):
-    """Controls the depth of the robo sub"""
-    x = 0
-    speed = 2.0
-    speedAdjustment = 2.3
-    if keyPress == "down":
-        # Move sub down
-        for x in range(0, 3):
-            print("Sub moving down at", speed)
-            speed = speed + speedAdjustment
-            time.sleep(1)
-    elif keyPress == "up":
-        # Move sub up
-        for x in range(0, 3):
-            print("Sub moving up at", speed)
-            speed = speed + speedAdjustment
-            time.sleep(1)
-
-    speed = 2.0 # set back to original value
-    return
-
-def userForwardBackwardChange(keyPress):
-    """Controls the forward and backwards movement of the sub"""
-    if keyPress == "forward":
-        print("Sub is moving forward at")
-    elif keyPress == "backwards":
-        print("Sub is moving backwards at")
-    return
-
-def userRotationChange(keyPress):
-    """Controls the rotational movement left and right of the sub"""
-    if keyPress == "left":
-        print("Sub is rotating to the left at")
-    elif keyPress == "right":
-        print("Sub is rotating to the right at")
-
-def main():
+def main(args):
     print """Usage:
 +-------+-------+-------+-------+
 | q     | w     | e     | r     |
@@ -106,30 +77,60 @@ def main():
  | a     | s     | d     | f     |
  | ROTATE|       | ROTATE|       |
  | LEFT  |  BACK | RIGHT | FALL  |
- +-------+-------+--=----+-------+
+ +-------+-------+-------+-------+
 """
+    com = Communicator(
+            module_name=args.module_name,
+            settings_path=args.settings_path)
+
+    # x is left/right
+    # y is forward/backward
+    # z is up/down
+    missive_template = {
+        "desired_offset": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "desired_orientation": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "desired_velocity": {"x": 0.0, "y": 0.0, "z": 0.0}
+    }
 
     while True:
-        # Used to capture the keypress
         key = ord(getch())
-        print key
+        missive = deepcopy(missive_template)
 
         if key == ord('w'):
-            userForwardBackwardChange("forward")
+            missive['desired_offset']['y'] = 9001.0
+            missive['desired_velocity']['y'] = 1.0
         elif key == ord('a'):
-            userRotationChange("left")
+            missive['desired_orientation']['z'] = 3 * math.pi / 2
         elif key == ord('s'):
-            userForwardBackwardChange("backwards")
+            missive['desired_offset']['y'] = -9001
+            missive['desired_velocity']['y'] = -1.0
         elif key == ord('d'):
-            userRotationChange("right")
+            missive['desired_orientation']['z'] = math.pi / 2
         elif key == ord('r'):
-            userChangeDepth("up")
+            missive['desired_offset']['z'] = 9001
+            missive['desired_velocity']['z'] = 1.0
         elif key == ord('f'):
-            userChangeDepth("down")
+            missive['desired_offset']['z'] = -9001
+            missive['desired_velocity']['z'] = -1.0
+        elif key == ord('e'):
+            # This will turn off the motors.
+            pass
         elif key == ord('q'):
-            print("sub motors shutting down")
             sys.exit()
 
-if __name__ == "__main__":
-    main()
+        com.publish_message(missive)
+
+def commandline():
+    parser = argparse.ArgumentParser(description='Mock module.')
+    parser.add_argument('--settings_path', type=str,
+            default=None,
+            help='Settings file path.')
+    parser.add_argument('-m', '--module_name', type=str,
+            default='decision',
+            help='Module name.')
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = commandline()
+    main(args)
 

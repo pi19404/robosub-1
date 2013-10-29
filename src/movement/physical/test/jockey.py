@@ -58,7 +58,6 @@ def cmd_thruster(thruster_id, magnitude, direction):
 
     # send the commmand to the microcontroller
     if DEBUG:
-        #print 'raw_cmd:', [ord(x) for x in raw_cmd]
         return
     else:
         cmd_thruster.ser.write(raw_cmd)
@@ -88,33 +87,33 @@ def main(args):
             elif stabalization_packet['vector']['x'] == -1.0:
                 pass
             elif stabalization_packet['vector']['y'] == 1.0:
-                """causes the sub to move forward"""
+                # causes the sub to move forward
                 cmd_thruster(THRUSTER_BOW_SB, mag, 0)
                 cmd_thruster(THRUSTER_BOW_PORT, mag, 0)
                 cmd_thruster(THRUSTER_STERN_SB, mag, 0)
                 cmd_thruster(THRUSTER_STERN_PORT, mag, 0)
             elif stabalization_packet['vector']['y'] == -1.0:
-                """causes the sub to move backwards"""
+                # causes the sub to move backwards
                 cmd_thruster(THRUSTER_BOW_SB, mag, 1)
                 cmd_thruster(THRUSTER_BOW_PORT, mag, 1)
                 cmd_thruster(THRUSTER_STERN_SB, mag, 1)
                 cmd_thruster(THRUSTER_STERN_PORT, mag, 1)
             elif stabalization_packet['vector']['z'] == 1.0:
-                """causes the sub to surface"""
+                # causes the sub to surface
                 cmd_thruster(THRUSTER_DEPTH_SB, mag, 1)
                 cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1)
             elif stabalization_packet['vector']['z'] == -1.0:
-                """causes the sub to dive"""
+                # causes the sub to dive
                 cmd_thruster(THRUSTER_DEPTH_SB, mag, 0)
                 cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0)
             elif stabalization_packet['rotation']['z'] == 1.0:
-                """causes the sub to rotate clockwise"""
+                # causes the sub to rotate clockwise
                 cmd_thruster(THRUSTER_BOW_SB, mag, 0)
                 cmd_thruster(THRUSTER_BOW_PORT, mag, 1)
                 cmd_thruster(THRUSTER_STERN_SB, mag, 1)
                 cmd_thruster(THRUSTER_STERN_PORT, mag, 0)
             elif stabalization_packet['rotation']['z'] == -1.0:
-                """causes the sub to rotate counter-clockwise"""
+                # causes the sub to rotate counter-clockwise
                 cmd_thruster(THRUSTER_BOW_SB, mag, 1)
                 cmd_thruster(THRUSTER_BOW_PORT, mag, 0)
                 cmd_thruster(THRUSTER_STERN_SB, mag, 0)

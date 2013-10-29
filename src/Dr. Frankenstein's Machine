@@ -66,11 +66,13 @@ me. How dare you sport thus with life?
 
         for fname in fnames:
             cmd = ['python', fname]
-            print "Executing:", cmd
+            print "Electrifying:", cmd
             Popen(cmd, stdout=FNULL, stderr=FNULL)
 
         FNULL.close()
+        print
         print "I beheld the wretch--the miserable monster whom I had created."
+        print
 
 
 def commandline():

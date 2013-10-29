@@ -1,9 +1,11 @@
 # COPYRIGHT: Robosub Club of the Palouse under the GPL v3
 
 import argparse
-import time
+import math
 import os
 import sys
+import time
+from copy import deepcopy
 from random import random
 sys.path.append(os.path.abspath("../../.."))
 from util.communication.grapevine import Communicator
@@ -22,21 +24,48 @@ def main(args):
     packet = {
             'is_left': 0.0,
             'is_right': 0.0,
-            'is_back': 1.0,
+            'is_back': 0.0,
             'is_forward': 0.0,
             'is_low': 0.0,
             'is_high': 0.0,
             'is_rotated_left': 0.0,
             'is_rotated_right': 0.0}
 
+    missive = {
+            "desired_offset": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "desired_orientation": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "desired_velocity": {"x": 0.0, "y": 0.0, "z": 0.0},
+            "timestamp": time.time()}
+
+    tx_packet = deepcopy(packet)
     while True:
-        com.publish_message(packet)
+        next_missive = com.get_last_message("decision")
+
+        if (next_missive and
+            next_missive['timestamp'] > missive['timestamp']):
+            missive = next_missive
+            tx_packet = deepcopy(packet)
+
+        if (missive['desired_offset']['y'] == 9001.0 and
+            missive['desired_velocity']['y'] == 1.0):
+            tx_packet['is_back'] = 1.0
+        elif (missive['desired_offset']['y'] == -9001 and
+              missive['desired_velocity']['y'] == -1.0):
+            tx_packet['is_forward'] = 1.0
+        elif missive['desired_orientation']['z'] == 3 * math.pi / 2:
+            tx_packet['is_rotated_right'] = 1.0
+        elif missive['desired_orientation']['z'] == math.pi / 2:
+            tx_packet['is_rotated_left'] = 1.0
+        elif (missive['desired_offset']['z'] == 9001 and
+              missive['desired_velocity']['z'] == 1.0):
+            tx_packet['is_low'] = 1.0
+        elif (missive['desired_offset']['z'] == -9001 and
+              missive['desired_velocity']['z'] == -1.0):
+            tx_packet['is_high'] = 1.0
+
+        com.publish_message(tx_packet)
         time.sleep(args.epoch)
-        for mname in com.listening():
-            recv_msg = com.get_last_message(mname)
-            if recv_msg:
-                pass
-                #print recv_msg
+
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
