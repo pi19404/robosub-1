@@ -4,6 +4,7 @@
 import serial
 import os
 import time
+import zmq
 
 #global constants
 control_byte = '\n'
@@ -14,15 +15,19 @@ GYRO_1_X_addr = ord('I')
 GYRO_1_Y_addr = ord('J')
 GYRO_1_Z_addr = ord('K')
 
+#get ZeroMQ context and bind to socket 5000
+context = zmq.Context()
+socket = context.socket(zmq.PUB)
+socket.bind('tcp://127.0.0.1:5000')
 
 #clear the screen
-os.system('cls')
+os.system('clear')
 
 #initialize the serial port
 s = serial.Serial()
 s.port = 2
 s.baudrate = 56818
-s.open()
+#s.open()
 
 start_time = time.time()
 packet_count = 0
@@ -209,12 +214,22 @@ while 1 :
 		if (received_time - sent_time) <  min_ping_time :
 			min_ping_time = received_time - sent_time
 
+	# Compile the Accelerometer data into a single python dictionary
+	accelerometer = { 'aclX' : ACL_1_X_val, 'aclY' : ACL_1_Y_val, 'aclZ' : ACL_1_Z_val}
+	socket.send(accelerometer)
+
 	print "ACL X: %d" % (ACL_1_X_val)
 	print "ACL Y: %d" % (ACL_1_Y_val)
 	print "ACL Z: %d" % (ACL_1_Z_val)
+	
+	gyro = { 'gyroX' : GYRO_1_X_val, 'gyroY' : GYRO_1_Y_val, 'gyroZ' : GYRO_1_Z_val}
+	socket.send(gyro)
+
 	print "GYRO X: %d" % (GYRO_1_X_val)
 	print "GYRO Y: %d" % (GYRO_1_Y_val)
 	print "GYRO Z: %d" % (GYRO_1_Z_val)
+
+	# Here we will build more dictionaries for each sensor
 	print "Minimum Ping Time: %lf" % (min_ping_time)
 	print "Average Ping Time: %lf" % (ping_total/ping_tick)
 	print "Sensor refresh period %lf" % (x_period)
