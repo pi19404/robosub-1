@@ -82,6 +82,10 @@ def main(args):
     while True:
         stabalization_packet = com.get_last_message("movement/stabalization")
         if stabalization_packet:
+            # TODO: This would allow us to use cleaner debug messages if we
+            # instead had a thruster settings dictionary. E.g.:
+            # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
+            #  'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
             if stabalization_packet['vector']['x'] == 1.0:
                 pass
             elif stabalization_packet['vector']['x'] == -1.0:
@@ -118,6 +122,14 @@ def main(args):
                 cmd_thruster(THRUSTER_BOW_PORT, mag, 0)
                 cmd_thruster(THRUSTER_STERN_SB, mag, 0)
                 cmd_thruster(THRUSTER_STERN_PORT, mag, 1)
+            else:
+                # Turn off all thrusters.
+                cmd_thruster(THRUSTER_BOW_SB, 0, 0)
+                cmd_thruster(THRUSTER_BOW_PORT, 0, 0)
+                cmd_thruster(THRUSTER_DEPTH_SB, 0, 0)
+                cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0)
+                cmd_thruster(THRUSTER_STERN_SB, 0, 0)
+                cmd_thruster(THRUSTER_STERN_PORT, 0, 0)
         time.sleep(args.epoch)
     ser.close()
 

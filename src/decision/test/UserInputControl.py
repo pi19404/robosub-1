@@ -68,6 +68,43 @@ getch = _Getch()
 
 
 def main(args):
+    """Reads a keyboard press.
+
+    The resultant command is communicated over the grapevine in a
+    dicitonary with this format:
+
+    {"desired_offset":
+        {"x": 0.0,
+         "y": 0.0,
+         "z": 0.0},
+     "desired_orientation":
+        {"x": 0.0,
+         "y": 0.0,
+         "z": 0.0},
+     "desired_velocity":
+        {"x": 0.0,
+         "y": 0.0,
+         "z": 0.0}
+    }
+
+    The AI's job is to interpret sensor data and video information,
+    and from that, specify where the sub SHOULD be relative to where
+    it CURRENTLY is. The desired location represents a state that
+    should be achieved at some future time.
+
+    The vector "desired_offset" specifies the relative location of
+    that desired state, the "desired_orientation" specifies which
+    direction the submarine should be facing, and the "desired_velocity"
+    specifies how the submarine should be moving at that point.
+
+    This information structure intentionally doesn't allow the AI to specify
+    the "roll" axis or a desired rotational velocity.
+
+    One way to think about this is that the AI module needs to figure out
+    what the next waypoint is, and where that waypoint is relative to
+    where the submarine currenlty is stationed.
+
+    """
     print """Usage:
 +-------+-------+-------+-------+
 | q     | w     | e     | r     |
@@ -83,6 +120,16 @@ def main(args):
             module_name=args.module_name,
             settings_path=args.settings_path)
 
+    # TODO: This is a tentative structure, and it will work for
+    # keyboard input, but we need to discuss what information the
+    # AI module will have and how it will express that information.
+    # If nothing else, the "desired_orientation" field should probably
+    # use polar coordinates with radians measured relative to magnetic
+    # north and gravity.
+    # Also, the AI module will need to communicate commands for
+    # torpedoes, grippers, etc. Should that be communicated in the
+    # same dictionary?
+    #
     # x is left/right
     # y is forward/backward
     # z is up/down
@@ -113,7 +160,8 @@ def main(args):
             missive['desired_offset']['z'] = -9001
             missive['desired_velocity']['z'] = -1.0
         elif key == ord('e'):
-            # This will turn off the motors.
+            # missive is unchanged from the template, so this
+            # will turn off the motors.
             pass
         elif key == ord('q'):
             sys.exit()
