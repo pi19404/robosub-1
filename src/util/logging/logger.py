@@ -7,10 +7,10 @@ Logger Module
 Sensors this module listens to can be found in robosub/src/settings.json
 """
 
-
 from time import sleep
 import argparse
 import os
+import json
 import sys
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator  #preffered method
@@ -33,15 +33,14 @@ def commandline():
 def main(args):
     com = Communicator(module_name=args.module_name)
     com.publish_message("logger.py started")
-    log_file = open(args.output, "w")
-
-    while True:
-        for mname in com.listening():
-            for message in com.get_messages(mname):
-                log_file.write(str(message))
-                log_file.write('\n')
-        log_file.flush()
-        sleep(args.epoch)
+    with open(args.output, 'w') as log_file:
+        while True:
+            for mname in com.listening():
+                for message in com.get_messages(mname):
+                    json.dump(message, log_file)
+                    log_file.write('\n')
+            log_file.flush()
+            sleep(args.epoch)
 
     log_file.close()
 
