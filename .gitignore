@@ -1,5 +1,9 @@
 CMakeCache.txt
 CMakeFiles
+*.dll
+build/
+dist/
+nbproject/
 Makefile
 cmake_install.cmake
 install_manifest.txt
