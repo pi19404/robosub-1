@@ -1,5 +1,13 @@
 CMakeCache.txt
 CMakeFiles
-Makefile
 cmake_install.cmake
 install_manifest.txt
+
+*.swp
+*.swo
+*.o
+*~
+*.lock
+*.DS_Store
+*.out
+*.pyc
