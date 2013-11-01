@@ -1,6 +1,5 @@
 # COPYRIGHT: Robosub Club of the Palouse under the GPL v3
 """
-Daniel Retherford
 RoboSub Movement Program
 """
 

@@ -40,6 +40,7 @@ def main(args):
             for message in com.get_messages(mname):
                 log_file.write(str(message))
                 log_file.write('\n')
+        log_file.flush()
         sleep(args.epoch)
 
     log_file.close()

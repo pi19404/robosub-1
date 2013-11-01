@@ -78,10 +78,11 @@ def main(args):
     com = Communicator(module_name=args.module_name,
                        settings_path=args.settings_path)
     mag = args.magnitude
-
+    last_packet_time = 0.0
     while True:
         stabalization_packet = com.get_last_message("movement/stabalization")
-        if stabalization_packet:
+        if (stabalization_packet and
+            stabalization_packet['timestamp'] > last_packet_time):
             # TODO: This would allow us to use cleaner debug messages if we
             # instead had a thruster settings dictionary. E.g.:
             # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},

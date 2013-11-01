@@ -28,9 +28,12 @@ def main(args):
             'vector': {'x': 0.0, 'y': 0.0, 'z': 0.0},
             'rotation': {'x': 0.0, 'y': 0.0, 'z': 0.0}}
 
+    last_packet_time = 0.0
     while True:
         directive_packet = com.get_last_message("movement/directive")
-        if directive_packet:
+        if directive_packet and directive_packet['timestamp'] > last_packet_time:
+            last_packet_time = directive_packet['timestamp']
+
             # Kludges to handle keyboard inputs.
             tx_packet = deepcopy(packet)
             if directive_packet['is_left'] == 1.0:

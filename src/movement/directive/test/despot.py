@@ -37,33 +37,33 @@ def main(args):
             "desired_velocity": {"x": 0.0, "y": 0.0, "z": 0.0},
             "timestamp": time.time()}
 
-    tx_packet = deepcopy(packet)
+    last_timestamp = 0.0
     while True:
-        next_missive = com.get_last_message("decision")
+        missive = com.get_last_message("decision")
 
-        if (next_missive and
-            next_missive['timestamp'] > missive['timestamp']):
-            missive = next_missive
+        if missive and missive['timestamp'] > last_timestamp:
+            last_timestamp = missive['timestamp']
             tx_packet = deepcopy(packet)
 
-        if (missive['desired_offset']['y'] == 9001.0 and
-            missive['desired_velocity']['y'] == 1.0):
-            tx_packet['is_back'] = 1.0
-        elif (missive['desired_offset']['y'] == -9001 and
-              missive['desired_velocity']['y'] == -1.0):
-            tx_packet['is_forward'] = 1.0
-        elif missive['desired_orientation']['z'] == 3 * math.pi / 2:
-            tx_packet['is_rotated_right'] = 1.0
-        elif missive['desired_orientation']['z'] == math.pi / 2:
-            tx_packet['is_rotated_left'] = 1.0
-        elif (missive['desired_offset']['z'] == 9001 and
-              missive['desired_velocity']['z'] == 1.0):
-            tx_packet['is_low'] = 1.0
-        elif (missive['desired_offset']['z'] == -9001 and
-              missive['desired_velocity']['z'] == -1.0):
-            tx_packet['is_high'] = 1.0
+            if (missive['desired_offset']['y'] == 9001.0 and
+                missive['desired_velocity']['y'] == 1.0):
+                tx_packet['is_back'] = 1.0
+            elif (missive['desired_offset']['y'] == -9001 and
+                  missive['desired_velocity']['y'] == -1.0):
+                tx_packet['is_forward'] = 1.0
+            elif missive['desired_orientation']['z'] == 3 * math.pi / 2:
+                tx_packet['is_rotated_right'] = 1.0
+            elif missive['desired_orientation']['z'] == math.pi / 2:
+                tx_packet['is_rotated_left'] = 1.0
+            elif (missive['desired_offset']['z'] == 9001 and
+                  missive['desired_velocity']['z'] == 1.0):
+                tx_packet['is_low'] = 1.0
+            elif (missive['desired_offset']['z'] == -9001 and
+                  missive['desired_velocity']['z'] == -1.0):
+                tx_packet['is_high'] = 1.0
 
-        com.publish_message(tx_packet)
+            print tx_packet
+            com.publish_message(tx_packet)
         time.sleep(args.epoch)
 
 
