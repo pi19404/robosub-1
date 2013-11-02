@@ -1,52 +1,76 @@
 #!/usr/bin/env python
 import cv2
 import cv2.cv as cv
+import threading
 
+#FIXME this logger should be JUST A LOGGER. Video grabbing should happen
+#elsewhere.
 
 class VideoLogger(object):
-   def __init__(self):
-      self.Filename = "video_output.avi"
-      self.Fourcc = cv.CV_FOURCC('M', 'J', 'P', 'G')
-      self.Fps = 10
-      self.Width = 640
-      self.Height = 480
-      self.FrameSize = (self.Width, self.Height)
-      self.videoWriter = cv2.VideoWriter()
-      self.videoWriter.open(filename = self.Filename, 
-            fourcc = self.Fourcc, 
-            fps = self.Fps, 
-            frameSize = self.FrameSize
-            )
-      self.camera = 1
-      self.cap = cv2.VideoCapture(self.camera)
-      print 'right before open pipe'
-      #self.cap = cv2.VideoCapture('testfifo2.avi')
-      print 'right after open pipe'
-      self.cap.set(cv.CV_CAP_PROP_FOURCC, self.Fourcc)
-      self.cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, self.Height)
-      self.cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, self.Width)
-      self.image = None
+    #class variables
+    FOURCC_MJPEG = cv.CV_FOURCC('M', 'J', 'P', 'G')
 
-      # status is a variable that can be used for error passing
-      self.status = 0
+    ############################################################################
+    # @method __init__()
+    # @brief:  Initialize opencv capture and writer objects.
+    # @param self:  standard python object reference.
+    # @param vidSrc:  Camera, video file, or stream to read via opencv.
+    # @param vidDestPrefix:  Prefix of filenames to write destination video.
+    # @param width:  Width to set video src and dest.
+    # @param height:  Height to set video src and dest.
+    # @param fps:  Frames per second ot set video output.
+    ############################################################################
+    def __init__(self, vidSrc, vidDestPrefix, width, height, fps):
+        self.videoWriter = cv2.VideoWriter()
 
-      # Grabs an image from the camera
-   def RecieveImage(self):
-      # TODO: set the status variable depending on outcome of attempting to grab an image.
-      _, self.image = self.cap.read()
+        #FIXME generate a proper output filename
+        self.videoWriter.open(
+                    filename = str(vidDestPrefix) + str(vidSrc) + '.avi',
+                    fourcc = self.FOURCC_MJPEG,
+                    fps = fps,
+                    frameSize = (width, height))
+        self.cap = cv2.VideoCapture(vidSrc)
+        self.cap.set(cv.CV_CAP_PROP_FOURCC, self.FOURCC_MJPEG)
+        self.cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, height)
+        self.cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, width)
+        self.image = None
 
-   # Writes the current image to file (the filename is set in __init__():)
-   def WriteImage(self):
-   # TODO: make this safer so we arent trying to write a bogus image.
-      self.videoWriter.write(self.image)
+    ############################################################################
+    # @method getImage()
+    # @brief:  Grab an image from the video source and set it to self.image
+    # @param self:  standard python object reference.
+    ############################################################################
+    def getImage(self):
+        _, self.image = self.cap.read()
 
-if __name__ == '__main__':
-   videoLogger = VideoLogger()
-   while(1):
-      videoLogger.RecieveImage()
-      videoLogger.WriteImage()
-      cv2.imshow('video test', videoLogger.image)
-      key = cv2.waitKey(10)
-      if key == 27:
-         break	
-   videoLogger.cap.release()
+    ############################################################################
+    # @method writeImage()
+    # @brief:  Write self.image to writer file.
+    # @param self:  standard python object reference.
+    ############################################################################
+    def writeImage(self):
+        # TODO: make this safer so we arent trying to write a bogus image.
+        self.videoWriter.write(self.image)
+
+    def start(self):
+        t = threading.Thread(target=self._start)
+        t.setDaemon(True)
+        t.start()
+
+    #FIXME by stopping this, we make it impossible to start again correctly.
+    #fix this so start/stop can be toggled.
+    def stop(self):
+        self.capturing = False
+
+    def _start(self):
+        self.capturing = True
+        while self.capturing:
+            self.getImage()
+            self.writeImage()
+            #cv2.imshow('video test', self.image)
+            key = cv2.waitKey(10)
+            if key == 27:
+                break	
+
+    def __del__(self):
+        self.cap.release()
