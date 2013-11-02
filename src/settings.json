@@ -17,8 +17,8 @@
             "sensor/vision",
             "util/logger"
         ],
-        "release": {"path": "util/logging/logger.py"},
-        "mock": {"path": "util/logging/logger.py"}
+        "release": {"path": "util/logging/pale_lager.py"},
+        "mock": {"path": "util/logging/pale_lager.py"}
     },
     "movement/directive": {
         "port": 20056,
