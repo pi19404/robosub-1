@@ -21,6 +21,7 @@ class VideoLogger(object):
     # @param fps:  Frames per second ot set video output.
     ############################################################################
     def __init__(self, vidSrc, vidDestPrefix, width, height, fps):
+        self.vidSrc = vidSrc
         self.videoWriter = cv2.VideoWriter()
 
         #FIXME generate a proper output filename
@@ -34,43 +35,52 @@ class VideoLogger(object):
         self.cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, height)
         self.cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, width)
         self.image = None
+        self.capture_lock = threading.RLock()
+        self.capturing = threading.Event()
 
     ############################################################################
-    # @method getImage()
-    # @brief:  Grab an image from the video source and set it to self.image
+    # @method start()
+    # @brief:  starts the video logging thread.
     # @param self:  standard python object reference.
     ############################################################################
-    def getImage(self):
-        _, self.image = self.cap.read()
-
-    ############################################################################
-    # @method writeImage()
-    # @brief:  Write self.image to writer file.
-    # @param self:  standard python object reference.
-    ############################################################################
-    def writeImage(self):
-        # TODO: make this safer so we arent trying to write a bogus image.
-        self.videoWriter.write(self.image)
-
     def start(self):
-        t = threading.Thread(target=self._start)
-        t.setDaemon(True)
-        t.start()
+        with self.capture_lock:
+            t = threading.Thread(target=self._start)
+            t.setDaemon(True)
+            self.capturing.set()
+            t.start()
 
     #FIXME by stopping this, we make it impossible to start again correctly.
     #fix this so start/stop can be toggled.
     def stop(self):
-        self.capturing = False
+        self.capturing.clear()
+        self.cap.release()
+
+    ############################################################################
+    # @method _getImage()
+    # @brief:  Grab an image from the video source and set it to self.image
+    # @param self:  standard python object reference.
+    ############################################################################
+    def _getImage(self):
+        _, self.image = self.cap.read()
+
+    ############################################################################
+    # @method _writeImage()
+    # @brief:  Write self.image to writer file.
+    # @param self:  standard python object reference.
+    ############################################################################
+    def _writeImage(self):
+        # TODO: make this safer so we arent trying to write a bogus image.
+        self.videoWriter.write(self.image)
 
     def _start(self):
-        self.capturing = True
-        while self.capturing:
-            self.getImage()
-            self.writeImage()
+        while self.capturing.is_set():
+            self._getImage()
+            self._writeImage()
             #cv2.imshow('video test', self.image)
             key = cv2.waitKey(10)
             if key == 27:
                 break	
 
-    def __del__(self):
-        self.cap.release()
+    #def __del__(self):
+    #    self.cap.release()
