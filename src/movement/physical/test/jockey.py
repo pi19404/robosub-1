@@ -17,9 +17,10 @@ THRUSTER_DEPTH_PORT = 0x13
 THRUSTER_STERN_SB = 0x14
 THRUSTER_STERN_PORT = 0x15
 
-DEBUG = True
+DEBUG = None
+COM = None
 
-def cmd_thruster(thruster_id, magnitude, direction):
+def cmd_thruster(thruster_id, magnitude, direction, debug=False):
     """
     cmd_thruster() sends a thruster control command to the microncontroller
     It takes an id, a magnitude (between 0 and 100), and a direction (0 or 1)
@@ -57,12 +58,16 @@ def cmd_thruster(thruster_id, magnitude, direction):
     raw_cmd = CONTROL_BYTE + raw_thruster_id + raw_direction_mag
 
     # send the commmand to the microcontroller
-    if DEBUG:
-        return
-    else:
+    if not DEBUG:
         cmd_thruster.ser.write(raw_cmd)
+    return raw_cmd
+
 
 def main(args):
+    # Someone SHOULD complain about this.
+    global DEBUG, COM
+    DEBUG = args.debug
+
     if not DEBUG:
         ser = serial.Serial()
         # this may change, depending on what port the OS gives the microcontroller
@@ -75,63 +80,78 @@ def main(args):
         ser.open()
         cmd_thruster.ser = ser
 
-    com = Communicator(module_name=args.module_name,
+    COM = Communicator(module_name=args.module_name,
                        settings_path=args.settings_path)
+    COM.publish_message({"abc": "def"})
+
     mag = args.magnitude
     last_packet_time = 0.0
     while True:
-        stabalization_packet = com.get_last_message("movement/stabalization")
+        stabalization_packet = COM.get_last_message("movement/stabalization")
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
             # TODO: This would allow us to use cleaner debug messages if we
             # instead had a thruster settings dictionary. E.g.:
             # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
             #  'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
+            raw_cmds = []
             if stabalization_packet['vector']['x'] == 1.0:
-                pass
+                intent = 'strafe left (not implemented)'
             elif stabalization_packet['vector']['x'] == -1.0:
-                pass
+                intent = 'strafe right (not implemented)'
             elif stabalization_packet['vector']['y'] == 1.0:
                 # causes the sub to move forward
-                cmd_thruster(THRUSTER_BOW_SB, mag, 0)
-                cmd_thruster(THRUSTER_BOW_PORT, mag, 0)
-                cmd_thruster(THRUSTER_STERN_SB, mag, 0)
-                cmd_thruster(THRUSTER_STERN_PORT, mag, 0)
+                intent = 'move forward'
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
             elif stabalization_packet['vector']['y'] == -1.0:
                 # causes the sub to move backwards
-                cmd_thruster(THRUSTER_BOW_SB, mag, 1)
-                cmd_thruster(THRUSTER_BOW_PORT, mag, 1)
-                cmd_thruster(THRUSTER_STERN_SB, mag, 1)
-                cmd_thruster(THRUSTER_STERN_PORT, mag, 1)
+                intent = 'move backward'
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
             elif stabalization_packet['vector']['z'] == 1.0:
                 # causes the sub to surface
-                cmd_thruster(THRUSTER_DEPTH_SB, mag, 1)
-                cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1)
+                intent = 'rise'
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
             elif stabalization_packet['vector']['z'] == -1.0:
                 # causes the sub to dive
-                cmd_thruster(THRUSTER_DEPTH_SB, mag, 0)
-                cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0)
+                intent = 'dive'
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
             elif stabalization_packet['rotation']['z'] == 1.0:
                 # causes the sub to rotate clockwise
-                cmd_thruster(THRUSTER_BOW_SB, mag, 0)
-                cmd_thruster(THRUSTER_BOW_PORT, mag, 1)
-                cmd_thruster(THRUSTER_STERN_SB, mag, 1)
-                cmd_thruster(THRUSTER_STERN_PORT, mag, 0)
+                intent = 'rotate right'
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
             elif stabalization_packet['rotation']['z'] == -1.0:
                 # causes the sub to rotate counter-clockwise
-                cmd_thruster(THRUSTER_BOW_SB, mag, 1)
-                cmd_thruster(THRUSTER_BOW_PORT, mag, 0)
-                cmd_thruster(THRUSTER_STERN_SB, mag, 0)
-                cmd_thruster(THRUSTER_STERN_PORT, mag, 1)
+                intent = 'rotate left'
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
             else:
                 # Turn off all thrusters.
-                cmd_thruster(THRUSTER_BOW_SB, 0, 0)
-                cmd_thruster(THRUSTER_BOW_PORT, 0, 0)
-                cmd_thruster(THRUSTER_DEPTH_SB, 0, 0)
-                cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0)
-                cmd_thruster(THRUSTER_STERN_SB, 0, 0)
-                cmd_thruster(THRUSTER_STERN_PORT, 0, 0)
-        time.sleep(args.epoch)
+                intent = 'full stop'
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+
+            msg = {"intent": intent,
+                   "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
+            print msg
+            COM.publish_message(msg)
+            time.sleep(args.epoch)
     ser.close()
 
 def commandline():
@@ -154,6 +174,10 @@ def commandline():
     parser.add_argument('--magnitude', type=str,
             default=25,
             help='Thruster magnitude in percent.')
+    parser.add_argument('-d', '--debug',
+            default=False,
+            action="store_true",
+            help='Set debug mode to True.')
     return parser.parse_args()
 
 if __name__ == '__main__':
