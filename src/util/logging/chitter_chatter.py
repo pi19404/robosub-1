@@ -43,9 +43,6 @@ class GuiPart(object):
             try:
                 msg = self.queue.get(0)
                 self.watch_window.delete(0.0, tk.END)
-                # Check contents of message and do what it says
-                # As a test, we simply print it
-                print msg
 
                 for line in pprint.pformat(msg, width=1).splitlines():
                     line = line.encode('ascii')
@@ -76,6 +73,7 @@ class ThreadedClient(object):
         self.module = args.module
         self.epoch = args.epoch
         self.log_path = args.log_path
+        self.quiet = args.quiet
 
         # Create the queue
         self.queue = Queue.Queue()
@@ -129,6 +127,8 @@ class ThreadedClient(object):
                     msg['message_number'] > last_msg['message_number']):
                     last_msg = msg
                     self.queue.put(pprint.pformat(msg, width=1))
+                    if not self.quiet:
+                        print msg
                 else:
                     pass
 
@@ -146,6 +146,8 @@ def commandline():
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
+    parser.add_argument('-q', '--quiet', action='store_true',
+            help='Suppress printing to stdout.')
     return parser.parse_args()
 
 
