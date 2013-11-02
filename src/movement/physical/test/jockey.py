@@ -18,7 +18,6 @@ THRUSTER_STERN_SB = 0x14
 THRUSTER_STERN_PORT = 0x15
 
 DEBUG = None
-COM = None
 
 def cmd_thruster(thruster_id, magnitude, direction, debug=False):
     """
@@ -65,7 +64,7 @@ def cmd_thruster(thruster_id, magnitude, direction, debug=False):
 
 def main(args):
     # Someone SHOULD complain about this.
-    global DEBUG, COM
+    global DEBUG
     DEBUG = args.debug
 
     if not DEBUG:
@@ -80,14 +79,13 @@ def main(args):
         ser.open()
         cmd_thruster.ser = ser
 
-    COM = Communicator(module_name=args.module_name,
+    com = Communicator(module_name=args.module_name,
                        settings_path=args.settings_path)
-    COM.publish_message({"abc": "def"})
 
     mag = args.magnitude
     last_packet_time = 0.0
     while True:
-        stabalization_packet = COM.get_last_message("movement/stabalization")
+        stabalization_packet = com.get_last_message("movement/stabalization")
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
             # TODO: This would allow us to use cleaner debug messages if we
@@ -150,7 +148,7 @@ def main(args):
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
             print msg
-            COM.publish_message(msg)
+            com.publish_message(msg)
             time.sleep(args.epoch)
     ser.close()
 

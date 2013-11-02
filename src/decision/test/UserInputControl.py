@@ -141,6 +141,7 @@ def main(args):
     while True:
         key = ord(getch())
         missive = deepcopy(missive_template)
+        print "{0}\r".format(chr(key)),
 
         if key == ord('w'):
             missive['desired_offset']['y'] = 9001.0

@@ -43,8 +43,8 @@
         "listen": [
             "movement/stabalization"
         ],
-        "release": {"path": "movement/physical/test/jockey.py"},
-        "mock": {"path": null}
+        "release": {"path": null},
+        "mock": {"path": "movement/physical/test/jockey.py"}
     },
     "sensor/accelerometer": {
         "port": 20059,
