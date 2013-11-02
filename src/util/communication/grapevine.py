@@ -2,13 +2,14 @@
 
 """This defines the python communication interface.
 
-Initialization settings are found in robosub/src/communication_settings.json
+Initialization settings are found in robosub/src/settings.json
 
 """
 
 import Queue
 import json
 import os
+import sys
 import threading
 import time
 import zmq
@@ -37,30 +38,27 @@ class Communicator(object):
                     self.communicator._refresh(module_name)
                 time.sleep(self.update_frequency)
 
-    def __init__(self, module_name, mode='debug',
+    def __init__(self, module_name,
                  subscriber_buffer_length=1024,
-                 subscriber_high_water_mark=1024, comm_json_path=None):
+                 subscriber_high_water_mark=1024, settings_path=None):
         """
         'module_name' must follow the folder path name convention that
             specifies a module.
-        'mode' must be 'debug' or 'release'.
         'subscriber_buffer_length' and 'subscriber_high_water_mark' control zmq
             memory settings.
-        'comm_json_path' specifies an alternative (testing) communication
+        'settings_path' specifies an alternative (testing) communication
             settings file.
 
         """
         self.module_name = module_name
-        self.mode = mode
-        if not comm_json_path:
-            comm_json_path = os.path.join(
-                    os.path.abspath('../..'), 'communication_settings.json')
-        self.settings = json.load(open(comm_json_path, 'r'))
-
-        # Make sure a location for sockets exists.
-        if mode == 'debug':
-            if not os.path.isdir('/tmp/robosub'):
-                os.mkdir('/tmp/robosub')
+        if not settings_path:
+            up_dir = lambda path: os.path.split(path)[0]
+            settings_path = os.path.join(
+                    up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
+                    'settings.json')
+        self.settings = json.load(open(settings_path, 'r'))
+        if not os.path.isdir('/tmp/robosub'):
+            os.mkdir('/tmp/robosub')
 
         # Prepare our publisher
         self.publisher = {}
@@ -117,17 +115,8 @@ class Communicator(object):
 
     def get_socket_name(self, module_name):
         """Determines the socket for module_name."""
-        if self.mode == 'debug':
-            return "ipc:///tmp/robosub/{port}.ipc".format(
-                    port=self.settings[module_name]['port'])
-        elif self.mode == 'release':
-            # TODO: Once we have a multiple computer environment, test this
-            # to make sure that it works.
-            return "tcp://{ip}:{port}".format(
-                    ip=self.settings[module_name]['ip'],
-                    port=self.settings[module_name]['port'])
-        else:
-            assert False, "mode '{0}' not recognized".format(self.mode)
+        return "ipc:///tmp/robosub/{port}.ipc".format(
+                port=self.settings[module_name]['port'])
 
     def listening(self):
         """Returns a list of modules this Communicator is listening to."""
@@ -150,6 +139,7 @@ class Communicator(object):
         message['message_number'] = self.publisher['next_message_number']
         self.publisher['next_message_number'] += 1
         message['timestamp'] = time.time()
+        message['module_name'] = self.module_name
         self.publisher['socket'].send_json(message)
 
     def _refresh(self, module_name):
