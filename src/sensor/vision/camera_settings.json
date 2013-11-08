@@ -1,76 +1,53 @@
 {
-    "cameras": {
-        "front": {
-            "dev": "video0",
+    "codec" : "MJPG",
+    "cameras": [
+        {
+            "camera": "front",
+            "dev": 0,
             "enable": true,
-            "log": true,
-            "fps": {
-                "min": 4,
-                "max": 10
-            },
-            "resolution": {
-                "min": {
-                    "width": 640,
-                    "height": 480
-                },
-                "max": {
-                    "width": 640,
-                    "height": 480
-                }
-            }
+            "log": [
+                "raw",
+                "processed"
+            ],
+            "fps": 30,
+            "width": 640,
+            "height": 480
         },
-        "down": {
-            "dev": "video1",
+        {
+            "camera": "down",
+            "dev": 1,
             "enable": false,
-            "log": true,
-            "fps": {
-                "min": 4,
-                "max": 10
-            },
-            "resolution": {
-                "min": {
-                    "width": 640,
-                    "height": 480
-                },
-                "max": {
-                    "width": 640,
-                    "height": 480
-                }
-            }
+            "log": [
+                "raw",
+                "processed"
+            ],
+            "fps": 30,
+            "width": 640,
+            "height": 480
         },
-        "left": {
-            "dev": "video2",
+        {
+            "camera": "left",
+            "dev": 2,
             "enable": false,
-            "log": true,
-            "fps": {
-                "min": 4,
-                "max": 10
-            },
-            "resolution": {
-                "min": {
-                    "width": 640,
-                    "height": 480
-                },
-                "max": {
-                    "width": 640,
-                    "height": 480
-                }
-            }
+            "log": [
+                "raw",
+                "processed"
+            ],
+            "fps": 30,
+            "width": 640,
+            "height": 480
         },
-        "right": {
-            "dev": "video3",
+        {
+            "camera": "right",
+            "dev": 3,
             "enable": false,
-            "log": true,
-            "resolution": {
-                "min": {
-                    "width": 640,
-                    "height": 480
-                },
-                "max": {
-                    "width": 640,
-                    "height": 480
-                }
-            }
+            "log": [
+                "raw",
+                "processed"
+            ],
+            "fps": 30,
+            "width": 640,
+            "height": 480
         }
-    }
+    ]
 }

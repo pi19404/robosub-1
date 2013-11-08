@@ -1,42 +1,62 @@
 #!/usr/bin/env python
+import os
 import cv2
 import cv2.cv as cv
 import threading
+from time import strftime
 
 #FIXME this logger should be JUST A LOGGER. Video grabbing should happen
 #elsewhere.
 
 class VideoLogger(object):
     #class variables
-    FOURCC_MJPEG = cv.CV_FOURCC('M', 'J', 'P', 'G')
+    #XXX does this filepath handling conform with Robosub standards?
+    DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
+    FOURCC = cv.CV_FOURCC(*list('MJPG'))
 
     ############################################################################
     # @method __init__()
+    #FIXME this is inaccurate. Update it.
     # @brief:  Initialize opencv capture and writer objects.
     # @param self:  standard python object reference.
-    # @param vidSrc:  Camera, video file, or stream to read via opencv.
-    # @param vidDestPrefix:  Prefix of filenames to write destination video.
+    # @param vid_src:  Camera, video file, or stream to read via opencv.
+    # @param vid_out:  Location to write destination video.
     # @param width:  Width to set video src and dest.
     # @param height:  Height to set video src and dest.
     # @param fps:  Frames per second ot set video output.
     ############################################################################
-    def __init__(self, vidSrc, vidDestPrefix, width, height, fps):
-        self.vidSrc = vidSrc
-        self.videoWriter = cv2.VideoWriter()
+    def __init__(self, settings):
+        self.settings = settings
+        self.writers = {}
 
+        self.videoWriter = cv2.VideoWriter()
         #FIXME generate a proper output filename
-        self.videoWriter.open(
-                    filename = str(vidDestPrefix) + str(vidSrc) + '.avi',
-                    fourcc = self.FOURCC_MJPEG,
-                    fps = fps,
-                    frameSize = (width, height))
-        self.cap = cv2.VideoCapture(vidSrc)
-        self.cap.set(cv.CV_CAP_PROP_FOURCC, self.FOURCC_MJPEG)
-        self.cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, height)
-        self.cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, width)
+        self.cap = None
         self.image = None
         self.capture_lock = threading.RLock()
         self.capturing = threading.Event()
+
+    def _init_cap(self):
+        self.cap = cv2.VideoCapture(self.vid_src)
+        self.cap.set(cv.CV_CAP_PROP_FOURCC, self.FOURCC)
+        self.cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, self.height)
+        self.cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, self.width)
+
+    def _init_writer(self, key):
+        dest = self.DIR + strftime('%yy_%mm_%dd_%Hh_%Mm_%Ss_') + key + '.avi'
+        self.writers[key] = cv2.VideoWriter()
+        self.writers[key].open(
+                    filename = dest,
+                    fourcc = self.FOURCC,
+                    fps = settings['fps'],
+                    frameSize = (settings['width'], settings['height']))
+
+    def _destroy_cap(self):
+        #FIXME change this to destroy only windows we create.
+        #cv2.destroyAllWindows()
+        cv2.destroyWindow('video test')
+        self.cap.release()
+        self.cap = None
 
     ############################################################################
     # @method start()
@@ -44,6 +64,9 @@ class VideoLogger(object):
     # @param self:  standard python object reference.
     ############################################################################
     def start(self):
+        self._init_cap()
+        if 'raw' in self.settings['log']:
+            self._init_writer('raw')
         with self.capture_lock:
             t = threading.Thread(target=self._start)
             t.setDaemon(True)
@@ -54,33 +77,27 @@ class VideoLogger(object):
     #fix this so start/stop can be toggled.
     def stop(self):
         self.capturing.clear()
-        self.cap.release()
+        self._destroy_cap()
 
     ############################################################################
-    # @method _getImage()
-    # @brief:  Grab an image from the video source and set it to self.image
-    # @param self:  standard python object reference.
-    ############################################################################
-    def _getImage(self):
-        _, self.image = self.cap.read()
-
-    ############################################################################
-    # @method _writeImage()
+    # @method _write_image()
     # @brief:  Write self.image to writer file.
     # @param self:  standard python object reference.
     ############################################################################
-    def _writeImage(self):
-        # TODO: make this safer so we arent trying to write a bogus image.
-        self.videoWriter.write(self.image)
+    def _write_image(self, writer, image=None):
+        if image is None:
+            self.writers.write(self.image)
+        else:
+            self.writers.write(image)
 
     def _start(self):
         while self.capturing.is_set():
-            self._getImage()
-            self._writeImage()
+            _, self.image = self.cap.read()
+            self._write_image('raw')
             #cv2.imshow('video test', self.image)
             key = cv2.waitKey(10)
             if key == 27:
-                break	
+                self.stop()
 
-    #def __del__(self):
-    #    self.cap.release()
+    def __del__(self):
+        cv2.destroyAllWindows()
