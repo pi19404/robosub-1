@@ -1,9 +1,10 @@
 {
-    "codec" : "MJPG",
+    "maintenance_interval": 10,
     "cameras": [
         {
             "camera": "front",
             "dev": 0,
+            "codec" : "MJPG",
             "enable": true,
             "log": [
                 "raw",
@@ -12,10 +13,13 @@
             "fps": 30,
             "width": 640,
             "height": 480
-        },
+        }
+    ],
+    "disabled_cameras": [
         {
             "camera": "down",
             "dev": 1,
+            "codec" : "MJPG",
             "enable": false,
             "log": [
                 "raw",
@@ -28,6 +32,7 @@
         {
             "camera": "left",
             "dev": 2,
+            "codec" : "MJPG",
             "enable": false,
             "log": [
                 "raw",
@@ -40,6 +45,7 @@
         {
             "camera": "right",
             "dev": 3,
+            "codec" : "MJPG",
             "enable": false,
             "log": [
                 "raw",
