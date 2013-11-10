@@ -1,6 +1,6 @@
 {
     "maintenance_interval": 10,
-    "cameras": [
+    "vision_processors": [
         {
             "camera": "front",
             "dev": 0,
@@ -12,7 +12,8 @@
             ],
             "fps": 30,
             "width": 640,
-            "height": 480
+            "height": 480,
+            "functions": ["path", "toll-booth"]
         }
     ],
     "disabled_cameras": [

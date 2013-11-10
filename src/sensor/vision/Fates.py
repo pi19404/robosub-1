@@ -9,77 +9,68 @@ from time import sleep
 #TODO figure out how to force a camera to have a certain index.
 #TODO figure out how to initialize the camera driver settings through guvcview.
 
-################################################################################
-# @class Fates
-# @brief:  This class initializes and maintains the video logic processes for
-#           a robosub. Settings for this object are provided
-################################################################################
 class Fates(object):
-    ############################################################################
-    # @method __init__()
-    # @brief:  Create VisionProcessor objects for all Robosub cameras and
-    #       restart the processes if they ever fail.
-    # @param self: Standard python object reference.
-    # @param settings:  Dictionary of settings for all Robosub vision logic.
-    ############################################################################
+    '''Create and maintain Robosub video logic processes.'''
+
     def __init__(self, settings):
+        '''Create and maintain all video logic processes defined in settings.
+
+        Args:
+        settings -- dictionary of settings for Fates and processes managed
+            by Fates.
+
+        '''
         self.settings = settings #XXX consider making this a deepcopy?
 
         #All vision logic processes go here.
         self._vision_pool = []
-        #Start all 
+        #Start all vision processes.
         self._init_vision_pool()
 
         #The vision processes are running. Now maintain them.
         self._maintain_vision_pool(settings['maintenance_interval'])
 
-    ############################################################################
-    # @method _init_vision_pool()
-    # @brief:  Initializes a process for a VisionProcessor object for each
-    #       entry in the self.settings['cameras'] list, and stores the process
-    #       in the self._vision_pool list.
-    # @param self: Standard python object reference.
-    ############################################################################
     def _init_vision_pool(self):
-        for camera_settings in self.settings['cameras']:
-            self._vision_pool += [self._make_process(camera_settings)]
+        '''Initialize process for each self.settings['vision_processors'].'''
+        for vp_settings in self.settings['vision_processors']:
+            self._vision_pool += [self._make_process(vp_settings)]
 
-    ############################################################################
-    # @method _make_process()
-    # @brief:  Create a a process for a VisionProcess object, starts it, and
-    #           returns it.
-    # @param self: Standard python object reference.
-    # @param camera_settings: Dictionary of settings for a single
-    #           VisionProcessor object.
-    ############################################################################
-    def _make_process(self, camera_settings):
+    def _make_process(self, vp_settings):
+        '''Initialize a process using settings given in vp_settings dict.
+
+        Args:
+        vp_settings: Dict of settings for one Vision processor object.
+
+        '''
         proc = Process(target = VisionProcessor,
-                       name = camera_settings['camera'] + '_cam',
-                       args = (camera_settings,))
+                       name = vp_settings['camera'] + '_cam',
+                       args = (vp_settings,))
+        #We want all managed processes to die if Fates dies.
         proc.daemon = True
         proc.start()
         return proc
 
-    ############################################################################
-    # @method _maintain_vision_pool()
-    # @brief:  Periodically makes sure all VideoProcessor object in the vision
-    #           pool are still functioning. Restarts any that are not.
-    # @param self: Standard python object reference.
-    # @param interval:
-    ############################################################################
-    def _maintain_vision_pool(self, interval=10):
+    def _maintain_vision_pool(self, interval=5):
+        '''Keep all processes in self._vision_pool alive.
+
+        Every 'interval' seconds, check that all processes in self._vision_pool
+        are responsive. Restart processes that are unresponsive or stopped.
+
+        Args:
+        interval -- How often in seconds to check processes in the 
+            self._vision_pool list for responsiveness. (default 5)
+
+        '''
+        #FIXME this is only checking that the processes are still running. Make
+        #sure they are still responsive too. Pipe message passing?
         while True:
             sleep(interval)
             print 'doing another maintenance loop'
             for idx, proc in enumerate(self._vision_pool):
-                #FIXME Does this fail if process is frozen? This might only work
-                #if the thread crashes. Consider enhancing this with a
-                #query/response pipe. Figure out how a real maintenance daemon
-                #does it.
                 if not proc.is_alive():
                     #Process died unexpectedly, restart it.
-                    self._vision_pool[idx] = \
-                            self._make_process(self.settings['cameras'][idx])
+                    self._vision_pool[idx] = self._make_process(
+                                    self.settings['vision_processors'][idx])
 
 
 #TODO delete this

@@ -4,7 +4,14 @@ from logging import VideoLogger
 from time import sleep
 
 class VisionProcessor(object):
+    '''Open a video stream and process frames. Report finds to the grapevine.'''
     def __init__(self, settings):
+        '''Initialize video capture, logger, and processing plugins.
+
+        Args:
+        settings -- dict of settings for this object.
+
+        '''
         print settings['camera']
         self._vision_functions = []
         self.settings = settings
