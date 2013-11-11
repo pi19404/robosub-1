@@ -13,7 +13,7 @@
             "fps": 30,
             "width": 640,
             "height": 480,
-            "functions": ["path", "toll-booth"]
+            "modules": ["path", "toll-booth"]
         }
     ],
     "disabled_cameras": [

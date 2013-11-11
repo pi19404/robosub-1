@@ -1,47 +1,61 @@
+# COPYRIGHT: Robosub Club of the Palouse under the GPL v3
+
+"""Creates and maintains Robosub vision processes.
+
+Creates one process for every vision processor defined in
+robosub/src/settings.json.
+
+"""
+
 import json #TODO remove this once the hack main function is removed
+import sys
+import os
 import cv2
 import cv2.cv as cv
-from multiprocessing import Pool, Process
+from multiprocessing import Process
 from VisionProcessor import VisionProcessor
 from logging import VideoLogger
 from time import sleep
+sys.path.append(os.path.abspath('../..'))
+from util.communication.grapevine import Communicator
 
 #TODO figure out how to force a camera to have a certain index.
 #TODO figure out how to initialize the camera driver settings through guvcview.
 
 class Fates(object):
-    '''Create and maintain Robosub video logic processes.'''
+    """Create and maintain Robosub video logic processes."""
 
     def __init__(self, settings):
-        '''Create and maintain all video logic processes defined in settings.
+        """Create and maintain all video logic processes defined in settings.
 
         Args:
         settings -- dictionary of settings for Fates and processes managed
             by Fates.
 
-        '''
+        """
         self.settings = settings #XXX consider making this a deepcopy?
 
         #All vision logic processes go here.
         self._vision_pool = []
+
         #Start all vision processes.
         self._init_vision_pool()
 
-        #The vision processes are running. Now maintain them.
+        #Monitor vision processes and reinitialize any that fail.
         self._maintain_vision_pool(settings['maintenance_interval'])
 
     def _init_vision_pool(self):
-        '''Initialize process for each self.settings['vision_processors'].'''
+        """Initialize process for each self.settings['vision_processors']."""
         for vp_settings in self.settings['vision_processors']:
             self._vision_pool += [self._make_process(vp_settings)]
 
     def _make_process(self, vp_settings):
-        '''Initialize a process using settings given in vp_settings dict.
+        """Initialize a process using settings given in vp_settings dict.
 
         Args:
-        vp_settings: Dict of settings for one Vision processor object.
+        vp_settings: Dict of settings for one VisionProcessor object.
 
-        '''
+        """
         proc = Process(target = VisionProcessor,
                        name = vp_settings['camera'] + '_cam',
                        args = (vp_settings,))
@@ -51,7 +65,7 @@ class Fates(object):
         return proc
 
     def _maintain_vision_pool(self, interval=5):
-        '''Keep all processes in self._vision_pool alive.
+        """Keep all processes in self._vision_pool alive.
 
         Every 'interval' seconds, check that all processes in self._vision_pool
         are responsive. Restart processes that are unresponsive or stopped.
@@ -60,7 +74,7 @@ class Fates(object):
         interval -- How often in seconds to check processes in the 
             self._vision_pool list for responsiveness. (default 5)
 
-        '''
+        """
         #FIXME this is only checking that the processes are still running. Make
         #sure they are still responsive too. Pipe message passing?
         while True:

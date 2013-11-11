@@ -5,7 +5,32 @@
         "port": 20054,
         "listen": [],
         "release": {"path": null},
-        "mock": {"path": null}
+        "mock": {"path": null},
+        "maintenance_interval": 5,
+        "vision_processors": [
+            {
+                "camera": "front",
+                "enabled": true,
+                "dev": 0,
+                "codec": "MJPG",
+                "log": ["raw", "processed"],
+                "fps": 30,
+                "width": 640,
+                "height": 480,
+                "modules": ["TollBooth"]
+            },
+            {
+                "camera": "down",
+                "enabled": false,
+                "dev": 1,
+                "codec": "MJPG",
+                "log": ["raw", "processed"],
+                "fps": 30,
+                "width": 640,
+                "height": 480,
+                "modules": ["Path"]
+            }
+        ]
     },
     "util/logger": {
         "port": 20055,

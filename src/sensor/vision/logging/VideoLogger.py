@@ -14,18 +14,13 @@ class VideoLogger(object):
     DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
     FOURCC = cv.CV_FOURCC(*list('MJPG'))
 
-    ############################################################################
-    # @method __init__()
-    #FIXME this is inaccurate. Update it.
-    # @brief:  Initialize opencv capture and writer objects.
-    # @param self:  standard python object reference.
-    # @param vid_src:  Camera, video file, or stream to read via opencv.
-    # @param vid_out:  Location to write destination video.
-    # @param width:  Width to set video src and dest.
-    # @param height:  Height to set video src and dest.
-    # @param fps:  Frames per second ot set video output.
-    ############################################################################
     def __init__(self, settings):
+        """Initialize opencv capture and writer objects.
+
+        Args:
+        settings -- Dict with VideoLogger settings.
+
+        """
         self.settings = settings
         self.writers = {}
 
