@@ -4,6 +4,7 @@ from logging import VideoLogger
 from time import sleep
 import sys
 import os
+import json
 from importlib import import_module
 sys.path.append(os.path.abspath('../..'))
 from util.communication.grapevine import Communicator
@@ -19,16 +20,21 @@ class VisionProcessor(object):
 
         """
         self.settings = settings
-        self.cap = cv2.VideoCapture(settings['dev'])
+        #self.cap = cv2.VideoCapture(settings['dev'])
+        self.cap = cv2.VideoCapture(1)#FIXME this line is hacked in
+        self.com = Communicator(
+                    module_name='sensor/vision',
+                    subscriber_buffer_length=8192,
+                    subscriber_high_water_mark=8192)
 
         #Images from self.cap will be processed by the modules stored here.
         self._vision_modules = []
         self.logger = VideoLogger.VideoLogger(settings = settings)
 
         #Load, instantiate, and store the modules defined in the settings file.
-        for module_str in self.settings.modules:
+        for vp in self.settings['plugins']:
             #Name of module and the class should be the same.
-            module_obj = getattr(import_module(module_str), module_str)()
+            module_obj = getattr(import_module(vp), vp)()
             self._vision_modules += [module_obj]
 
         #XXX figure out if setting any of these is really necessary.
@@ -50,6 +56,8 @@ class VisionProcessor(object):
             #TODO make it so this loop happens once every 'settings['fps']
             #seconds. (endtime - starttime == whatever needed process
             #correct fps.
-            _, im = self.cap.read()
-            for 
-            sleep(100)
+            got_image, im = self.cap.read()
+            if got_image:
+                im_list = im.tolist()
+                self.com.publish_message(json.dumps({'im': im_list}))
+                sleep(.05)

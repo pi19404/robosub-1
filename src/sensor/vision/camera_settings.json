@@ -13,7 +13,7 @@
             "fps": 30,
             "width": 640,
             "height": 480,
-            "modules": ["path", "toll-booth"]
+            "plugins": []
         }
     ],
     "disabled_cameras": [
@@ -28,7 +28,8 @@
             ],
             "fps": 30,
             "width": 640,
-            "height": 480
+            "height": 480,
+            "plugins": []
         },
         {
             "camera": "left",
@@ -41,7 +42,8 @@
             ],
             "fps": 30,
             "width": 640,
-            "height": 480
+            "height": 480,
+            "plugins": []
         },
         {
             "camera": "right",
@@ -54,7 +56,8 @@
             ],
             "fps": 30,
             "width": 640,
-            "height": 480
+            "height": 480,
+            "plugins": []
         }
     ]
 }

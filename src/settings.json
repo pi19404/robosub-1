@@ -17,7 +17,7 @@
                 "fps": 30,
                 "width": 640,
                 "height": 480,
-                "modules": ["TollBooth"]
+                "plugins": []
             },
             {
                 "camera": "down",
@@ -28,7 +28,7 @@
                 "fps": 30,
                 "width": 640,
                 "height": 480,
-                "modules": ["Path"]
+                "plugins": []
             }
         ]
     },
@@ -102,6 +102,14 @@
     "decision": {
         "port": 20063,
         "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "util/vision_viewer": {
+        "port": 20064,
+        "listen": [
+            "sensor/vision"
+        ],
         "release": {"path": null},
         "mock": {"path": null}
     }
