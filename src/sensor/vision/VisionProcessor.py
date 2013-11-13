@@ -5,6 +5,7 @@ from time import sleep
 import sys
 import os
 import json
+import zmq
 from importlib import import_module
 sys.path.append(os.path.abspath('../..'))
 from util.communication.grapevine import Communicator
@@ -21,11 +22,11 @@ class VisionProcessor(object):
         """
         self.settings = settings
         #self.cap = cv2.VideoCapture(settings['dev'])
-        self.cap = cv2.VideoCapture(1)#FIXME this line is hacked in
+        self.cap = cv2.VideoCapture(0)#FIXME this line is hacked in
         self.com = Communicator(
                     module_name='sensor/vision',
-                    subscriber_buffer_length=8192,
-                    subscriber_high_water_mark=8192)
+                    subscriber_buffer_length=81920,
+                    subscriber_high_water_mark=81920)
 
         #Images from self.cap will be processed by the modules stored here.
         self._vision_modules = []
@@ -50,6 +51,9 @@ class VisionProcessor(object):
 
     def _vision_process(self):
         print self.settings['camera'] + '_heck_yeah'
+        context = zmq.Context()
+        socket = context.socket(zmq.PAIR)
+        socket.bind("tcp://127.0.0.1:50000")
         while True:
             #TODO add some error checking before calling modules. They may
             #be crashed. Reinstantiate them before calling them if they do.
@@ -58,6 +62,9 @@ class VisionProcessor(object):
             #correct fps.
             got_image, im = self.cap.read()
             if got_image:
-                im_list = im.tolist()
-                self.com.publish_message(json.dumps({'im': im_list}))
-                sleep(.05)
+                #self.com.publish_image(im)
+                socket.send(im)
+                socket.recv()
+                sleep(.2)
+
+
