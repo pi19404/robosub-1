@@ -51,9 +51,7 @@ class VisionProcessor(object):
 
     def _vision_process(self):
         print self.settings['camera'] + '_heck_yeah'
-        context = zmq.Context()
-        socket = context.socket(zmq.PAIR)
-        socket.bind("tcp://127.0.0.1:50000")
+        self.com.bind_video_stream(50000)
         while True:
             #TODO add some error checking before calling modules. They may
             #be crashed. Reinstantiate them before calling them if they do.
@@ -63,8 +61,7 @@ class VisionProcessor(object):
             got_image, im = self.cap.read()
             if got_image:
                 #self.com.publish_image(im)
-                socket.send(im)
-                socket.recv()
+                self.com.send_image(im)
                 sleep(.2)
 
 
