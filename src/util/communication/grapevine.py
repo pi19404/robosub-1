@@ -116,6 +116,8 @@ class Communicator(object):
 
     def bind_video_stream(self, port):
         """Bind one end of a socket pair for video streaming."""
+        # FIXME change the dictionary structure for stream socket pair.
+        # Maybe make an entirely new dictionary.
         self.publisher['stream'] = {}
         self.publisher['stream']['context'] = zmq.Context(1)
         self.publisher['stream']['socket'] = \
