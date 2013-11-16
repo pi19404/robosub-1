@@ -22,7 +22,8 @@ class VisionProcessor(object):
         """
         self.settings = settings
         #self.cap = cv2.VideoCapture(settings['dev'])
-        self.cap = cv2.VideoCapture(0)#FIXME this line is hacked in
+        index = self._find_index(settings['serial'])
+        self.cap = cv2.VideoCapture(index)
         #self.cap = cv2.VideoCapture('/dev/v4l/by-id/usb-L*')#FIXME this line is hacked in
         self.com = Communicator(
                     module_name='sensor/vision',
