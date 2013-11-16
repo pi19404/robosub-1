@@ -13,6 +13,7 @@ import sys
 import threading
 import time
 import zmq
+from numpy import array, frombuffer
 
 class Communicator(object):
     """The robosub communication interface."""
@@ -112,6 +113,42 @@ class Communicator(object):
                 yield self.subscribers[module_name]['queue'].get_nowait()
             except Queue.Empty:
                 raise StopIteration()
+
+    def bind_video_stream(self, port):
+        """Bind one end of a socket pair for video streaming."""
+        # FIXME change the dictionary structure for stream socket pair.
+        # Maybe make an entirely new dictionary.
+        self.publisher['stream'] = {}
+        self.publisher['stream']['context'] = zmq.Context(1)
+        self.publisher['stream']['socket'] = \
+                    self.publisher['stream']['context'].socket(zmq.PAIR)
+        self.publisher['stream']['socket'].bind(
+                    "tcp://*:{port}".format(port=port))
+
+    def connect_video_stream(self, port, addr='127.0.0.1'):
+        """Connect one end of a socket pair for video streaming."""
+        self.subscribers['stream'] = {}
+        self.subscribers['stream']['context'] = zmq.Context(1)
+        self.subscribers['stream']['socket'] = \
+                    self.subscribers['stream']['context'].socket(zmq.PAIR)
+        self.subscribers['stream']['socket'].connect(
+                    "tcp://{addr}:{port}".format(addr=addr, port=port))
+
+    def send_image(self, image):
+        """Send an image over the connected stream server socket"""
+        metadata = dict(dtype = str(image.dtype), shape = image.shape)
+        self.publisher['stream']['socket'].send_json(metadata, zmq.SNDMORE)
+        self.publisher['stream']['socket'].send(image, copy=True, track=False)
+
+    def recv_image(self):
+        """Receive an image from the connected stream client socket."""
+        metadata = self.subscribers['stream']['socket'].recv_json()
+        message = self.subscribers['stream']['socket'].recv(
+                    copy=True, track=False)
+        buf = buffer(message)
+        image = frombuffer(buf, dtype=metadata['dtype'])
+        return image.reshape(metadata['shape'])
+
 
     def get_socket_name(self, module_name):
         """Determines the socket for module_name."""

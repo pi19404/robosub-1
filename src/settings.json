@@ -12,17 +12,19 @@
                 "camera": "front",
                 "enabled": true,
                 "dev": 0,
+                "serial": 'LOEAAI011P2S01125k12042',
                 "codec": "MJPG",
                 "log": ["raw", "processed"],
                 "fps": 30,
                 "width": 640,
                 "height": 480,
-                "plugins": ["tollbooth"]
+                "plugins": []
             },
             {
                 "camera": "down",
                 "enabled": false,
                 "dev": 1,
+                "serial": '4C6477A0',
                 "codec": "MJPG",
                 "log": ["raw", "processed"],
                 "fps": 30,
@@ -105,8 +107,8 @@
         "release": {"path": null},
         "mock": {"path": null}
     },
-    "util/vision_viewer": {
-        "port": 20064,
+    "camera_reciever": {
+        "port": 20063,
         "listen": [
             "sensor/vision"
         ],

@@ -2,8 +2,7 @@
     "maintenance_interval": 10,
     "vision_processors": [
         {
-            "camera": "front",
-            "dev": 0,
+            "symlink": "frontcam",
             "codec" : "MJPG",
             "enable": true,
             "log": [
@@ -18,8 +17,7 @@
     ],
     "disabled_cameras": [
         {
-            "camera": "down",
-            "dev": 1,
+            "symlink": "downcam",
             "codec" : "MJPG",
             "enable": false,
             "log": [
@@ -32,8 +30,7 @@
             "plugins": []
         },
         {
-            "camera": "left",
-            "dev": 2,
+            "symlink": "leftcam",
             "codec" : "MJPG",
             "enable": false,
             "log": [
@@ -46,8 +43,7 @@
             "plugins": []
         },
         {
-            "camera": "right",
-            "dev": 3,
+            "symlink": "rightcam",
             "codec" : "MJPG",
             "enable": false,
             "log": [
