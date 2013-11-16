@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+# test image: http://imgur.com/4pWOTKq.jpg
+
 
 # The number of min and max "hits" needed to detect an edge.
 MIN_EDGE_VAL = 50
@@ -16,7 +18,7 @@ def main():
     cv2.waitKey(0)
 
     lines = get_lines(img)
-    return True
+    return True #debug
 
     # If it's empty, return bool and empty.
     if (not lines):
