@@ -77,11 +77,6 @@ def get_lines(img):
     cv2.waitKey(0)
 
     # TODO: Check for a blank image here. Return empty if so.
-    old_hsv = threshold_hsv.copy()
-
-    # get the 'edge' points, the True selects more accurate algorithm.    while(1):
-    threshold_hsv = old_hsv.copy()
-
     min_e = 30  #int(raw_input("min value:"))
     max_e = 300  # int(raw_input("max value:"))
     Canny_edges = cv2.Canny(threshold_hsv, min_e, max_e)
@@ -95,7 +90,7 @@ def get_lines(img):
         cv2.imshow("can", threshold_hsv)
         cv2.waitKey(0)
 
-    return lines
+    return lines[0]
 
 
 if (__name__ == "__main__"):
