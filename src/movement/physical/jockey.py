@@ -6,7 +6,7 @@ import os
 import sys
 import serial
 from random import random
-sys.path.append(os.path.abspath("../../.."))
+sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 
 CONTROL_BYTE = '\n'

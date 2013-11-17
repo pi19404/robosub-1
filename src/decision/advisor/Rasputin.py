@@ -61,7 +61,7 @@ def main(args):
 | q     | w     | e     | r     |
 |       |       |       |       |
 | QUIT  |FORWARD|  N/A  | RISE  |
-++------++------++------++-----++
+++------++------++------++------++
  | a     | s     | d     | f     |
  | ROTATE|       | ROTATE|       |
  | LEFT  |  BACK | RIGHT | FALL  |
