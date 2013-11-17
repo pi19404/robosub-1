@@ -1,59 +1,66 @@
 {
-    "maintenance_interval": 10,
-    "vision_processors": [
-        {
-            "symlink": "frontcam",
-            "codec" : "MJPG",
-            "enable": true,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        }
-    ],
-    "disabled_cameras": [
-        {
-            "symlink": "downcam",
-            "codec" : "MJPG",
-            "enable": false,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        },
-        {
-            "symlink": "leftcam",
-            "codec" : "MJPG",
-            "enable": false,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        },
-        {
-            "symlink": "rightcam",
-            "codec" : "MJPG",
-            "enable": false,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        }
-    ]
+    "sensor/vision/Fates": {
+        "port": 20054,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null},
+        "maintenance_interval": 5,
+        "vision_processors": [
+            "sensor/vision/cam_down"
+        ]
+    },
+    "sensor/vision/cam_front": {
+        "stream_port": 50000,
+        "symlink": "/dev/cam_front",
+        "codec" : "MJPG",
+        "enable": true,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    },
+    "sensor/vision/cam_down": {
+        "stream_port": 50001,
+        "symlink": "/dev/cam_down",
+        "codec" : "MJPG",
+        "enable": false,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    },
+    "sensor/vision/cam_left": {
+        "symlink": "/dev/cam_left",
+        "codec" : "MJPG",
+        "enable": false,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    },
+    "sensor/vision/cam_right": {
+        "symlink": "/dev/cam_right",
+        "codec" : "MJPG",
+        "enable": false,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    }
 }

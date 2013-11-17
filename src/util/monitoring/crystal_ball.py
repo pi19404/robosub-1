@@ -20,7 +20,7 @@ class VisionViewer(object):
                 subscriber_high_water_mark=81920,
                 settings_path="../../settings.json")
         last_timestamp = 0.0
-        self.com.connect_video_stream(50000)
+        self.com.connect_video_stream(50001)
         print 'connected'
         while True:
             try:

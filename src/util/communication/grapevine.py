@@ -124,6 +124,8 @@ class Communicator(object):
                     self.publisher['stream']['context'].socket(zmq.PAIR)
         self.publisher['stream']['socket'].bind(
                     "tcp://*:{port}".format(port=port))
+        #self.poller = zmq.Poller()
+        #self.poller.register(self.publisher['stream']['socket'], zmq.POLLOUT)
 
     def connect_video_stream(self, port, addr='127.0.0.1'):
         """Connect one end of a socket pair for video streaming."""
@@ -136,9 +138,13 @@ class Communicator(object):
 
     def send_image(self, image):
         """Send an image over the connected stream server socket"""
+
         metadata = dict(dtype = str(image.dtype), shape = image.shape)
-        self.publisher['stream']['socket'].send_json(metadata, zmq.SNDMORE)
-        self.publisher['stream']['socket'].send(image, copy=True, track=False)
+        try:
+            self.publisher['stream']['socket'].send_json(metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
+            self.publisher['stream']['socket'].send(image, copy=True, track=False, flags=zmq.NOBLOCK)
+        except zmq.ZMQError:
+            pass
 
     def recv_image(self):
         """Receive an image from the connected stream client socket."""
