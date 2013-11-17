@@ -1,0 +1,27 @@
+{
+    path: [ This key will only exist if at least one path is detected.
+        {
+            theta: (float) //radians, plus/minus pi/2, reporting angle of path relative to sub. If path is pointed forward and right, theta is positive.
+        },
+        {
+            theta: (float)
+        }
+    ]
+}
+
+{
+    funny_object: {
+        distance: (float) //meters
+        center: {
+            x: (float), //percentage between 0.0 and 1.0 (0.0, 0.0) is the top left of the screen
+            y: (float)
+        }
+        strafe: (int), //-1 strafe right, 0 just right, 1 strafe left
+            
+    }
+}
+
+
+{
+    depth: (float) //negative depth starting with surface == 0.0
+}
