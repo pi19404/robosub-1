@@ -79,6 +79,7 @@ def get_lock(ser):
 
     X000X000X
     012345678
+
     """
     # variables for the sync loop
     current_byte = '\0'
@@ -146,13 +147,23 @@ def get_packet(ser):
 
         return packet
 
-def respond_to_stabalization_packet(packet, mag):
+def respond_to_stabalization_packet(packet, mag, full_stop=False):
     # TODO: This would allow us to use cleaner debug messages if we
     # instead had a thruster settings dictionary. E.g.:
     # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
     # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
     raw_cmds = []
-    if packet['vector']['x'] > 0.0:
+
+    if full_stop:
+        # Turn off all thrusters.
+        intent = 'full stop'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+    elif packet['vector']['x'] > 0.0:
         intent = 'strafe left (not implemented)'
     elif packet['vector']['x'] < 0.0:
         intent = 'strafe right (not implemented)'
@@ -163,6 +174,8 @@ def respond_to_stabalization_packet(packet, mag):
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['vector']['y'] < 0.0:
         # causes the sub to move backwards
         intent = 'move backward'
@@ -170,14 +183,24 @@ def respond_to_stabalization_packet(packet, mag):
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['vector']['z'] > 0.0:
         # causes the sub to surface
         intent = 'rise'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
     elif packet['vector']['z'] < -0.0:
         # causes the sub to dive
         intent = 'dive'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
     elif packet['rotation']['z'] > 0.0:
@@ -187,6 +210,8 @@ def respond_to_stabalization_packet(packet, mag):
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['rotation']['z'] < -0.0:
         # causes the sub to rotate counter-clockwise
         intent = 'rotate left'
@@ -194,15 +219,8 @@ def respond_to_stabalization_packet(packet, mag):
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
-    else:
-        # Turn off all thrusters.
-        intent = 'full stop'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
 
     return intent, raw_cmds
 
@@ -287,6 +305,9 @@ def main(args):
     global DEBUG
     DEBUG = args.debug
 
+    # Expected: args.module_name == "movement/physical"
+    com = Communicator(module_name=args.module_name,
+                       settings_path=args.settings_path)
     accel_com = Communicator(module_name='sensor/accelerometer')
     gyro_com = Communicator(module_name='sensor/gyroscope')
     compass_com = Communicator(module_name='sensor/compass')
@@ -308,18 +329,28 @@ def main(args):
 
         get_lock(ser) # get in sync with the stream
 
-    com = Communicator(module_name=args.module_name,
-                       settings_path=args.settings_path)
-
     mag = args.magnitude
     last_packet_time = 0.0
+    last_advisor_packet = None
+    last_advisor_packet_time = 0.0
     while True:
         stabalization_packet = com.get_last_message("movement/stabalization")
+
+        advisor_packet = com.get_last_message("decision/advisor")
+        if (advisor_packet and
+            advisor_packet['timestamp'] > last_advisor_packet_time):
+            last_advisor_packet = advisor_packet
+
+        if last_advisor_packet and last_advisor_packet['command'] == "stop":
+            full_stop = True
+        else:
+            full_stop = False
+
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
             last_packet_time = stabalization_packet['timestamp']
             intent, raw_cmds = respond_to_stabalization_packet(
-                    packet=stabalization_packet, mag=mag)
+                    packet=stabalization_packet, mag=mag, full_stop=full_stop)
             # Debugging info...
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
@@ -327,14 +358,16 @@ def main(args):
             com.publish_message(msg)
 
         # receive a packet
-        received_packet = get_packet(ser)
-        respond_to_serial_packet(
-                received_packet, accel_com, gyro_com, compass_com, depth_com,
-                battery_voltage_com)
+        if not DEBUG:
+            received_packet = get_packet(ser)
+            respond_to_serial_packet(
+                    received_packet, accel_com, gyro_com, compass_com, depth_com,
+                    battery_voltage_com)
 
         time.sleep(args.epoch)
 
-    ser.close()
+    if not DEBUG:
+        ser.close()
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
