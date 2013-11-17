@@ -1,40 +1,53 @@
 import cv2
 import numpy as np
+from random import randint
+from math import *
+
 # test image: http://imgur.com/4pWOTKq.jpg
-
-
-# The number of min and max "hits" needed to detect an edge.
-MIN_EDGE_VAL = 50
-MAX_EDGE_VAL = 300
 
 # The high and low HSV values for orange
 ORANGE_HI  = np.array([180, 200, 255], np.uint8)
 ORANGE_LO  = np.array([30, 100, 80], np.uint8)
 
 def main():
-    img   = cv2.imread("imagefiletest.jpg")
-    #debug code
-    cv2.imshow("Initial image", img)
-    cv2.waitKey(0)
-
-    lines = get_lines(img)
-    return True #debug
+    image = cv2.imread("imagefiletest.jpg")
+    lines = get_lines(image)
 
     # If it's empty, return bool and empty.
-    if (not lines):
+    if (lines is None):
         print 'Lines not detected'
-        return (False, [])
+        return (False, None)
 
-    longest_line = get_longest_line(lines)
-    angle  = get_line_angle(longest_line)
+    longest = get_longest_line(lines)
+    angle   = get_line_angle(longest)
 
-    # return that we've found something, and
-    return (True, angle)
+    # now modify an image to return
+    c_image   = image[10:470, 90:550]
+    hsv_img = cv2.cvtColor(c_image, cv2.COLOR_BGR2HSV)
+
+    lines_detected = 0
+    for l in lines:
+        lines_detected = lines_detected + 1
+        line_color     = (randint(0,180), randint(0,200), randint(0, 180))
+        cv2.line(hsv_img, (l[0], l[1]), (l[2], l[3]), line_color, 4, cv2.CV_AA)
+        cv2.circle(hsv_img, (l[2], l[3]), 10,  line_color, 2, cv2.CV_AA)
+    print 'angle is:',angle, 'rads, degrees:', degrees(angle)
+
+    # draw last line.
+    cv2.line(hsv_img, (longest[0], longest[1]), (longest[2], longest[3]), (180, 180, 180), 6, cv2.CV_AA)
+    cv2.circle(hsv_img, (longest[2], longest[3]), 20,  (180, 180, 180), 2, cv2.CV_AA)
+    cv2.imwrite("path_out.jpg", hsv_img)
+
+    return (True, {"image": hsv_img, "angle": angle})
 
 def get_line_angle(line):
-    """ Simple geometric function to get the angle of the previously calculated lines relative to the submarine (which is just to the line (0, 1). Will return an array of angles of the line. """
 
-    return (np.arctan2((line[0] - line[1]), (line[3] - line[2])))
+    theta = -atan2(int(line[2]-line[0]), int(line[3] - line[1]))
+
+    # Fix me, make math good.
+    if(abs(theta) > pi/2):
+        theta = -atan2(int(line[0]-line[2]), int(line[1]-line[3]))
+    return theta
 
 def get_longest_line(lines):
     longest_line = []
@@ -42,17 +55,19 @@ def get_longest_line(lines):
     y_len   = 0
     mag     = 0
     new_mag = 0
+    l_index = 0
 
     for (x1, y1, x2, y2) in lines:
         # compute the length of the wire, compare, then update if it's the longest line.
         # TODO: this might not be the correct calulation. Maybe just care about endpoint angle?
-        x_len = x2 - x1
-        y_len = y2 - y1
-        new_mag = np.absolute[x_len, y_len]
-        if mag < (new_mag):
-            mag = new_mag
-            longest_line = [x1, y1, x2, y2]
+        x_len = int(x2 - x1)
+        y_len = int(y2 - y1)
 
+        new_mag = sqrt(x_len * x_len + y_len * y_len)
+        if mag < (abs(new_mag)):
+            mag = abs(new_mag)
+            longest_line = [x1, y1, x2, y2]
+        l_index = l_index+1
     print 'longest vector is', longest_line
     return longest_line
 
@@ -62,33 +77,34 @@ def get_lines(img):
 
     # crop the image to remove edges ends of the image
     image = img[10:470, 90:550]
-    cv2.imshow("cropped image", image)
 
     # convert to hsv
     hsv_img = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    # remove noise by applying gaussian blur. the (5,5) specifies a 5x5 kernel,
-    # and the 0 sets the sigmaX to the same value.
+    # remove noise by applying gaussian blur. the (5,5) specifies a 5x5
+    # kernel, and the 0 sets the sigmaX to the same value.
     gau_hsv_img = cv2.GaussianBlur(hsv_img, (5,5), 0)
 
     # now threshold anything NOT of this color.
     threshold_hsv = cv2.inRange(gau_hsv_img, ORANGE_LO, ORANGE_HI)
-    cv2.imshow("Image orange threshold", threshold_hsv)
-    cv2.waitKey(0)
 
     # TODO: Check for a blank image here. Return empty if so.
-    min_e = 30  #int(raw_input("min value:"))
-    max_e = 300  # int(raw_input("max value:"))
-    Canny_edges = cv2.Canny(threshold_hsv, min_e, max_e)
+    min_e = 50
+    max_e = 100
+    Canny_edges = cv2.Canny(threshold_hsv, min_e, max_e,apertureSize=5, L2gradient=True)
+    g_Canny_edges = cv2.GaussianBlur(Canny_edges, (5,5), 0)
 
     # returns beginning points and  endpoints of all lines.
-    lines = cv2.HoughLinesP(Canny_edges, 1, np.pi/180, 40, 100, 10)
-    print lines
-    for l in lines[0]:
-        cv2.line(threshold_hsv,(l[0], l[1]), (l[2], l[3]), (100,255,0), cv2.CV_AA)
+    minLineLength = 110
+    maxLineGap    = 50
+    rho           = 1
+    theta         = np.pi/180
+    h_threshold   = 20
+    lines = cv2.HoughLinesP(g_Canny_edges, rho, theta, h_threshold, minLineLength, maxLineGap)
 
-        cv2.imshow("can", threshold_hsv)
-        cv2.waitKey(0)
+    # if nothing is detected.
+    if(lines is None):
+        return None
 
     return lines[0]
 
