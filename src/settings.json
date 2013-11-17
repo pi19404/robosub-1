@@ -101,8 +101,8 @@
             "decision/advisor",
             "movement/stabalization"
         ],
-        "release": {"path": "movement/physical/jockey.py"},
-        "mock": {"path": "movement/physical/test/jockey.py"}
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "sensor/accelerometer": {
         "port": 20059,

@@ -36,21 +36,21 @@ def main(args):
 
             # Kludges to handle keyboard inputs.
             tx_packet = deepcopy(packet)
-            if directive_packet['is_left'] == 1.0:
+            if directive_packet['is_left'] > 0.0:
                 tx_packet['vector']['x'] = 1.0
-            elif directive_packet['is_right'] == 1.0:
+            elif directive_packet['is_right'] > 0.0:
                 tx_packet['vector']['x'] = -1.0
-            elif directive_packet['is_back'] == 1.0:
+            elif directive_packet['is_back'] > 0.0:
                 tx_packet['vector']['y'] = 1.0
-            elif directive_packet['is_forward'] == 1.0:
+            elif directive_packet['is_forward'] > 0.0:
                 tx_packet['vector']['y'] = -1.0
-            elif directive_packet['is_low'] == 1.0:
+            elif directive_packet['is_low'] > 0.0:
                 tx_packet['vector']['z'] = 1.0
-            elif directive_packet['is_high'] == 1.0:
+            elif directive_packet['is_high'] > 0.0:
                 tx_packet['vector']['z'] = -1.0
-            elif directive_packet['is_rotated_left'] == 1.0:
+            elif directive_packet['is_rotated_left'] > 0.0:
                 tx_packet['rotation']['z'] = 1.0
-            elif directive_packet['is_rotated_right'] == 1.0:
+            elif directive_packet['is_rotated_right'] > 0.0:
                 tx_packet['rotation']['z'] = -1.0
 
             com.publish_message(tx_packet)
