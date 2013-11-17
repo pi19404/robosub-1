@@ -99,12 +99,8 @@ def main(args):
         elif key == '1':
             advice["command"] = "state: keyboard"
         elif key == '2':
-            advice["command"] = "state: path full"
+            advice["command"] = "state: path"
         elif key == '3':
-            advice["command"] = "state: path orient"
-        elif key == '4':
-            advice["command"] = "state: path follow"
-        elif key == '5':
             advice["command"] = "state: depth"
        #elif key == '6':
        #    advice["command"] = 

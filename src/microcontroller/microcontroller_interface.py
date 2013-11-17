@@ -250,8 +250,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
     # handles the data appropriately
     if device == ACL_1_X_addr:
         # pulls the data out the last two bytes of the packet
-        ACL_1_X_val = int(( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 ))
+        ACL_1_X_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
         # data is stored in 2's complement form, this does the appropriate
         # conversion
@@ -260,24 +259,21 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 
         accel_com.publish_message({"ACL_X": ACL_1_X_val})
     elif device == ACL_1_Y_addr:
-        ACL_1_Y_val = (ord(packet[2]) |
-                       ord(packet[3]) << 8)
+        ACL_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
         if ACL_1_Y_val > 32767:
             ACL_1_Y_val = (ACL_1_Y_val-65536)
 
         accel_com.publish_message({"ACL_Y": ACL_1_Y_val})
     elif device == ACL_1_Z_addr:
-        ACL_1_Z_val = ( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 )
+        ACL_1_Z_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
 
         if ACL_1_Z_val > 32767:
             ACL_1_Z_val = (ACL_1_Z_val-65536)
 
         accel_com.publish_message({"ACL_Z": ACL_1_Z_val})
     elif device == GYRO_1_X_addr:
-        GYRO_1_X_val = ( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 )
+        GYRO_1_X_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
 
         if GYRO_1_X_val > 32767:
             GYRO_1_X_val = (GYRO_1_X_val-65536)
@@ -285,8 +281,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         # XXX com?
         accel_com.publish_message({"GYRO_X": GYRO_1_X_val})
     elif device == GYRO_1_Y_addr:
-        GYRO_1_Y_val = ( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 )
+        GYRO_1_Y_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
 
         if GYRO_1_Y_val > 32767:
             GYRO_1_Y_val = (GYRO_1_Y_val-65536)
@@ -294,22 +289,19 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         # XXX com?
         accel_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
     elif device == GYRO_1_Z_addr:
-        GYRO_1_Z_val = ( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 )
+        GYRO_1_Z_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
         if GYRO_1_Z_val > 32767:
             GYRO_1_Z_val = (GYRO_1_Z_val-65536)
 
         # XXX com?
         accel_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
     elif device == ADC_DEPTH:
-        ADC_DEPTH_val = ( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 )
+        ADC_DEPTH_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
 
         # XXX Shouldn't this be depth_com?
-        accel_com.publish_message({"DEPTH": ADC_DEPTH_val})
+        depth_com.publish_message({"DEPTH": ADC_DEPTH_val})
     elif device == ADC_BATT:
-        ADC_BATT_val = ( ord(packet[2]) ) | \
-        ( ord(packet[3]) << 8 )
+        ADC_BATT_val = ord(packet[2]) | (ord(packet[3]) << 8)
         ADC_BATT_val = ((ADC_BATT_val) * 3.3/1024 * 7.5)
 
         # XXX com?

@@ -54,6 +54,7 @@
             "movement/physical",
             "sensor/vision/front",
             "sensor/vision/down",
+            "sensor/vision/fates",
             "sensor/accelerometer",
             "sensor/gyroscope",
             "sensor/compass",
@@ -134,9 +135,18 @@
     },
     "decision": {
         "port": 20063,
-        "listen": ["decision/advisor"],
+        "listen": [
+          "decision/advisor",
+          "sensor/vision/front",
+          "sensor/vision/down",
+          "sensor/accelerometer",
+          "sensor/gyroscope",
+          "sensor/compass",
+          "sensor/depth"
+        ],
         "release": {"path": "decision/shadow_behind_the_throne.py"},
-        "mock": {"path": null}
+        "mock": {"path": null},
+        "depth_threshold": 500
     },
     "decision/advisor": {
         "port": 20064,

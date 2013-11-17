@@ -10,6 +10,19 @@ sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
 from advisors_peon import AdvisorsPeon
 from path_oligarch import PathOligarch
+from depth_oligarch import DepthOligarch
+
+def choose_last_packet(com, module, last_packet):
+    packet = com.get_last_message(module)
+    if (packet and
+        (not last_packet or packet['timestamp'] > last_packet['timestamp'])):
+        ret_packet = packet
+        success = True
+    else:
+        ret_packet = last_packet
+        success = False
+
+    return ret_packet, success
 
 def main(args):
     """The resultant command is communicated over the grapevine in a
@@ -63,48 +76,41 @@ def main(args):
     oligarchs = {
             "AdvisorsPeon": AdvisorsPeon(com),
             "PathOligarch": PathOligarch(com),
+            "DepthOligarch": DepthOligarch(com),
     }
 
     state = None
-    last_sensor = {"timestamp": 0}
-    last_video_front = {"timestamp": 0}
-    last_video_down = {"timestamp": 0}
-    last_advice = {"timestamp": 0}
+    video_front = None
+    video_down = None
+    advice = None
+    depth = None
     while True:
-        #missive = deepcopy(missive_template)
-        #com.publish_message(missive)
-
-        # TODO: What will this be in the end?
-       #sensor = com.get_last_message("sensor/serial")
-       #if sensor and sensor['timestamp'] > last_sensor['timestamp']:
-       #    last_sensor = sensor
-
-        # TODO: Is this going to need more video streams?
-       #video = com.get_last_message("sensor/video")
-       #if video and video['timestamp'] > last_video['timestamp']:
-       #    last_video = video
-
-        advice = com.get_last_message("decision/advisor")
-        if advice and advice['timestamp'] > last_advice['timestamp']:
+        advice, succ = choose_last_packet(com, "decision/advisor", advice)
+        if succ:
             print advice["command"]
             if advice["command"] == "state: keyboard":
                 state = 'keyboard'
-            elif advice["command"] == "state: path full":
-                state = 'path full'
-            elif advice["command"] == "state: path orient":
-                state = 'path orient'
-            elif advice["command"] == "state: path follow":
-                state = 'path follow'
+            elif advice["command"] == "state: path":
+                state = 'path'
             elif advice["command"] == "state: depth":
                 state = 'depth'
-            last_advice = advice
+            elif advice["command"] == "stop":
+                state = "stop"
 
-            if state == 'keyboard':
-                decree = oligarchs["AdvisorsPeon"].decision(
-                        last_advice)
-            elif state == 'path full':
-                decree = oligarchs["PathOligarch"].decision(
-                        last_sensor, last_video_front, last_video_down)
+        video_front, _ = choose_last_packet(
+                com, "sensor/video/front", video_front)
+        video_down, _ = choose_last_packet(
+                com, "sensor/video/down", video_front)
+        depth, _ = choose_last_packet(com, "sensor/depth", depth)
+
+        if state == "stop":
+            pass
+        elif state == 'keyboard':
+            oligarchs["AdvisorsPeon"].decision(advice)
+        elif state == 'path':
+            oligarchs["PathOligarch"].decision(video_front, video_down)
+        elif state == 'depth':
+            oligarchs["DepthOligarch"].decision(depth)
 
         time.sleep(args.epoch)
 
