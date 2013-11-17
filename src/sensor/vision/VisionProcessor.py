@@ -69,12 +69,13 @@ class VisionProcessor(object):
             got_image, im = self.cap.read()
             if got_image:
                 #self.com.publish_image(im)
-                self.com.send_image(im)
                 #self.logger._write_image("raw", im)
+                self.com.send_image(im)
                 for plugin in self._plugins:
                     retval, new_im = plugin.process_image(im)
                     if retval is not None:
                         self.com.publish_message(retval)
+
                     #if new_im is not None:
                     #    cv2.imshow("image_yo", new_im)
                     #else:

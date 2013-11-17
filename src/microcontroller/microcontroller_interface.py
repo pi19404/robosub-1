@@ -186,55 +186,59 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
     elif packet['vector']['y'] > 0.0:
         # causes the sub to move forward
         intent = 'move forward'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['vector']['y'] < 0.0:
         # causes the sub to move backwards
         intent = 'move backward'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['vector']['z'] > 0.0:
         # causes the sub to surface
         intent = 'rise'
+        print intent
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
     elif packet['vector']['z'] < -0.0:
         # causes the sub to dive
         intent = 'dive'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
+        print intent
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+       #raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+       #raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['rotation']['yaw'] > 0.0:
         # causes the sub to rotate clockwise
         intent = 'rotate right'
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
     elif packet['rotation']['yaw'] < -0.0:
         # causes the sub to rotate counter-clockwise
         intent = 'rotate left'
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
 
@@ -266,14 +270,14 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 
         accel_com.publish_message({"ACL_Y": ACL_1_Y_val})
     elif device == ACL_1_Z_addr:
-        ACL_1_Z_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
+        ACL_1_Z_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
         if ACL_1_Z_val > 32767:
             ACL_1_Z_val = (ACL_1_Z_val-65536)
 
         accel_com.publish_message({"ACL_Z": ACL_1_Z_val})
     elif device == GYRO_1_X_addr:
-        GYRO_1_X_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
+        GYRO_1_X_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
         if GYRO_1_X_val > 32767:
             GYRO_1_X_val = (GYRO_1_X_val-65536)
@@ -281,7 +285,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         # XXX com?
         accel_com.publish_message({"GYRO_X": GYRO_1_X_val})
     elif device == GYRO_1_Y_addr:
-        GYRO_1_Y_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
+        GYRO_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
         if GYRO_1_Y_val > 32767:
             GYRO_1_Y_val = (GYRO_1_Y_val-65536)
@@ -289,14 +293,14 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         # XXX com?
         accel_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
     elif device == GYRO_1_Z_addr:
-        GYRO_1_Z_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
+        GYRO_1_Z_val = ord(packet[2]) | (ord(packet[3]) << 8)
         if GYRO_1_Z_val > 32767:
             GYRO_1_Z_val = (GYRO_1_Z_val-65536)
 
         # XXX com?
         accel_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
     elif device == ADC_DEPTH:
-        ADC_DEPTH_val = ord(packet[2]) ) | (ord(packet[3]) << 8)
+        ADC_DEPTH_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
         # XXX Shouldn't this be depth_com?
         depth_com.publish_message({"DEPTH": ADC_DEPTH_val})
@@ -391,7 +395,7 @@ def commandline():
             default='/dev/ttyUSB0',
             help="Serial interface port.")
     parser.add_argument('--magnitude', type=str,
-            default=25,
+            default=100,
             help='Thruster magnitude in percent.')
     parser.add_argument('-d', '--debug',
             default=False,

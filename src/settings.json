@@ -27,7 +27,7 @@
         "fps": 30,
         "width": 640,
         "height": 480,
-        "plugins": [],
+        "plugins": ["PathDetection"],
         "port": 20053,
         "release": {"path": null},
         "mock": {"path": null}
@@ -145,7 +145,7 @@
         ],
         "release": {"path": "decision/shadow_behind_the_throne.py"},
         "mock": {"path": null},
-        "depth_threshold": 500
+        "depth_threshold": 550
     },
     "decision/advisor": {
         "port": 20064,

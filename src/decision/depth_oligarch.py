@@ -19,5 +19,9 @@ class DepthOligarch(BaseOligarch):
         if depth_packet["DEPTH"] < self.depth_threshold:
             # XXX Better interpret the depth sensor.
             missive['desired_offset']['z'] = -1.0
+        else:
+            missive['desired_offset']['z'] = 1.0
+        print depth_packet["DEPTH"], self.depth_threshold
+        print missive
         self._publish_decision(missive)
 

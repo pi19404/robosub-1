@@ -110,6 +110,7 @@ def main(args):
         elif state == 'path':
             oligarchs["PathOligarch"].decision(vision_cam_front, vision_cam_down)
         elif state == 'depth':
+            print "state: depth"
             oligarchs["DepthOligarch"].decision(depth)
 
         time.sleep(args.epoch)

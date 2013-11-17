@@ -12,6 +12,7 @@ import argparse
 import os
 import json
 import sys
+import time
 from subprocess import check_call, CalledProcessError
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator  #preffered method
@@ -37,7 +38,8 @@ def main(args):
 
     try:
         # Hardcoding this to save me from myself.
-        check_call(['rm', '/tmp/robosub/log.out'])
+        check_call(['mv', '/tmp/robosub/log.out',
+                    "/tmp/robosub/log.out." + str(time.time())])
     except CalledProcessError:
         pass
 
