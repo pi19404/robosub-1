@@ -142,7 +142,7 @@ def commandline():
             help='Module to watch.')
     parser.add_argument('-l', '--log_path', type=str,
             default='/tmp/robosub/log.out',
-            help='Module to watch.')
+            help='Logfile path.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')

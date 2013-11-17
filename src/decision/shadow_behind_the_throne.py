@@ -6,9 +6,10 @@ import os
 import sys
 import time
 from copy import deepcopy
-sys.path.append(os.path.abspath("../.."))
+sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
-
+from advisors_peon import AdvisorsPeon
+from path_oligarch import PathOligarch
 
 def main(args):
     """The resultant command is communicated over the grapevine in a
@@ -61,7 +62,7 @@ def main(args):
 
     oligarchs = {
             "AdvisorsPeon": AdvisorsPeon(com),
-            "PathOligargh": PathOligarch(com),
+            "PathOligarch": PathOligarch(com),
     }
 
     state = None
@@ -74,14 +75,14 @@ def main(args):
         #com.publish_message(missive)
 
         # TODO: What will this be in the end?
-        sensor = com.get_last_message("sensor/serial")
-        if sensor and sensor['timestamp'] > last_sensor['timestamp']:
-            last_sensor = sensor
+       #sensor = com.get_last_message("sensor/serial")
+       #if sensor and sensor['timestamp'] > last_sensor['timestamp']:
+       #    last_sensor = sensor
 
         # TODO: Is this going to need more video streams?
-        video = com.get_last_message("sensor/video")
-        if video and video['timestamp'] > last_video['timestamp']:
-            last_video = video
+       #video = com.get_last_message("sensor/video")
+       #if video and video['timestamp'] > last_video['timestamp']:
+       #    last_video = video
 
         advice = com.get_last_message("decision/advisor")
         if advice and advice['timestamp'] > last_advice['timestamp']:
@@ -98,15 +99,12 @@ def main(args):
                 state = 'depth'
             last_advice = advice
 
-        if state == 'keyboard':
-            decree = oligarchs["AdvisorsPeon"].decision(
-                    last_sensor, last_video, last_advice)
-        elif state == 'path full':
-            decree = oligarchs["PathOligarch"].decision(
-                    last_sensor, last_video)
-
-        self.communicator.publish_message(decree)
-
+            if state == 'keyboard':
+                decree = oligarchs["AdvisorsPeon"].decision(
+                        last_advice)
+            elif state == 'path full':
+                decree = oligarchs["PathOligarch"].decision(
+                        last_sensor, last_video_front, last_video_down)
 
         time.sleep(args.epoch)
 

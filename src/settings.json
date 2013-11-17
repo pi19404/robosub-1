@@ -1,51 +1,59 @@
 {
     "publisher_high_water_mark": 1024,
     "publisher_buffer_length": 1024,
-    "sensor/vision": {
+    "sensor/vision/front": {
+        "camera": "front",
+        "enabled": true,
+        "dev": 0,
+        "codec": "MJPG",
+        "log": ["raw", "processed"],
+        "stream": {
+        },
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "port": 20066,
+        "plugins": ["tollbooth"],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/vision/down": {
+        "camera": "down",
+        "enabled": false,
+        "dev": 1,
+        "codec": "MJPG",
+        "log": ["raw", "processed"],
+        "stream": {
+        },
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": [],
+        "port": 20067,
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/vision/fates": {
         "port": 20054,
         "listen": [],
         "release": {"path": null},
         "mock": {"path": null},
         "maintenance_interval": 5,
         "vision_processors": [
-            {
-                "camera": "front",
-                "enabled": true,
-                "dev": 0,
-                "codec": "MJPG",
-                "log": ["raw", "processed"],
-                "stream": {
-                    "port": 20065
-                },
-                "fps": 30,
-                "width": 640,
-                "height": 480,
-                "plugins": ["tollbooth"]
-            },
-            {
-                "camera": "down",
-                "enabled": false,
-                "dev": 1,
-                "codec": "MJPG",
-                "log": ["raw", "processed"],
-                "stream": {
-                    "port": 20066
-                },
-                "fps": 30,
-                "width": 640,
-                "height": 480,
-                "plugins": []
-            }
+            "sensor/vision/front",
+            "sensor/vision/down"
         ]
     },
     "util/logger": {
         "port": 20055,
         "listen": [
             "decision",
+            "decision/advisor",
             "movement/directive",
             "movement/stabalization",
             "movement/physical",
-            "sensor/vision",
+            "sensor/vision/front",
+            "sensor/vision/down",
             "util/logger"
         ],
         "release": {"path": "util/logging/pale_lager.py"},
@@ -55,9 +63,10 @@
         "port": 20056,
         "listen": [
             "decision",
-            "sensor/vision"
+            "sensor/vision/front",
+            "sensor/vision/down"
         ],
-        "release": {"path": null},
+        "release": {"path": "movement/directive/despot.py"},
         "mock": {"path": "movement/directive/test/despot.py"}
     },
     "movement/stabalization": {
@@ -66,7 +75,7 @@
             "movement/directive",
             "sensor/accelerometer"
         ],
-        "release": {"path": null},
+        "release": {"path": "movement/stabalization/tightrope_walker.py"},
         "mock": {"path": "movement/stabalization/test/tightrope_walker.py"}
     },
     "movement/physical": {
@@ -74,7 +83,7 @@
         "listen": [
             "movement/stabalization"
         ],
-        "release": {"path": null},
+        "release": {"path": "movement/physical/jockey.py"},
         "mock": {"path": "movement/physical/test/jockey.py"}
     },
     "sensor/accelerometer": {
@@ -95,7 +104,7 @@
         "release": {"path": null},
         "mock": {"path": null}
     },
-    "sensor/serial/test/display_messages": {
+    "sensor/serial/display_messages": {
         "port": 20062,
         "listen": [
             "sensor/serial/accelerometer",
@@ -107,14 +116,21 @@
     },
     "decision": {
         "port": 20063,
+        "listen": ["decision/advisor"],
+        "release": {"path": "decision/shadow_behind_the_throne.py"},
+        "mock": {"path": null}
+    },
+    "decision/advisor": {
+        "port": 20064,
         "listen": [],
         "release": {"path": null},
         "mock": {"path": null}
     },
     "util/vision_viewer": {
-        "port": 20064,
+        "port": 20065,
         "listen": [
-            "sensor/vision"
+            "sensor/vision/front",
+            "sensor/vision/down"
         ],
         "release": {"path": null},
         "mock": {"path": null}
