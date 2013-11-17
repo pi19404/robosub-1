@@ -5,8 +5,7 @@ import time
 import os
 import sys
 import serial
-from random import random
-sys.path.append(os.path.abspath("../../.."))
+sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
 
 CONTROL_BYTE = '\n'
@@ -29,13 +28,13 @@ THRUSTER_STERN_PORT = 0x15
 
 DEBUG = None
 
-def cmd_thruster(thruster_id, magnitude, direction, debug=False):
+def cmd_thruster(thruster_id, magnitude, direction):
     """
-cmd_thruster() sends a thruster control command to the microncontroller
-It takes an id, a magnitude (between 0 and 100), and a direction (0 or 1)
-0 is forward, 1 is reverse
+    cmd_thruster() sends a thruster control command to the microncontroller It
+    takes an id, a magnitude (between 0 and 100), and a direction (0 or 1) 0 is
+    forward, 1 is reverse
 
-"""
+    """
 
     raw_thruster_id = '\0'
     raw_direction_mag = '\0'
@@ -71,98 +70,233 @@ It takes an id, a magnitude (between 0 and 100), and a direction (0 or 1)
         cmd_thruster.ser.write(raw_cmd)
     return raw_cmd
 
-"""
-        Here we are trying to make sure we have actually found
-        a control byte, so we receive several packets, then look
-        at where we expect the control bytes to be. If they are not in the expected
-        locations, we wait for a new control byte and try again.
+def get_lock(ser):
+    """
+    Here we are trying to make sure we have actually found a control byte, so
+    we receive several packets, then look at where we expect the control bytes
+    to be. If they are not in the expected locations, we wait for a new control
+    byte and try again.
 
-        X000X000X
-        012345678
-"""
-def get_lock() :
-        #variables for the sync loop
-        current_byte = '\0'
-        packet_array = ""
-        in_sync = False
-        
-        #reset the serial port
-        s.close()
-        s.open()
+    X000X000X
+    012345678
+    """
+    # variables for the sync loop
+    current_byte = '\0'
+    packet_array = ""
+    in_sync = False
 
-        print "Aquiring stream sync"
+    # reset the serial port
+    ser.close()
+    ser.open()
 
-        while in_sync == False:
-                #read a packet from the serial port
-                current_byte = s.read()
+    print "Aquiring stream sync"
 
-                #if the byte is the control_byte, then receive several packets
-                #otherwise, we will jump back to the top of the loop and get another byte
-                if current_byte == control_byte :
-                        packet_array = "" # clear out the array
-                        packet_array += current_byte # add the byte to the array
+    while not in_sync:
+        # read a packet from the serial port
+        current_byte = ser.read()
 
-                        #receive several packets
-                        while len(packet_array) != 9 :
-                                packet_array += s.read()
+        # if the byte is the CONTROL_BYTE, then receive several packets
+        # otherwise, we will jump back to the top of the loop and get
+        # another byte
+        if current_byte == CONTROL_BYTE:
+            packet_array = "" # clear out the array
+            packet_array += current_byte # add the byte to the array
 
-                        #check to see if the control byte is in the proper location in the received packets
-                        if (packet_array[0] == control_byte and \
-                                packet_array[4] == control_byte and \
-                                packet_array[8] == control_byte) :
-                                
-                                #throw away rest of last packet
-                                s.read(3)
+            # receive several packets
+            while len(packet_array) != 9:
+                packet_array += ser.read()
 
-                                #say we are in sync so we can break out of the loop
-                                in_sync = True
-                                print "sync locked"
+            # check to see if the control byte is in the proper
+            # location in the received packets
+            if (packet_array[0] == CONTROL_BYTE and
+                packet_array[4] == CONTROL_BYTE and
+                packet_array[8] == CONTROL_BYTE):
 
-#end get_lock()
+                # throw away rest of last packet
+                ser.read(3)
 
-"""
-        This function reads a 4-byte packet from the serial port.
-        It will also check to make sure we are still in sync, and
-        pauses the program if we lose sync. It will then attempt
-        to get back into sync with the serial stream.
-"""
-        
-def get_packet() :
+                # say we are in sync so we can break out of the
+                # loop
+                in_sync = True
+                print "sync locked"
+# end get_lock()
 
-        success = False
-        
-        while success == False :
+def get_packet(ser):
+    """
+    This function reads a 4-byte packet from the serial port.  It will also
+    check to make sure we are still in sync, and pauses the program if we lose
+    sync. It will then attempt to get back into sync with the serial stream.
 
-                #read 4 bytes from the serial port
-                packet = s.read(4)
-                
-                #ensure we are in sync by checking that the control byte is in the correct place
-                if packet[0] != control_byte : #if we are not in sync
-                        print "Error: lost sync. Press the [Enter] key to attempt to re-sync"
-                        raw_input() #waits for the user to press the enter key
-                        s.flushInput() #flushes the serial rx buffer
-                        get_lock() #get back into sync
-                else : #if we are in sync, break out of loop
-                        success = True
-                        
+    """
+    success = False
+
+    while not success:
+        # read 4 bytes from the serial port
+        packet = ser.read(4)
+        # ensure we are in sync by checking that the control byte is in the
+        # correct place
+        if packet[0] != CONTROL_BYTE: # if we are not in sync
+            print "Error: lost sync. Press the [Enter] key to attempt to re-sync"
+            raw_input() # waits for the user to press the enter key
+            ser.flushInput() # flushes the serial rx buffer
+            get_lock(ser) # get back into sync
+        else:
+            # if we are in sync, break out of loop
+            success = True
 
         return packet
-#end get_packet()
+
+def respond_to_stabalization_packet(packet, mag):
+    # TODO: This would allow us to use cleaner debug messages if we
+    # instead had a thruster settings dictionary. E.g.:
+    # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
+    # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
+    raw_cmds = []
+    if packet['vector']['x'] > 0.0:
+        intent = 'strafe left (not implemented)'
+    elif packet['vector']['x'] < 0.0:
+        intent = 'strafe right (not implemented)'
+    elif packet['vector']['y'] > 0.0:
+        # causes the sub to move forward
+        intent = 'move forward'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+    elif packet['vector']['y'] < 0.0:
+        # causes the sub to move backwards
+        intent = 'move backward'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+    elif packet['vector']['z'] > 0.0:
+        # causes the sub to surface
+        intent = 'rise'
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
+    elif packet['vector']['z'] < -0.0:
+        # causes the sub to dive
+        intent = 'dive'
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
+    elif packet['rotation']['z'] > 0.0:
+        # causes the sub to rotate clockwise
+        intent = 'rotate right'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+    elif packet['rotation']['z'] < -0.0:
+        # causes the sub to rotate counter-clockwise
+        intent = 'rotate left'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+    else:
+        # Turn off all thrusters.
+        intent = 'full stop'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+
+    return intent, raw_cmds
+
+def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
+                             depth_com, battery_voltage_com):
+    # pull the device information out of the packet second byte of packet
+    # is device information (first byte is always control byte)
+    device = ord(packet[1])
+
+    # if-elif statement looks for what device the packet is concerning, and
+    # handles the data appropriately
+    if device == ACL_1_X_addr:
+        # pulls the data out the last two bytes of the packet
+        ACL_1_X_val = int(( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 ))
+
+        # data is stored in 2's complement form, this does the appropriate
+        # conversion
+        if ACL_1_X_val > 32767:
+            ACL_1_X_val = (ACL_1_X_val-65536)
+
+        accel_com.publish_message({"ACL_X": ACL_1_X_val})
+    elif device == ACL_1_Y_addr:
+        ACL_1_Y_val = (ord(packet[2]) |
+                       ord(packet[3]) << 8)
+
+        if ACL_1_Y_val > 32767:
+            ACL_1_Y_val = (ACL_1_Y_val-65536)
+
+        accel_com.publish_message({"ACL_Y": ACL_1_Y_val})
+    elif device == ACL_1_Z_addr:
+        ACL_1_Z_val = ( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 )
+
+        if ACL_1_Z_val > 32767:
+            ACL_1_Z_val = (ACL_1_Z_val-65536)
+
+        accel_com.publish_message({"ACL_Z": ACL_1_Z_val})
+    elif device == GYRO_1_X_addr:
+        GYRO_1_X_val = ( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 )
+
+        if GYRO_1_X_val > 32767:
+            GYRO_1_X_val = (GYRO_1_X_val-65536)
+
+        # XXX com?
+        accel_com.publish_message({"GYRO_X": GYRO_1_X_val})
+    elif device == GYRO_1_Y_addr:
+        GYRO_1_Y_val = ( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 )
+
+        if GYRO_1_Y_val > 32767:
+            GYRO_1_Y_val = (GYRO_1_Y_val-65536)
+
+        # XXX com?
+        accel_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
+    elif device == GYRO_1_Z_addr:
+        GYRO_1_Z_val = ( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 )
+        if GYRO_1_Z_val > 32767:
+            GYRO_1_Z_val = (GYRO_1_Z_val-65536)
+
+        # XXX com?
+        accel_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
+    elif device == ADC_DEPTH:
+        ADC_DEPTH_val = ( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 )
+
+        # XXX Shouldn't this be depth_com?
+        accel_com.publish_message({"DEPTH": ADC_DEPTH_val})
+    elif device == ADC_BATT:
+        ADC_BATT_val = ( ord(packet[2]) ) | \
+        ( ord(packet[3]) << 8 )
+        ADC_BATT_val = ((ADC_BATT_val) * 3.3/1024 * 7.5)
+
+        # XXX com?
+        accel_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
+
 
 def main(args):
     # Someone SHOULD complain about this.
     global DEBUG
     DEBUG = args.debug
-	
-	accel_com = Communicator(module_name='sensor/accelerometer')
+
+    accel_com = Communicator(module_name='sensor/accelerometer')
     gyro_com = Communicator(module_name='sensor/gyroscope')
     compass_com = Communicator(module_name='sensor/compass')
-	depth_com = Communicator(module_name='sensor/depth')
-	battery_voltage_com = Communicator(module_name='sensor/battery_voltage')
+    depth_com = Communicator(module_name='sensor/depth')
+    battery_voltage_com = Communicator(module_name='sensor/battery_voltage')
 
     if not DEBUG:
         ser = serial.Serial()
-        # this may change, depending on what port the OS gives the microcontroller
+        # this may change, depending on what port the OS gives the
+        # microcontroller
         ser.port = args.port
         # the baudrate may change in the future
         ser.baudrate = args.baudrate
@@ -171,8 +305,8 @@ def main(args):
         # this does not fail)
         ser.open()
         cmd_thruster.ser = ser
-		
-		get_lock() #get in sync with the stream
+
+        get_lock(ser) # get in sync with the stream
 
     com = Communicator(module_name=args.module_name,
                        settings_path=args.settings_path)
@@ -183,144 +317,23 @@ def main(args):
         stabalization_packet = com.get_last_message("movement/stabalization")
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
-            # TODO: This would allow us to use cleaner debug messages if we
-            # instead had a thruster settings dictionary. E.g.:
-            # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
-            # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
-            raw_cmds = []
-            if stabalization_packet['vector']['x'] == 1.0:
-                intent = 'strafe left (not implemented)'
-            elif stabalization_packet['vector']['x'] == -1.0:
-                intent = 'strafe right (not implemented)'
-            elif stabalization_packet['vector']['y'] == 1.0:
-                # causes the sub to move forward
-                intent = 'move forward'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
-            elif stabalization_packet['vector']['y'] == -1.0:
-                # causes the sub to move backwards
-                intent = 'move backward'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
-            elif stabalization_packet['vector']['z'] == 1.0:
-                # causes the sub to surface
-                intent = 'rise'
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
-            elif stabalization_packet['vector']['z'] == -1.0:
-                # causes the sub to dive
-                intent = 'dive'
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
-            elif stabalization_packet['rotation']['z'] == 1.0:
-                # causes the sub to rotate clockwise
-                intent = 'rotate right'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
-            elif stabalization_packet['rotation']['z'] == -1.0:
-                # causes the sub to rotate counter-clockwise
-                intent = 'rotate left'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
-            else:
-                # Turn off all thrusters.
-                intent = 'full stop'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
-
+            last_packet_time = stabalization_packet['timestamp']
+            intent, raw_cmds = respond_to_stabalization_packet(
+                    packet=stabalization_packet, mag=mag)
+            # Debugging info...
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
             print msg
             com.publish_message(msg)
-			
-		#receive a packet
-		received_packet = get_packet()
-        
-		#pull the device information out of the packet
-		device = ord(received_packet[1]) #second byte of packet is device information (first byte is always control byte)
-		
-		#if-elif statement looks for what device the packet is concerning, and handles the data appropriately
-        if device == ACL_1_X_addr :
-			#pulls the data out the last two bytes of the packet
-			ACL_1_X_val = int(( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 ))
 
-			#data is stored in 2's complement form, this does the appropriate conversion
-			if ACL_1_X_val > 32767 :
-				ACL_1_X_val = (ACL_1_X_val-65536)
-			
-			accel_com.publish_message({"ACL_X": ACL_1_X_val})
-        
-        elif device == ACL_1_Y_addr :
-			ACL_1_Y_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
+        # receive a packet
+        received_packet = get_packet(ser)
+        respond_to_serial_packet(
+                received_packet, accel_com, gyro_com, compass_com, depth_com,
+                battery_voltage_com)
 
-			if ACL_1_Y_val > 32767 :
-				ACL_1_Y_val = (ACL_1_Y_val-65536)
-
-			accel_com.publish_message({"ACL_Y": ACL_1_Y_val})
-
-        elif device == ACL_1_Z_addr :
-			ACL_1_Z_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
-
-			if ACL_1_Z_val > 32767 :
-				ACL_1_Z_val = (ACL_1_Z_val-65536)
-
-			accel_com.publish_message({"ACL_Z": ACL_1_Z_val})
-
-        elif device == GYRO_1_X_addr :
-			GYRO_1_X_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
-
-			if GYRO_1_X_val > 32767 :
-				GYRO_1_X_val = (GYRO_1_X_val-65536)
-				
-			accel_com.publish_message({"GYRO_X": GYRO_1_X_val})
-        
-        elif device == GYRO_1_Y_addr :
-			GYRO_1_Y_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
-
-			if GYRO_1_Y_val > 32767 :
-				GYRO_1_Y_val = (GYRO_1_Y_val-65536)
-				
-			accel_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
-			
-        elif device == GYRO_1_Z_addr :
-			GYRO_1_Z_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
-			if GYRO_1_Z_val > 32767 :
-				GYRO_1_Z_val = (GYRO_1_Z_val-65536)
-				
-			accel_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
-
-        elif device == ADC_DEPTH :
-			ADC_DEPTH_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
-            
-			accel_com.publish_message({"DEPTH": ADC_DEPTH_val})
-			
-        elif device == ADC_BATT :
-			ADC_BATT_val = ( ord(received_packet[2]) ) | \
-			( ord(received_packet[3]) << 8 )
-			ADC_BATT_val = ((ADC_BATT_val) * 3.3/1024 * 7.5)
-			
-			accel_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
-		
         time.sleep(args.epoch)
+
     ser.close()
 
 def commandline():
