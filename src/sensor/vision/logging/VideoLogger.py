@@ -43,8 +43,8 @@ class VideoLogger(object):
         self.writers[key].open(
                     filename = dest,
                     fourcc = self.FOURCC,
-                    fps = settings['fps'],
-                    frameSize = (settings['width'], settings['height']))
+                    fps = 10,
+                    frameSize = (640, 480))
 
     def _destroy_cap(self):
         #FIXME change this to destroy only windows we create.
@@ -81,18 +81,18 @@ class VideoLogger(object):
     ############################################################################
     def _write_image(self, writer, image=None):
         if image is None:
-            self.writers.write(self.image)
+            self.writers[writer].write(self.image)
         else:
-            self.writers.write(image)
+            self.writers[writer].write(image)
 
     def _start(self):
         while self.capturing.is_set():
             _, self.image = self.cap.read()
             self._write_image('raw')
             #cv2.imshow('video test', self.image)
-            key = cv2.waitKey(10)
-            if key == 27:
-                self.stop()
+            #key = cv2.waitKey(10)
+            #if key == 27:
+            #    self.stop()
 
     def __del__(self):
         cv2.destroyAllWindows()

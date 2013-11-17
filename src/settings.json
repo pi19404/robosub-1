@@ -16,6 +16,7 @@
         "mock": {"path": null}
     },
     "sensor/vision/cam_down": {
+        "symlink": "/dev/cam_down",
         "camera": "down",
         "enabled": false,
         "dev": 1,

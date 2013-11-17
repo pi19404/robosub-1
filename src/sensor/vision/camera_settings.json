@@ -6,12 +6,13 @@
         "mock": {"path": null},
         "maintenance_interval": 5,
         "vision_processors": [
-            "sensor/vision/cam_front"
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down"
         ]
     },
     "sensor/vision/cam_front": {
         "stream_port": 50000,
-        "symlink": "/dev/cam_down",
+        "symlink": "/dev/cam_front",
         "codec" : "MJPG",
         "enable": true,
         "log": [
@@ -21,7 +22,7 @@
         "fps": 30,
         "width": 640,
         "height": 480,
-        "plugins": ["PathDetection"]
+        "plugins": []
     },
     "sensor/vision/cam_down": {
         "stream_port": 50001,
@@ -35,7 +36,7 @@
         "fps": 30,
         "width": 640,
         "height": 480,
-        "plugins": []
+        "plugins": ["PathDetection"]
     },
     "sensor/vision/cam_left": {
         "symlink": "/dev/cam_left",
