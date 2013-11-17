@@ -36,14 +36,14 @@ class VisionProcessor(object):
                     subscriber_high_water_mark=81920)
 
         #Images from self.cap will be processed by the modules stored here.
-        self._vision_modules = []
+        self._plugins = []
         self.logger = VideoLogger.VideoLogger(settings = settings)
 
         #Load, instantiate, and store the modules defined in the settings file.
         for vp in self.settings['plugins']:
             #Name of module and the class should be the same.
-            module_obj = getattr(import_module(vp), vp)()
-            self._vision_modules += [module_obj]
+            module_obj = getattr(import_module('..'+vp, package='plugins.subpkg'), vp)()
+            self._plugins += [module_obj]
 
         #XXX figure out if setting any of these is really necessary.
         #Preconfiguring the driver should take care of these.
@@ -72,6 +72,13 @@ class VisionProcessor(object):
             if got_image:
                 #self.com.publish_image(im)
                 self.com.send_image(im)
+                for plugin in self._plugins:
+                    retval, new_im = plugin.process_image(im)
+                    #if new_im is not None:
+                    #    cv2.imshow("image_yo", new_im)
+                    #else:
+                    #    cv2.imshow("image_yo", im)
+                    #cv2.waitKey(10)
                 sleep(.1)
             else:
                 raise Exception

@@ -1,10 +1,8 @@
 {
     "publisher_high_water_mark": 1024,
     "publisher_buffer_length": 1024,
-    "sensor/vision/front": {
-        "camera": "front",
-        "enabled": true,
-        "dev": 0,
+    "sensor/vision/cam_front": {
+        "symlink": "/dev/cam_front",
         "codec": "MJPG",
         "log": ["raw", "processed"],
         "stream": {
@@ -17,7 +15,7 @@
         "release": {"path": null},
         "mock": {"path": null}
     },
-    "sensor/vision/down": {
+    "sensor/vision/cam_down": {
         "camera": "down",
         "enabled": false,
         "dev": 1,

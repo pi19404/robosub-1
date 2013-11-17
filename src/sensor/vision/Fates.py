@@ -94,4 +94,4 @@ class Fates(object):
 if __name__ == '__main__':
     with open('camera_settings.json') as settings_file:
         vision_settings = json.loads(settings_file.read())
-        f = Fates('sensor/vision/Fates',vision_settings)
+        f = Fates('sensor/vision/fates',vision_settings)
