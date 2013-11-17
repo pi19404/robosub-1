@@ -24,7 +24,7 @@ from util.communication.grapevine import Communicator
 
 class Fates(object):
     """Create and maintain Robosub video logic processes."""
-    def __init__(self, settings):
+    def __init__(self, module_name, settings):
         """Create and maintain all video logic processes defined in settings.
 
         Args:
@@ -32,6 +32,7 @@ class Fates(object):
             by Fates.
 
         """
+        self.module_name = module_name
         self.settings = settings #XXX consider making this a deepcopy?
 
         #All vision logic processes go here.
@@ -43,23 +44,24 @@ class Fates(object):
         print 'size of vision pool is {size}'.format(size=len(self._vision_pool))
 
         #Monitor vision processes and reinitialize any that fail.
-        self._maintain_vision_pool(settings['maintenance_interval'])
+        self._maintain_vision_pool(
+                    settings[self.module_name]['maintenance_interval'])
 
     def _init_vision_pool(self):
         """Initialize process for each self.settings['vision_processors']."""
-        for vp_settings in self.settings['vision_processors']:
-            self._vision_pool += [self._init_vision_process(vp_settings)]
+        for vp_name in self.settings[self.module_name]['vision_processors']:
+            self._vision_pool += [self._init_vision_process(vp_name)]
 
-    def _init_vision_process(self, vp_settings):
+    def _init_vision_process(self, name):
         """Initialize a process using settings given in vp_settings dict.
 
         Args:
-        vp_settings: Dict of settings for one VisionProcessor object.
+        name: Name of process. Must match a process key entry in self.settings.
 
         """
         proc = Process(target = VisionProcessor,
-                       name = vp_settings['camera'] + '_cam',
-                       args = (vp_settings,))
+                       name = name,
+                       args = (name, self.settings))
         #We want all managed processes to die if Fates dies.
         proc.daemon = True
         proc.start()
@@ -85,11 +87,11 @@ class Fates(object):
                 if not proc.is_alive():
                     #Process died unexpectedly, restart it.
                     self._vision_pool[idx] = self._init_vision_process(
-                                    self.settings['vision_processors'][idx])
+                                    self.settings[self.module_name]['vision_processors'][idx])
 
 
 #TODO delete this
 if __name__ == '__main__':
     with open('camera_settings.json') as settings_file:
         vision_settings = json.loads(settings_file.read())
-        f = Fates(vision_settings)
+        f = Fates('sensor/vision/fates',vision_settings)

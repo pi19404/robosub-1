@@ -1,63 +1,66 @@
 {
-    "maintenance_interval": 10,
-    "vision_processors": [
-        {
-            "camera": "front",
-            "dev": 0,
-            "codec" : "MJPG",
-            "enable": true,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        }
-    ],
-    "disabled_cameras": [
-        {
-            "camera": "down",
-            "dev": 1,
-            "codec" : "MJPG",
-            "enable": false,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        },
-        {
-            "camera": "left",
-            "dev": 2,
-            "codec" : "MJPG",
-            "enable": false,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        },
-        {
-            "camera": "right",
-            "dev": 3,
-            "codec" : "MJPG",
-            "enable": false,
-            "log": [
-                "raw",
-                "processed"
-            ],
-            "fps": 30,
-            "width": 640,
-            "height": 480,
-            "plugins": []
-        }
-    ]
+    "sensor/vision/fates": {
+        "port": 20054,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null},
+        "maintenance_interval": 5,
+        "vision_processors": [
+            "sensor/vision/cam_front"
+        ]
+    },
+    "sensor/vision/cam_front": {
+        "stream_port": 50000,
+        "symlink": "/dev/cam_down",
+        "codec" : "MJPG",
+        "enable": true,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": ["PathDetection"]
+    },
+    "sensor/vision/cam_down": {
+        "stream_port": 50001,
+        "symlink": "/dev/cam_down",
+        "codec" : "MJPG",
+        "enable": false,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    },
+    "sensor/vision/cam_left": {
+        "symlink": "/dev/cam_left",
+        "codec" : "MJPG",
+        "enable": false,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    },
+    "sensor/vision/cam_right": {
+        "symlink": "/dev/cam_right",
+        "codec" : "MJPG",
+        "enable": false,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    }
 }
