@@ -30,10 +30,7 @@ class VisionProcessor(object):
         # the symlink.
         self.cap = cv2.VideoCapture(int(os.path.realpath(
                     self.settings['symlink'])[-1]))
-        self.com = Communicator(
-                    module_name=module_name,
-                    subscriber_buffer_length=81920,
-                    subscriber_high_water_mark=81920)
+        self.com = Communicator(module_name=module_name)
 
         #Images from self.cap will be processed by the modules stored here.
         self._plugins = []
@@ -74,6 +71,8 @@ class VisionProcessor(object):
                 self.com.send_image(im)
                 for plugin in self._plugins:
                     retval, new_im = plugin.process_image(im)
+                    #if
+                    print retval
                     #if new_im is not None:
                     #    cv2.imshow("image_yo", new_im)
                     #else:
