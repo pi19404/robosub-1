@@ -1,0 +1,139 @@
+{
+    "publisher_high_water_mark": 1024,
+    "publisher_buffer_length": 1024,
+    "sensor/vision/front": {
+        "camera": "front",
+        "enabled": true,
+        "dev": 0,
+        "codec": "MJPG",
+        "log": ["raw", "processed"],
+        "stream": {
+        },
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "port": 20066,
+        "plugins": ["tollbooth"],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/vision/down": {
+        "camera": "down",
+        "enabled": false,
+        "dev": 1,
+        "codec": "MJPG",
+        "log": ["raw", "processed"],
+        "stream": {
+        },
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": [],
+        "port": 20067,
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/vision/fates": {
+        "port": 20054,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null},
+        "maintenance_interval": 5,
+        "vision_processors": [
+            "sensor/vision/front",
+            "sensor/vision/down"
+        ]
+    },
+    "util/logger": {
+        "port": 20055,
+        "listen": [
+            "decision",
+            "decision/advisor",
+            "movement/directive",
+            "movement/stabalization",
+            "movement/physical",
+            "sensor/vision/front",
+            "sensor/vision/down",
+            "util/logger"
+        ],
+        "release": {"path": "util/logging/pale_lager.py"},
+        "mock": {"path": "util/logging/pale_lager.py"}
+    },
+    "movement/directive": {
+        "port": 20056,
+        "listen": [
+            "decision",
+            "sensor/vision/front",
+            "sensor/vision/down"
+        ],
+        "release": {"path": "movement/directive/despot.py"},
+        "mock": {"path": "movement/directive/test/despot.py"}
+    },
+    "movement/stabalization": {
+        "port": 20057,
+        "listen": [
+            "movement/directive",
+            "sensor/accelerometer"
+        ],
+        "release": {"path": "movement/stabalization/tightrope_walker.py"},
+        "mock": {"path": "movement/stabalization/test/tightrope_walker.py"}
+    },
+    "movement/physical": {
+        "port": 20058,
+        "listen": [
+            "movement/stabalization"
+        ],
+        "release": {"path": "movement/physical/jockey.py"},
+        "mock": {"path": "movement/physical/test/jockey.py"}
+    },
+    "sensor/accelerometer": {
+        "port": 20059,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/gyroscope": {
+        "port": 20060,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/compass": {
+        "port": 20061,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/serial/display_messages": {
+        "port": 20062,
+        "listen": [
+            "sensor/serial/accelerometer",
+            "sensor/serial/gyroscope",
+            "sensor/serial/compass"
+        ],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "decision": {
+        "port": 20063,
+        "listen": ["decision/advisor"],
+        "release": {"path": "decision/shadow_behind_the_throne.py"},
+        "mock": {"path": null}
+    },
+    "decision/advisor": {
+        "port": 20064,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "util/vision_viewer": {
+        "port": 20065,
+        "listen": [
+            "sensor/vision/front",
+            "sensor/vision/down"
+        ],
+        "release": {"path": null},
+        "mock": {"path": null}
+    }
+}
+
