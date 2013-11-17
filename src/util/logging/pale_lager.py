@@ -47,8 +47,6 @@ def main(args):
                 for message in com.get_messages(mname):
                     json.dump(message, log_file)
                     log_file.write('\n')
-                    if mname == 'movement/physical':
-                        print 'here', message
             log_file.flush()
             sleep(args.epoch)
 

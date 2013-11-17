@@ -7,7 +7,7 @@ import sys
 import time
 from copy import deepcopy
 from random import random
-sys.path.append(os.path.abspath("../../.."))
+sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 
 def main(args):

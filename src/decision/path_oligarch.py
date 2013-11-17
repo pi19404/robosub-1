@@ -9,7 +9,7 @@ class PathOligarch(BaseOligarch):
         BaseOligarch.__init__(self, communicator)
         self.face_of_power = "PathOligarch"
 
-    def decision(self, sensor, video):
+    def decision(self, sensor, video_front, video_down):
         self._publish_decision(self._get_missive_template())
 
     def _get_missive_template(self):

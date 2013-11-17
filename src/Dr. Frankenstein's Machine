@@ -12,36 +12,51 @@ import argparse
 import json
 import os
 import re
+import time
+from pprint import pprint
 from subprocess import check_output, check_call, Popen, CalledProcessError
 
-def main(args):
-    release_fnames = set()
-    mock_fnames = set()
-    settings = json.load(open(args.settings_path, 'r'))
+def get_fnames(mode, settings):
+    fnames = set()
     for key, val in settings.items():
         if isinstance(val, dict):
-            release_fnames.add(val['release']['path'])
-            mock_fnames.add(val['mock']['path'])
+            fnames.add(val[mode]['path'])
+    None in fnames and fnames.remove(None)
+    return fnames
 
-    None in release_fnames and release_fnames.remove(None)
-    None in mock_fnames and mock_fnames.remove(None)
+def get_running(settings):
+    running = []
+    running_raw = check_output(['ps', '-e', '-o', 'pid,cmd']).splitlines()
+    for entry in running_raw[1:]:
+        pid, cmd = entry.strip().split(' ', 1)
+        pid = pid.strip()
+        cmd = cmd.strip()
+        running.append([pid, cmd])
+    release_fnames = get_fnames("release", settings)
+    mock_fnames = get_fnames("mock", settings)
+    robosub_running = []
+    PID, PROG = 0, 1
+    for fname in release_fnames.union(mock_fnames):
+        for entry in running:
+            if re.search(fname, entry[PROG]):
+                robosub_running.append((entry[PROG], entry[PID]))
+
+    return robosub_running
+
+
+def main(args):
+    settings = json.load(open(args.settings_path, 'r'))
+    release_fnames = get_fnames("release", settings)
+    mock_fnames = get_fnames("mock", settings)
 
     if args.kill:
-        running_raw = check_output(['ps', '-e', '-o', 'pid,cmd']).splitlines()
-        running = []
-        for entry in running_raw[1:]:
-            pid, cmd = entry.strip().split(' ', 1)
-            pid = pid.strip()
-            cmd = cmd.strip()
-            running.append([pid, cmd])
+        running = get_running(settings)
         PID = 0
         PROG = 1
-        for fname in release_fnames.union(mock_fnames):
-            for entry in running:
-                if re.search(fname, entry[PROG]):
-                    print "Killing '{0}' with pid {1}".format(
-                            entry[PROG], entry[PID])
-                    check_call(['kill', '-9', entry[PID]])
+        for prog, pid in running:
+            print "Killing '{0}' with pid {1}".format(
+                    prog, pid)
+            check_call(['kill', '-9', pid])
 
         print """
 Yet you, my creator, detest and spurn me, thy creature, to whom thou art bound
@@ -74,13 +89,19 @@ me. How dare you sport thus with life?
         print "I beheld the wretch--the miserable monster whom I had created."
         print
 
+    if args.running:
+        print '{0:>6}: {1}'.format("PID", "COMMAND")
+        print '{0:=>6}: {1:=>10}'.format("", "")
+        for prog, pid in get_running(settings):
+            print '{pid:>6}: {prog}'.format(pid=pid, prog=prog)
+
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
     parser.add_argument('--settings_path', type=str,
             default="./settings.json",
             help='Settings file path.')
-    parser.add_argument('-c', '--create', type=str, default="mock",
+    parser.add_argument('-c', '--create', type=str,
                         help="Would you also create for yourself and "
                              "the world a demoniacal enemy? (mock|release)")
     parser.add_argument('-k', '--kill', action='store_true',
@@ -88,6 +109,7 @@ def commandline():
     parser.add_argument('-m', '--module_name', type=str,
             default='movement/directive',
             help='Module name.')
+    parser.add_argument('-r', '--running', action='store_true')
     return parser.parse_args()
 
 
