@@ -138,7 +138,7 @@ def get_packet(ser):
         # correct place
         if packet[0] != CONTROL_BYTE: # if we are not in sync
             print "Error: lost sync. Press the [Enter] key to attempt to re-sync"
-            raw_input() # waits for the user to press the enter key
+            #raw_input() # waits for the user to press the enter key
             ser.flushInput() # flushes the serial rx buffer
             get_lock(ser) # get back into sync
         else:
@@ -376,7 +376,7 @@ def main(args):
                     received_packet, accel_com, gyro_com, compass_com, depth_com,
                     battery_voltage_com)
 
-        time.sleep(args.epoch)
+        #time.sleep(args.epoch)
 
     if not DEBUG:
         ser.close()
