@@ -9,7 +9,7 @@ class BaseOligarch(object):
         # Subclasses must specify self.face_of_power
 
     @abstractmethod
-    def decision(self, sensor, video):
+    def decision(self, *args):
         # Child classes don't need to use the same parameters.
         # Must call self._publish_decision().
         # Also, the parameters to this function will be the most recently

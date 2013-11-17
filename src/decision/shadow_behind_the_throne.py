@@ -47,7 +47,7 @@ def main(args):
     to tilt the nose up, and a small positive roll specifies a desire
     to lower the right side of the sub.
 
-    The AI's job is to interpret sensor data and video information,
+    The AI's job is to interpret sensor data and vision information,
     and from that, specify where the sub SHOULD be relative to where
     it CURRENTLY is. The desired location represents a state that
     should be achieved at some future time.
@@ -80,8 +80,8 @@ def main(args):
     }
 
     state = None
-    video_front = None
-    video_down = None
+    vision_front = None
+    vision_down = None
     advice = None
     depth = None
     while True:
@@ -97,10 +97,10 @@ def main(args):
             elif advice["command"] == "stop":
                 state = "stop"
 
-        video_front, _ = choose_last_packet(
-                com, "sensor/video/front", video_front)
-        video_down, _ = choose_last_packet(
-                com, "sensor/video/down", video_front)
+        vision_front, _ = choose_last_packet(
+                com, "sensor/vision/cam_front", vision_front)
+        vision_down, _ = choose_last_packet(
+                com, "sensor/vision/cam_down", vision_front)
         depth, _ = choose_last_packet(com, "sensor/depth", depth)
 
         if state == "stop":
@@ -108,7 +108,7 @@ def main(args):
         elif state == 'keyboard':
             oligarchs["AdvisorsPeon"].decision(advice)
         elif state == 'path':
-            oligarchs["PathOligarch"].decision(video_front, video_down)
+            oligarchs["PathOligarch"].decision(vision_front, vision_down)
         elif state == 'depth':
             oligarchs["DepthOligarch"].decision(depth)
 
