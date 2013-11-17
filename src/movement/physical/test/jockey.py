@@ -70,7 +70,7 @@ def main(args):
     if not DEBUG:
         ser = serial.Serial()
         # this may change, depending on what port the OS gives the microcontroller
-        ser.port = args.port
+        ser.port = "/dev/ttyUSB0" #args.port
         # the baudrate may change in the future
         ser.baudrate = args.baudrate
 
@@ -100,41 +100,41 @@ def main(args):
             elif stabalization_packet['vector']['y'] == 1.0:
                 # causes the sub to move forward
                 intent = 'move forward'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
                 raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
                 raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
             elif stabalization_packet['vector']['y'] == -1.0:
                 # causes the sub to move backwards
                 intent = 'move backward'
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
                 raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
                 raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
             elif stabalization_packet['vector']['z'] == 1.0:
                 # causes the sub to surface
                 intent = 'rise'
                 raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
             elif stabalization_packet['vector']['z'] == -1.0:
                 # causes the sub to dive
                 intent = 'dive'
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 100, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 100, 0))
             elif stabalization_packet['rotation']['z'] == 1.0:
                 # causes the sub to rotate clockwise
                 intent = 'rotate right'
                 raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
+                #raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
+                #raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
             elif stabalization_packet['rotation']['z'] == -1.0:
                 # causes the sub to rotate counter-clockwise
                 intent = 'rotate left'
                 raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
-                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+                raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
+                #raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
+                #raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
             else:
                 # Turn off all thrusters.
                 intent = 'full stop'
@@ -143,7 +143,7 @@ def main(args):
                 raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
                 raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
                 raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
-                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+                raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
 
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
@@ -170,7 +170,7 @@ def commandline():
             default='/dev/ttyUSB0',
             help="Serial interface port.")
     parser.add_argument('--magnitude', type=str,
-            default=25,
+            default=100,
             help='Thruster magnitude in percent.')
     parser.add_argument('-d', '--debug',
             default=False,
