@@ -134,6 +134,12 @@
         ],
         "release": {"path": null},
         "mock": {"path": null}
+    },
+    "sensor/depth": {
+        "port": 20066,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     }
 }
 
