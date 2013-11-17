@@ -35,6 +35,7 @@ class VisionProcessor(object):
         #Images from self.cap will be processed by the modules stored here.
         self._plugins = []
         self.logger = VideoLogger.VideoLogger(settings = settings)
+        self.logger._init_writer('raw')
 
         #Load, instantiate, and store the modules defined in the settings file.
         for vp in self.settings['plugins']:
@@ -69,10 +70,11 @@ class VisionProcessor(object):
             if got_image:
                 #self.com.publish_image(im)
                 self.com.send_image(im)
+                self.logger._write_image("raw", im)
                 for plugin in self._plugins:
                     retval, new_im = plugin.process_image(im)
-                    #if
-                    print retval
+                    if retval is not None:
+                        self.com.publish_message(retval)
                     #if new_im is not None:
                     #    cv2.imshow("image_yo", new_im)
                     #else:

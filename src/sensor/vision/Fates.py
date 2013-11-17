@@ -45,7 +45,7 @@ class Fates(object):
 
         #Monitor vision processes and reinitialize any that fail.
         self._maintain_vision_pool(
-                    settings[self.module_name]['maintenance_interval'])
+                    self.settings[self.module_name]['maintenance_interval'])
 
     def _init_vision_pool(self):
         """Initialize process for each self.settings['vision_processors']."""
