@@ -80,8 +80,8 @@ def main(args):
     }
 
     state = None
-    vision_front = None
-    vision_down = None
+    vision_cam_front = None
+    vision_cam_down = None
     advice = None
     depth = None
     while True:
@@ -97,10 +97,10 @@ def main(args):
             elif advice["command"] == "stop":
                 state = "stop"
 
-        vision_front, _ = choose_last_packet(
-                com, "sensor/vision/cam_front", vision_front)
-        vision_down, _ = choose_last_packet(
-                com, "sensor/vision/cam_down", vision_front)
+        vision_cam_front, _ = choose_last_packet(
+                com, "sensor/vision/cam_front", vision_cam_front)
+        vision_cam_down, _ = choose_last_packet(
+                com, "sensor/vision/cam_down", vision_cam_front)
         depth, _ = choose_last_packet(com, "sensor/depth", depth)
 
         if state == "stop":
@@ -108,7 +108,7 @@ def main(args):
         elif state == 'keyboard':
             oligarchs["AdvisorsPeon"].decision(advice)
         elif state == 'path':
-            oligarchs["PathOligarch"].decision(vision_front, vision_down)
+            oligarchs["PathOligarch"].decision(vision_cam_front, vision_cam_down)
         elif state == 'depth':
             oligarchs["DepthOligarch"].decision(depth)
 

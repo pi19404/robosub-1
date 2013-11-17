@@ -219,7 +219,7 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
-    elif packet['rotation']['z'] > 0.0:
+    elif packet['rotation']['yaw'] > 0.0:
         # causes the sub to rotate clockwise
         intent = 'rotate right'
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
@@ -228,7 +228,7 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
-    elif packet['rotation']['z'] < -0.0:
+    elif packet['rotation']['yaw'] < -0.0:
         # causes the sub to rotate counter-clockwise
         intent = 'rotate left'
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))

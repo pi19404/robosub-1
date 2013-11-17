@@ -10,7 +10,11 @@ class PathOligarch(BaseOligarch):
 
     def decision(self, vision_front, vision_down):
         missive = self._get_missive_template()
+
+        if not vision_down:
+            return
         theta = vision_down['theta']
+
         while theta < 0.0:
             theta += 2 * math.pi
         missive['desired_orientation']['yaw'] = theta

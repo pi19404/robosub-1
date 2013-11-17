@@ -6,7 +6,7 @@ import os
 import sys
 from copy import deepcopy
 from random import random
-sys.path.append(os.path.abspath("../../.."))
+sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 
 def main(args):
@@ -26,7 +26,7 @@ def main(args):
     #   z is yaw. Negative yaws left, positive yaws right.
     packet = {
             'vector': {'x': 0.0, 'y': 0.0, 'z': 0.0},
-            'rotation': {'x': 0.0, 'y': 0.0, 'z': 0.0}}
+            'rotation': {'yaw': 0.0, 'pitch': 0.0, 'roll': 0.0}}
 
     last_packet_time = 0.0
     while True:
@@ -49,9 +49,9 @@ def main(args):
             elif directive_packet['is_high'] > 0.0:
                 tx_packet['vector']['z'] = -1.0
             elif directive_packet['is_rotated_left'] > 0.0:
-                tx_packet['rotation']['z'] = 1.0
+                tx_packet['rotation']['yaw'] = 1.0
             elif directive_packet['is_rotated_right'] > 0.0:
-                tx_packet['rotation']['z'] = -1.0
+                tx_packet['rotation']['yaw'] = -1.0
 
             com.publish_message(tx_packet)
 
