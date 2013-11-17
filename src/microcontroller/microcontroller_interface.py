@@ -147,14 +147,14 @@ def get_packet(ser):
 
         return packet
 
-def respond_to_stabalization_packet(packet, mag, full_stop=False):
+def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
     # TODO: This would allow us to use cleaner debug messages if we
     # instead had a thruster settings dictionary. E.g.:
     # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
     # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
     raw_cmds = []
-
-    if full_stop:
+    intent = None
+    if advisor_packet and advisor_packet['command'] == 'stop':
         # Turn off all thrusters.
         intent = 'full stop'
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
@@ -163,6 +163,22 @@ def respond_to_stabalization_packet(packet, mag, full_stop=False):
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+    elif advisor_packet and advisor_packet['command'] == 'roll left':
+        intent = 'roll left'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
+    elif advisor_packet and advisor_packet['command'] == 'roll right':
+        intent = 'roll right'
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
     elif packet['vector']['x'] > 0.0:
         intent = 'strafe left (not implemented)'
     elif packet['vector']['x'] < 0.0:
@@ -341,16 +357,12 @@ def main(args):
             advisor_packet['timestamp'] > last_advisor_packet_time):
             last_advisor_packet = advisor_packet
 
-        if last_advisor_packet and last_advisor_packet['command'] == "stop":
-            full_stop = True
-        else:
-            full_stop = False
-
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
             last_packet_time = stabalization_packet['timestamp']
             intent, raw_cmds = respond_to_stabalization_packet(
-                    packet=stabalization_packet, mag=mag, full_stop=full_stop)
+                    packet=stabalization_packet, mag=mag,
+                    advisor_packet=last_advisor_packet)
             # Debugging info...
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
