@@ -146,6 +146,18 @@
         ],
         "release": {"path": null},
         "mock": {"path": null}
+    },
+    "sensor/depth": {
+        "port": 20066,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/battery_voltage": {
+        "port": 20067,
+        "listen": [],
+        "release": {"path": null},
+        "mock": {"path": null}
     }
 }
 
