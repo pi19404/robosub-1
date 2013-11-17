@@ -98,8 +98,8 @@ class PathDetection(object):
         max_e = 100
         Canny_edges = cv2.Canny(threshold_hsv, min_e, max_e,apertureSize=5, L2gradient=True)
         g_Canny_edges = cv2.GaussianBlur(Canny_edges, (5,5), 0)
-        cv2.imshow("brotime", g_Canny_edges)
-        cv2.waitKey(20)
+        #cv2.imshow("brotime", g_Canny_edges)
+        #cv2.waitKey(20)
 
         # returns beginning points and  endpoints of all lines.
         minLineLength = 160

@@ -50,6 +50,7 @@ class Fates(object):
     def _init_vision_pool(self):
         """Initialize process for each self.settings['vision_processors']."""
         for vp_name in self.settings[self.module_name]['vision_processors']:
+            print "adding vision process {vp}".format(vp=vp_name)
             self._vision_pool += [self._init_vision_process(vp_name)]
 
     def _init_vision_process(self, name):
