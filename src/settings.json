@@ -16,6 +16,7 @@
         "mock": {"path": null}
     },
     "sensor/vision/cam_down": {
+        "symlink": "/dev/cam_down",
         "camera": "down",
         "enabled": false,
         "dev": 1,
@@ -38,8 +39,8 @@
         "mock": {"path": null},
         "maintenance_interval": 5,
         "vision_processors": [
-            "sensor/vision/front",
-            "sensor/vision/down"
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down"
         ]
     },
     "util/logger": {
@@ -50,8 +51,8 @@
             "movement/directive",
             "movement/stabalization",
             "movement/physical",
-            "sensor/vision/front",
-            "sensor/vision/down",
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down",
             "sensor/vision/fates",
             "sensor/accelerometer",
             "sensor/gyroscope",
@@ -67,8 +68,8 @@
         "port": 20056,
         "listen": [
             "decision",
-            "sensor/vision/front",
-            "sensor/vision/down"
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down"
         ],
         "fuzzy_sets": {
             "is_right": [[-2.0, 1.0], [0.0, 0.0]],
@@ -135,8 +136,8 @@
         "port": 20063,
         "listen": [
           "decision/advisor",
-          "sensor/vision/front",
-          "sensor/vision/down",
+          "sensor/vision/cam_front",
+          "sensor/vision/cam_down",
           "sensor/accelerometer",
           "sensor/gyroscope",
           "sensor/compass",
@@ -155,8 +156,8 @@
     "util/vision_viewer": {
         "port": 20065,
         "listen": [
-            "sensor/vision/front",
-            "sensor/vision/down"
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down"
         ],
         "release": {"path": null},
         "mock": {"path": null}
