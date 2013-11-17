@@ -36,6 +36,5 @@ class AdvisorsPeon(BaseOligarch):
         elif advice["command"] == "roll right":
             missive['desired_orientation']['roll'] = math.pi / 2
 
-        print missive
         self._publish_decision(missive)
 

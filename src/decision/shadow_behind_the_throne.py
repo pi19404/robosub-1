@@ -87,7 +87,6 @@ def main(args):
     while True:
         advice, succ = choose_last_packet(com, "decision/advisor", advice)
         if succ:
-            print advice["command"]
             if advice["command"] == "state: keyboard":
                 state = 'keyboard'
             elif advice["command"] == "state: path":

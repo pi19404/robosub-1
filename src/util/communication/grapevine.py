@@ -88,6 +88,7 @@ class Communicator(object):
             mdata['socket'].connect(self.get_socket_name(mname))
             mdata['queue'] = Queue.Queue()
             mdata['refresh_lock'] = threading.Semaphore(value=1)
+            mdata['last_message'] = None
 
         # Set up the passive refresher
         self._refresher = Communicator._Refresher(communicator=self)
@@ -100,17 +101,22 @@ class Communicator(object):
         The messages prior to the last one will be discarded.
 
         """
+        # Updates the last message
         try:
-            return [msg for msg in self.get_messages(module_name)][-1]
-        except IndexError:
-            return None
+            self.get_messages(module_name).next()
+        except StopIteration:
+            pass
+        return self.subscribers[module_name]['last_message']
 
     def get_messages(self, module_name):
         """Returns a generator that yields all available messages."""
         self._refresh(module_name)
         while True:
             try:
-                yield self.subscribers[module_name]['queue'].get_nowait()
+                msg = self.subscribers[module_name]['queue'].get_nowait()
+                if msg:
+                    self.subscribers[module_name]['last_message'] = msg
+                yield msg
             except Queue.Empty:
                 raise StopIteration()
 
