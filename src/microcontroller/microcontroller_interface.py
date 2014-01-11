@@ -374,7 +374,8 @@ def main(args):
             advisor_packet['timestamp'] > last_advisor_packet_time):
             last_advisor_packet_time = advisor_packet['timestamp']
             last_advisor_packet = advisor_packet
-            new_event = True
+            if advisor_packet['command'] == 'stop':
+                new_event = True
 
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
