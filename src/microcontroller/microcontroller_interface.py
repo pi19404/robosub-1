@@ -367,16 +367,21 @@ def main(args):
     last_advisor_packet_time = 0.0
     while True:
         stabalization_packet = com.get_last_message("movement/stabalization")
-
         advisor_packet = com.get_last_message("decision/advisor")
+        new_event = False
+
         if (advisor_packet and
             advisor_packet['timestamp'] > last_advisor_packet_time):
             last_advisor_packet_time = advisor_packet['timestamp']
             last_advisor_packet = advisor_packet
+            new_event = True
 
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
             last_packet_time = stabalization_packet['timestamp']
+            new_event = True
+
+        if new_event:
             intent, raw_cmds = respond_to_stabalization_packet(
                     packet=stabalization_packet, mag=mag,
                     advisor_packet=last_advisor_packet)
