@@ -34,6 +34,29 @@ def cmd_thruster(thruster_id, magnitude, direction):
     takes an id, a magnitude (between 0 and 100), and a direction (0 or 1) 0 is
     forward, 1 is reverse
 
+    -------------------------
+    |                       |
+---------               ---------
+|BOW    |               |BOW    |
+|PORT   |               |STARBOA|
+---------               ---------
+    |                       |
+    |                       |
+    |                       |
+---------               ---------
+|DEPTH  |               |DEPTH  |
+|PORT   |               |STARBOA|
+---------               ---------
+    |                       |
+    |                       |
+    |                       |
+---------               ---------
+|STERN  |               |STERN  |
+|PORT   |               |STARBOA|
+---------               ---------
+    |                       |
+    -------------------------
+
     """
 
     raw_thruster_id = '\0'
@@ -154,31 +177,32 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
     # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
     raw_cmds = []
     intent = None
+    # Node: the advisor_packet is for debugging purposes only.
     if advisor_packet and advisor_packet['command'] == 'stop':
         # Turn off all thrusters.
         intent = 'full stop'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
     elif advisor_packet and advisor_packet['command'] == 'roll left':
         intent = 'roll left'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
     elif advisor_packet and advisor_packet['command'] == 'roll right':
         intent = 'roll right'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
     elif packet['vector']['x'] > 0.0:
         intent = 'strafe left (not implemented)'
     elif packet['vector']['x'] < 0.0:
@@ -186,61 +210,57 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
     elif packet['vector']['y'] > 0.0:
         # causes the sub to move forward
         intent = 'move forward'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
     elif packet['vector']['y'] < 0.0:
         # causes the sub to move backwards
         intent = 'move backward'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
     elif packet['vector']['z'] > 0.0:
         # causes the sub to surface
         intent = 'rise'
-        print intent
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
     elif packet['vector']['z'] < -0.0:
         # causes the sub to dive
         intent = 'dive'
-        print intent
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
-       #raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag, 0))
-       #raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
     elif packet['rotation']['yaw'] > 0.0:
         # causes the sub to rotate clockwise
         intent = 'rotate right'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 1))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 1))
     elif packet['rotation']['yaw'] < -0.0:
         # causes the sub to rotate counter-clockwise
         intent = 'rotate left'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag, 0))
+        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag, 0))
 
     return intent, raw_cmds
 
