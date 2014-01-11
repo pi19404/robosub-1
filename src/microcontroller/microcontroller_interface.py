@@ -90,7 +90,6 @@ def cmd_thruster(thruster_id, magnitude, direction):
 
     # send the commmand to the microcontroller
     if not DEBUG:
-        print "Writing to microcontroller..."
         cmd_thruster.ser.write(raw_cmd)
     return raw_cmd
 
@@ -372,6 +371,7 @@ def main(args):
         advisor_packet = com.get_last_message("decision/advisor")
         if (advisor_packet and
             advisor_packet['timestamp'] > last_advisor_packet_time):
+            last_advisor_packet_time = advisor_packet['timestamp']
             last_advisor_packet = advisor_packet
 
         if (stabalization_packet and

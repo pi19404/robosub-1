@@ -85,8 +85,8 @@ def main(args):
     advice = None
     depth = None
     while True:
-        advice, succ = choose_last_packet(com, "decision/advisor", advice)
-        if succ:
+        advice, success = choose_last_packet(com, "decision/advisor", advice)
+        if success:
             if advice["command"] == "state: keyboard":
                 state = 'keyboard'
             elif advice["command"] == "state: path":
@@ -104,7 +104,7 @@ def main(args):
 
         if state == "stop":
             pass
-        elif state == 'keyboard':
+        elif state == 'keyboard' and success:
             oligarchs["AdvisorsPeon"].decision(advice)
         elif state == 'path':
             oligarchs["PathOligarch"].decision(vision_cam_front, vision_cam_down)
