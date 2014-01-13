@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # COPYRIGHT: Robosub Club of the Palouse under the GPL v3
 
 """Creates and maintains Robosub vision processes.
@@ -34,7 +35,8 @@ class Fates(object):
         self.module_name = module_name
         self.settings = settings # XXX consider making this a deepcopy?
 
-        self._vision_processors = []
+        #self._vision_processors = []
+        self._vision_processors = {}
 
         self._init_vision_processors()
 
@@ -48,25 +50,27 @@ class Fates(object):
     def _init_vision_processors(self):
         """Initialize process for each self.settings['vision_processors']."""
         for vp_name in self.settings[self.module_name]['vision_processors']:
-            print "adding vision process {vp}".format(vp=vp_name)
-            self._vision_processors += [self._init_vision_process(vp_name)]
+            self._init_vision_process(vp_name)
+            #print "adding vision process {vp}".format(vp=vp_name)
+            #self._vision_processors[vp_name] = self._init_vision_process(vp_name)
 
-    def _init_vision_process(self, name):
+    def _init_vision_process(self, process_name):
         """Initialize a process using settings given in vp_settings dict.
 
         Args:
-        name: Name of process. Must match a process key entry in self.settings.
+        process_name: Name of process. Must match a process key entry in self.settings.
 
         """
         parent_conn, child_conn = Pipe()
         proc = Process(target = VisionProcessor,
-                       name = name,
-                       args = (name, self.settings, child_conn))
+                       name = process_name,
+                       args = (process_name, self.settings, child_conn))
         #We want all managed processes to die if Fates dies.
         proc.daemon = True
         proc.start()
         parent_conn.send(1)
-        return {'process': proc, 'pipe': parent_conn}
+        self._vision_processors[process_name] = \
+                {'process': proc, 'pipe': parent_conn}
 
     def _maintain_vision_processors(self, interval=5):
         """Keep all processes in self._vision_processors alive.
@@ -86,16 +90,18 @@ class Fates(object):
         while True:
             sleep(interval)
             print 'doing another maintenance loop'
-            for idx, proc in enumerate(self._vision_processors):
-                if not proc['process'].is_alive():
-                    #Process died unexpectedly, restart it.
-                    self._vision_processors[idx] = self._init_vision_process(
-                            self.settings[self.module_name] \
-                            ['vision_processors'][idx])
+            for process_name in self._vision_processors.keys():
+                self._maintain_proc(process_name)
+
     # TODO if a process has died or frozen, the process needs to be destroyed
     # and restarted after the camera has been given sufficient time to shut
     # down (~4sec?). This wait should be done in a separate thread so the rest
     # of the vision processing can continue.
+    def _maintain_proc(self, process_name):
+        if not self._vision_processors[process_name]['process'].is_alive():
+            #Process died unexpectedly, restart it.
+            self._vision_processors[process_name]['process'] = \
+                    self._init_vision_process(process_name)
 
 
 

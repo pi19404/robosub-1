@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import cv2
 import cv2.cv as cv
 from logging import VideoLogger
@@ -22,6 +23,7 @@ class VisionProcessor(object):
         pipe -- TODO
 
         """
+        print 1
         self.module_name = module_name
         self.settings = settings[module_name]
         # TODO pipe should be a pipe. Save, it check it for messages, and
@@ -33,8 +35,16 @@ class VisionProcessor(object):
         # FIXME error check the path. If the camera doesn't exist, neither will
         # the symlink.
         # TODO enable using videos or images as a source.
-        self._cap = cv2.VideoCapture(int(os.path.realpath(
-                    self.settings['symlink'])[-1]))
+        try:
+            self._cap = cv2.VideoCapture(int(os.path.realpath(
+                        self.settings['symlink'])[-1]))
+            self._cap.set(cv.CV_CAP_PROP_FOURCC, cv.CV_FOURCC(
+                        *list(self.settings['codec'].encode('ascii'))))
+            self._cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, self.settings['height'])
+            self._cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, self.settings['width'])
+        except KeyError:
+            print self.settings['recorded_video']
+            self._cap = cv2.VideoCapture(self.settings['recorded_video'])
         self._com = Communicator(module_name=module_name)
 
         #Images from self._cap will be processed by the modules stored here.
@@ -53,14 +63,9 @@ class VisionProcessor(object):
 
         #Configure the VideoCapture object.
         #FIXME fix the JSON load so it doesn't make all strings unicode.
-        self._cap.set(cv.CV_CAP_PROP_FOURCC, cv.CV_FOURCC(
-                    *list(self.settings['codec'].encode('ascii'))))
-        self._cap.set(cv.CV_CAP_PROP_FRAME_HEIGHT, self.settings['height'])
-        self._cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, self.settings['width'])
         self._vision_process()
 
     def _vision_process(self):
-        print self.settings['symlink'] + '_heck_yeah'
         self._com.bind_video_stream(self.settings['stream_port'])
         while True:
             #TODO add some error checking before calling modules. They may

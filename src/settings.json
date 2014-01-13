@@ -32,15 +32,32 @@
         "release": {"path": null},
         "mock": {"path": null}
     },
-    "sensor/vision/fates": {
+    "sensor/vision/cam_fake": {
+        "symlink": "/dev/cam_down",
+        "recorded_video": "~/Videos/Robosub/Obstacles/pathForwardCamera640x$80.mp4",
+        "camera": "down",
+        "enabled": false,
+        "dev": 1,
+        "codec": "MJPG",
+        "log": ["raw", "processed"],
+        "stream": {
+        },
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": ["PathDetection"],
+        "port": 20053,
+        "release": {"path": null},
+        "mock": {"path": null}
+    },
+    "sensor/vision/visiond": {
         "port": 20054,
         "listen": [],
         "release": {"path": null},
         "mock": {"path": null},
         "maintenance_interval": 5,
         "vision_processors": [
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down"
+            "sensor/vision/cam_fake"
         ]
     },
     "util/logger": {

@@ -9,8 +9,20 @@
             "sensor/vision/cam_fake"
         ]
     },
-    "sensor/vision/cam_fake: {
-        "image": "/home/cevans/Pictures/test_im.jpg",
+    "sensor/vision/cam_fake": {
+        "recorded_video": "/home/cevans/Videos/RoboSub/Obstacles/pathForwardCamera640x480.mp4",
+        "stream_port": 50000,
+        "port": 50001,
+        "codec" : "MJPG",
+        "enable": true,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 30,
+        "width": 640,
+        "height": 480,
+        "plugins": []
     },
     "sensor/vision/cam_front": {
         "stream_port": 50000,
