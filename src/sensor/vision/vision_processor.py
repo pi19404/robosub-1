@@ -7,6 +7,7 @@ import sys
 import os
 import json
 import zmq
+from multiprocessing.pool import ThreadPool
 from importlib import import_module
 sys.path.append(os.path.abspath('../..'))
 from util.communication.grapevine import Communicator
@@ -35,6 +36,7 @@ class VisionProcessor(object):
         # FIXME error check the path. If the camera doesn't exist, neither will
         # the symlink.
         # TODO enable using videos or images as a source.
+        self.pool = ThreadPool(cv2.getNumberOfCPUs())
         try:
             self._cap = cv2.VideoCapture(int(os.path.realpath(
                         self.settings['symlink'])[-1]))
@@ -78,7 +80,7 @@ class VisionProcessor(object):
             # detect that so that we can generate an error.
             got_image, im = self._cap.read()
             if not got_image:
-                raise Exception
+                raise Exception('Could not read image.')
             else:
                 # Check if parent sent a message to see if this process.
                 if self._pipe.poll() is True:
@@ -86,9 +88,10 @@ class VisionProcessor(object):
                     # isn't frozen.
                     self._pipe.send(self._pipe.recv())
 
-                #self._com.publish_image(im)
-                #self.logger._write_image("raw", im)
                 self._com.send_image(im)
+                cv2.imshow("image_yo", im)
+                cv2.waitKey(10)
+                #self.pool.apply_async(self._com.send_image, (im,))
                 for plugin in self._plugins:
                     retval, new_im = plugin.process_image(im)
                     if retval is not None:

@@ -10,7 +10,7 @@
         ]
     },
     "sensor/vision/cam_fake": {
-        "recorded_video": "/home/cevans/Videos/RoboSub/Obstacles/pathForwardCamera640x480.mp4",
+        "recorded_video": "/home/cevans/Videos/RoboSub/Obstacles/pathOutOfStartGate640x480.mp4",
         "stream_port": 50000,
         "port": 50001,
         "codec" : "MJPG",

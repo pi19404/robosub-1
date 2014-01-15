@@ -9,8 +9,13 @@ import numpy
 import cv2
 import cv2.cv as cv
 import time
+from multiprocessing.pool import ThreadPool
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
+
+def yield_forever():
+    while True:
+        yield
 
 class VisionViewer(object):
     def __init__(self):
@@ -20,8 +25,9 @@ class VisionViewer(object):
                 subscriber_high_water_mark=81920,
                 settings_path="../../settings.json")
         last_timestamp = 0.0
-        self.com.connect_video_stream(50001)
+        self.com.connect_video_stream(50000)
         print 'connected'
+        result = []
         while True:
             try:
                 im = self.com.recv_image()

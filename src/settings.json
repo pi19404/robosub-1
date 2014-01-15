@@ -34,7 +34,7 @@
     },
     "sensor/vision/cam_fake": {
         "symlink": "/dev/cam_down",
-        "recorded_video": "~/Videos/Robosub/Obstacles/pathForwardCamera640x$80.mp4",
+        "recorded_video": "~/Videos/Robosub/Obstacles/pathOutOfStartGate640x$80.mp4",
         "camera": "down",
         "enabled": false,
         "dev": 1,

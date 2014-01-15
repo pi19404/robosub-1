@@ -100,8 +100,9 @@ class Fates(object):
     def _maintain_proc(self, process_name):
         if not self._vision_processors[process_name]['process'].is_alive():
             #Process died unexpectedly, restart it.
-            self._vision_processors[process_name]['process'] = \
-                    self._init_vision_process(process_name)
+            self._init_vision_process(process_name)
+            #self._vision_processors[process_name]['process'] = \
+            #        self._init_vision_process(process_name)
 
 
 
