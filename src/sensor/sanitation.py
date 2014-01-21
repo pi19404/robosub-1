@@ -15,7 +15,6 @@ sensors = {}
 # Example Sensor Object
 #
 # sensors = {
-# 	'timestamp' : datetime.datetime.now(),
 # 	'gyroscope' : {
 # 		'gx' : 1,
 # 		'gy' : 2,
@@ -104,6 +103,7 @@ def main():
 		#comp_msg = san.get_last_message("sensor/compass")
 
 		# Finally, we will publish our sensors object to the grapevine for use elsewhere
+
 		san.publish_message(sensors)
 
 
