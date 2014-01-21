@@ -9,6 +9,7 @@ import json
 import zmq
 from multiprocessing.pool import ThreadPool
 from importlib import import_module
+from image_preprocessor import Preprocessor
 sys.path.append(os.path.abspath('../..'))
 from util.communication.grapevine import Communicator
 
@@ -24,9 +25,9 @@ class VisionProcessor(object):
         pipe -- TODO
 
         """
-        print 1
         self.module_name = module_name
         self.settings = settings[module_name]
+        self.preprocessor = Preprocessor()
         # TODO pipe should be a pipe. Save, it check it for messages, and
         # reply.
         self._pipe = pipe
@@ -89,8 +90,9 @@ class VisionProcessor(object):
                     self._pipe.send(self._pipe.recv())
 
                 self._com.send_image(im)
-                cv2.imshow("image_yo", im)
-                cv2.waitKey(10)
+                self.preprocessor.preprocess(im)
+                #cv2.imshow("image_yo", im)
+                #cv2.waitKey(10)
                 #self.pool.apply_async(self._com.send_image, (im,))
                 for plugin in self._plugins:
                     retval, new_im = plugin.process_image(im)
