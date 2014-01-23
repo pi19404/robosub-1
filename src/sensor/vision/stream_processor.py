@@ -9,12 +9,12 @@ import json
 import zmq
 from multiprocessing.pool import ThreadPool
 from importlib import import_module
-from image_preprocessor import Preprocessor
+from frame_preprocessor import FramePreprocessor
 sys.path.append(os.path.abspath('../..'))
 from util.communication.grapevine import Communicator
 
 
-class VisionProcessor(object):
+class StreamProcessor(object):
     """Open a video stream and process frames. Report finds to the grapevine."""
     def __init__(self, module_name, settings, pipe):
         """Initialize video capture, logger, and processing plugins.
@@ -27,7 +27,7 @@ class VisionProcessor(object):
         """
         self.module_name = module_name
         self.settings = settings[module_name]
-        self.preprocessor = Preprocessor()
+        self.preprocessor = FramePreprocessor()
         # TODO pipe should be a pipe. Save, it check it for messages, and
         # reply.
         self._pipe = pipe
