@@ -22,14 +22,14 @@ from util.communication.grapevine import Communicator
 
 # TODO figure out how to initialize the camera driver settings through guvcview.
 
-class Fates(object):
+class VisionController(object):
     """Create and maintain Robosub video logic processes."""
     def __init__(self, module_name, settings):
         """Create and maintain all video logic processes defined in settings.
 
         Args:
-        settings -- dictionary of settings for Fates and processes managed
-            by Fates.
+        settings -- dictionary of settings for VisionController and processes managed
+            by VisionController.
 
         """
         self.module_name = module_name
@@ -64,7 +64,7 @@ class Fates(object):
         proc = Process(target = StreamProcessor,
                        name = process_name,
                        args = (process_name, self.settings, child_conn))
-        #We want all managed processes to die if Fates dies.
+        #We want all managed processes to die if VisionController dies.
         proc.daemon = True
         proc.start()
         parent_conn.send(1)
@@ -111,7 +111,7 @@ def _main(args):
         settings['sensor/vision/cam_fake']['recorded_video'] = args.video
     if args.plugins:
         settings['sensor/vision/cam_fake']['plugins'] = args.plugins
-    v = Fates('sensor/vision/visiond', settings)
+    v = VisionController('sensor/vision/visiond', settings)
 
 def _command_line():
     """Parse command line arguments."""
