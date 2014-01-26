@@ -47,7 +47,8 @@ class StreamProcessor(object):
             self._cap.set(cv.CV_CAP_PROP_FRAME_WIDTH, self.settings['width'])
         except KeyError:
             print self.settings['recorded_video']
-            self._cap = cv2.VideoCapture(self.settings['recorded_video'])
+            #self._cap = cv2.VideoCapture(self.settings['recorded_video'])
+            self._cap = cv2.VideoCapture(0)
         self._com = Communicator(module_name=module_name)
 
         #Images from self._cap will be processed by the modules stored here.
