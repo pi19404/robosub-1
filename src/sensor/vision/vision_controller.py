@@ -32,6 +32,7 @@ class VisionController(object):
             by VisionController.
 
         """
+        #sys.stdout, sys.stdin, sys.stderr = [open('/dev/null', 'w')] * 3
         self.module_name = module_name
         self.settings = settings # XXX consider making this a deepcopy?
 
@@ -50,8 +51,6 @@ class VisionController(object):
         """Initialize process for each self.settings['vision_processors']."""
         for vp_name in self.settings[self.module_name]['vision_processors']:
             self._init_vision_process(vp_name)
-            #print "adding vision process {vp}".format(vp=vp_name)
-            #self._vision_processors[vp_name] = self._init_vision_process(vp_name)
 
     def _init_vision_process(self, process_name):
         """Initialize a process using settings given in vp_settings dict.
@@ -84,7 +83,6 @@ class VisionController(object):
 
         while True:
             sleep(self.settings[self.module_name]['maintenance_interval'])
-            print 'doing another maintenance loop'
             for process_name in self._vision_processors.keys():
                 self._maintain_proc(process_name)
 

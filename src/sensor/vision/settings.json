@@ -5,7 +5,9 @@
         "release": {"path": null},
         "mock": {"path": null},
         "maintenance_interval": 5,
+        "max_failed_frames": 150,
         "vision_processors": [
+            "sensor/vision/cam_down",
             "sensor/vision/cam_fake"
         ]
     },
@@ -14,19 +16,21 @@
         "recorded_video_": "/home/cevans/Videos/RoboSub/Obstacles/tollBooth640x480.mp4",
         "stream_port": 50000,
         "port": 50001,
+        "stream_type": "recorded_video",
         "codec" : "MJPG",
         "enable": true,
         "log": [
             "raw",
             "processed"
         ],
-        "fps": 30,
+        "fps": 8,
         "width": 640,
         "height": 480,
         "plugins": []
     },
     "sensor/vision/cam_front": {
         "stream_port": 50000,
+        "stream_type": "device",
         "symlink": "/dev/cam_front",
         "codec" : "MJPG",
         "enable": true,
@@ -34,13 +38,14 @@
             "raw",
             "processed"
         ],
-        "fps": 30,
+        "fps": 10,
         "width": 640,
         "height": 480,
         "plugins": []
     },
     "sensor/vision/cam_down": {
         "stream_port": 50001,
+        "stream_type": "device",
         "symlink": "/dev/cam_down",
         "codec" : "MJPG",
         "enable": false,
@@ -48,7 +53,7 @@
             "raw",
             "processed"
         ],
-        "fps": 30,
+        "fps": 10,
         "width": 640,
         "height": 480,
         "plugins": ["PathDetection"]
