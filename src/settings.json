@@ -175,7 +175,7 @@
         "mock": {"path": null}
     },
     "sensor/sanitation":{
-        "port":20067,
+        "port":20068,
         "listen":[
             "sensor/depth",
             "sensor/battery_voltage",
