@@ -5,7 +5,6 @@ import time
 import os
 import sys
 import serial
-sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
 
 CONTROL_BYTE = '\n'
@@ -170,7 +169,7 @@ def get_packet(ser):
 
         return packet
 
-def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
+def respond_to_stabilization_packet(packet, mag, advisor_packet=None):
     # TODO: This would allow us to use cleaner debug messages if we
     # instead had a thruster settings dictionary. E.g.:
     # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
@@ -338,8 +337,7 @@ def main(args):
     DEBUG = args.debug
 
     # Expected: args.module_name == "movement/physical"
-    com = Communicator(module_name=args.module_name,
-                       settings_path=args.settings_path)
+    com = Communicator(module_name=args.module_name)
     accel_com = Communicator(module_name='sensor/accelerometer')
     gyro_com = Communicator(module_name='sensor/gyroscope')
     compass_com = Communicator(module_name='sensor/compass')
@@ -366,7 +364,7 @@ def main(args):
     last_advisor_packet = None
     last_advisor_packet_time = 0.0
     while True:
-        stabalization_packet = com.get_last_message("movement/stabalization")
+        stabilization_packet = com.get_last_message("movement/stabilization")
         advisor_packet = com.get_last_message("decision/advisor")
         new_event = False
 
@@ -377,14 +375,14 @@ def main(args):
             if advisor_packet['command'] == 'stop':
                 new_event = True
 
-        if (stabalization_packet and
-            stabalization_packet['timestamp'] > last_packet_time):
-            last_packet_time = stabalization_packet['timestamp']
+        if (stabilization_packet and
+            stabilization_packet['timestamp'] > last_packet_time):
+            last_packet_time = stabilization_packet['timestamp']
             new_event = True
 
         if new_event:
-            intent, raw_cmds = respond_to_stabalization_packet(
-                    packet=stabalization_packet, mag=mag,
+            intent, raw_cmds = respond_to_stabilization_packet(
+                    packet=stabilization_packet, mag=mag,
                     advisor_packet=last_advisor_packet)
             # Debugging info...
             msg = {"intent": intent,
@@ -406,9 +404,6 @@ def main(args):
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')

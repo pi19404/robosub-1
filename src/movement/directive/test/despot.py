@@ -19,7 +19,7 @@ def main(args):
     # These sets come in pairs (left/right, back/forward, etc.) and represent
     # where the submarine is in relation to where it wants to be.
     # The roll and yaw sets are not available to directive module since
-    # they should be controlled by either the stabalization module, or by
+    # they should be controlled by either the stabilization module, or by
     # the awesome balancing skills of the mech-e's.
     packet = {
             'is_left': 0.0,

@@ -71,9 +71,7 @@ def main(args):
      | LEFT  |  BACK | RIGHT | FALL  |
      +-------+-------+-------+-------+
 """
-    com = Communicator(
-            module_name=args.module_name,
-            settings_path=args.settings_path)
+    com = Communicator(module_name=args.module_name)
 
     advice_template = {"command": None}
 
@@ -121,10 +119,6 @@ def main(args):
 
 def commandline():
     parser = argparse.ArgumentParser(description='Keyboard advice module.')
-    parser.add_argument(
-            '--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument(
             '-m', '--module_name', type=str,
             default='decision/advisor',

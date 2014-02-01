@@ -115,9 +115,7 @@ def main(args):
  | LEFT  |  BACK | RIGHT | FALL  |
  +-------+-------+-------+-------+
 """
-    com = Communicator(
-            module_name=args.module_name,
-            settings_path=args.settings_path)
+    com = Communicator(module_name=args.module_name)
 
     # TODO: This is a tentative structure, and it will work for
     # keyboard input, but we need to discuss what information the
@@ -170,9 +168,6 @@ def main(args):
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument('-m', '--module_name', type=str,
             default='decision',
             help='Module name.')
