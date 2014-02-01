@@ -20,7 +20,9 @@ class FrameProcessor(object):
 
         # Minimum height of peak on hue histogram before being considered
         # something of interest.
-        self._histogram_beta = 0
+        # XXX Slope might also be a good way to detect these colors.
+        # Investigate.
+        self._hue_histogram_beta = 0
 
         # Hue midpoints will shift in different light. Midpoints for current
         # image should be calculated and stored here.
@@ -57,7 +59,7 @@ class FrameProcessor(object):
         self._histogram_value = None
 
         # Bitmasks of pixels with attributes unique to robosub obstacles.
-        self._filtered_frames = {
+        self._filtered_images = {
             # High saturation colors (colored duct tape).
             'b': None, # blue
             'g': None, # green
@@ -136,24 +138,24 @@ class FrameProcessor(object):
     def _memoized_filtered_hue_image(self, key):
         """Memoize a bitmask near given hue.
 
-        Bitmask includes high-saturation areas that also closely match given
-        hue_val.
+        Bitmask includes high-saturation areas that also closely match
+        current hue midpoint stored in self._hue_midpoints[key].
 
         Args:
 
-        key - One of the keys from self._filtered_frames dict.
+        key - One of the keys from self._filtered_images dict.
 
         """
 
-        if self._filtered_frames[key] is None:
+        if self._filtered_images[key] is None:
             # The filtered image hasn't been created yet. Memoize it.
-            self._filtered_frames[key] = \
+            self._filtered_images[key] = \
                     cv2.bitwise_and(
                         self._filter_hue(self._hue_midpoints[key]),
                         cv2.inRange(self.im_saturation, 
                             np.array(170), np.array(255)))
 
-        return self._filtered_frames[key]
+        return self._filtered_images[key]
 
     @property
     def filtered_blue(self):
@@ -244,44 +246,48 @@ class FrameProcessor(object):
         # different directions. The direction of the shifts is orthagonal so
         # that any direction of edges is detected.
         im_crop = im[0: x_dim - shift, 0: y_dim - shift]
-        im_up = im[0:x_dim - shift, shift: y_dim]
-        im_left = im[shift:x_dim, 0: y_dim - shift]
-        vertical_detect = cv2.absdiff(im_crop, im_up)
-        horizontal_detect = cv2.absdiff(im_crop, im_left)
+        im_shift_up = im[0:x_dim - shift, shift: y_dim]
+        im_shift_left = im[shift:x_dim, 0: y_dim - shift]
+        vertical_detect = cv2.absdiff(im_crop, im_shift_up)
+        horizontal_detect = cv2.absdiff(im_crop, im_shift_left)
         return cv2.add(vertical_detect, horizontal_detect)
 
-    def _filter_hue(self, mid, radius=5):
-        """Return bitmask of image where hue is within radius of mid.
+    def _filter_hue(self, mid, include_distance=5):
+        """Return bitmask of image where hue is within include_distance of mid.
 
         Args:
 
             mid - Hue to target. Use (real hue / 2). Example, (30 / 2) for
             orange.
 
-            radius - Hue distance from mid that should be included in bitmask.
+            include_distance - Hue distance from mid that should be included in
+            bitmask.
+
 
         """
-        if mid - radius < 0:
+
+        if mid - include_distance < 0:
             # We're calculating a value too near the 0 end of the hue circle.
             # Some values near 180 need to be included in this mask.
             low_side = cv2.inRange(self.im_hue,
                     np.array(0),
-                    np.array(mid + radius))
+                    np.array(mid + include_distance))
             high_side = cv2.inRange(self.im_hue,
-                    np.array(180 + (mid - radius)), np.array(180))
+                    np.array(180 + (mid - include_distance)), np.array(180))
             return cv2.bitwise_or(low_side, high_side)
-        elif mid + radius >= 180:
+        elif mid + include_distance >= 180:
             # We're calculating a value too near the 180 end of the hue circle.
             # Some values near 0 need to be included in this mask.
             low_side = cv2.inRange(self.im_hue,
-                    np.array(0 + (mid + radius - 180)),
+                    np.array(0 + (mid + include_distance - 180)),
                     np.array(180))
             high_side = cv2.inRange(self.im_hue,
-                    np.array(mid - radius),
+                    np.array(mid - include_distance),
                     np.array(180))
             return cv2.bitwise_or(low_side, high_side)
         return cv2.inRange(self.im_hue, 
-                np.array(mid - radius), np.array(mid + radius))
+                np.array(mid - include_distance),
+                np.array(mid + include_distance))
 
     ###########################################################################
     # FUTURE: Implement functions requiring bitmasking edge detection images
@@ -343,7 +349,7 @@ class FrameProcessor(object):
         """
 
         # Generate histogram of hue after it is filtered for high saturation
-        # pixels only.
+        # pixels only. Also update hue midpoints?
 
         pass
 
@@ -451,7 +457,7 @@ class FrameProcessor(object):
         pass
 
     @property
-    def has_high_blue_saturation(self):
+    def has_high_saturation_blue(self):
         """Return whether there is a lot of high saturation blue in image."""
 
         # TODO: Detect a well-defined peak in blue range on hue histogram after
@@ -460,7 +466,7 @@ class FrameProcessor(object):
         pass
 
     @property
-    def has_high_green_saturation(self):
+    def has_high_saturation_green(self):
         """Return whether there is a lot of high saturation green in image."""
 
         # TODO: Detect a well-defined peak in green range on hue histogram
@@ -469,7 +475,7 @@ class FrameProcessor(object):
         pass
 
     @property
-    def has_high_red_saturation(self):
+    def has_high_saturation_red(self):
         """Return whether there is a lot of high saturation red in image."""
 
         # TODO: Detect a well-defined peak in red range on hue histogram after
@@ -478,7 +484,7 @@ class FrameProcessor(object):
         pass
 
     @property
-    def has_high_orange_saturation(self):
+    def has_high_saturation_orange(self):
         """Return whether there is a lot of high saturation orange in image."""
 
         # TODO: Detect a well-defined peak in orange range on hue histogram
@@ -487,7 +493,7 @@ class FrameProcessor(object):
         pass
 
     @property
-    def has_high_yellow_saturation(self):
+    def has_high_saturation_yellow(self):
         """Return whether there is a lot of high saturation yellow in image."""
 
         # TODO: Detect a well-defined peak in yellow range on hue histogram
