@@ -48,7 +48,8 @@ class FrameProcessor(object):
 
         self.im = im
         self._hsv = None
-
+	# Used for filtering noise.
+	self._eroded_im = None
         # Use to detect objects of interest and hue shifts due to weather.
         self._histogram_hue = None
 
@@ -96,7 +97,41 @@ class FrameProcessor(object):
 
         # Reset the processor and clear out stale image data.
         self._reset(im)
+     
+     def lineAngle(self, line):
+       """returns angle from a single line
 
+        Args:
+
+            line - An np array of four elements, [x1, y1, x2, y2].
+
+        """
+        theta = -atan2(int(line[2]-line[0]), int(line[3] - line[1]))
+        # FIXME, make math good.
+        if(abs(theta) > cv2.cv.CV_PI/2):
+	  theta = -atan2(int(line[0]-line[2]), int(line[1]-line[3]))
+        return theta
+    def eroded_im(
+   
+    
+    def erode_image(self, im=self.im, kernel_size=3, iterations=2):
+       """ erodes the image. Useful for cleaning image.
+
+        Args:
+
+            im - the normal im.
+            
+            kernel_size - the size of kernel pixel, e.g. 3x3 pixels
+            
+            iterations - the number of iterations cv will do.
+
+        """
+	if self.eroded_im is None:
+	  kernel = np.ones((kernel_size, kernel_size), np.uint8)
+	  self._eroded_im = cv2.erode(img, kernel, iterations=iterations)
+	return self._eroded_im
+   
+   
     def _get_hsv_channel(self, key):
         """Return hue, saturation, or value channel of current image.
 
