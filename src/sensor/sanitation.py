@@ -12,6 +12,7 @@ import datetime
 sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
 
+san = Communicator(module_name="sensor/sanitation")
 sensors = {}
 # Example Sensor Object
 #
@@ -36,14 +37,8 @@ sensors = {}
 # 		'direction' : 0
 # 	}
 # }
-
-def main():
-	san = Communicator(module_name="sensor/sanitation")
-
-	while True:
-		# Get all of the last messages
-
-		# First get all Gyroscope and Accelerometer messages since they come seperately
+def fetchData(obj):
+	# First get all Gyroscope and Accelerometer messages since they come seperately
 		gyro = {
 			'gx':None,
 			'gy':None,
@@ -68,7 +63,7 @@ def main():
 				# if we have data for all axises then break;
 				break
 
-		sensors['gyroscope'] = gyro
+		obj['gyroscope'] = gyro
 
 		# Now accelerometer
 		accel = {
@@ -95,7 +90,7 @@ def main():
 					# if we have data for all axises then break;
 					break
 
-		sensors['accelerometer'] = accel
+		obj['accelerometer'] = accel
 
 
 		# Now lets get the depth using the conversion function
@@ -112,7 +107,7 @@ def main():
 	
 				depth =  {'value' : depth_actual}
 
-				sensors['depth'] = depth
+				obj['depth'] = depth
 
 		# And lastly, battery voltage
 		batt_msg = san.get_last_message("sensor/battery_voltage")
@@ -124,14 +119,94 @@ def main():
 
 				battery = {'voltage' : batt_raw }
 
-				sensors['battery_voltage'] = battery
+				obj['battery_voltage'] = battery
+		
+		
 
 		# We will add compass later
 		#comp_msg = san.get_last_message("sensor/compass")
+	
+def calibrateData(dataSampleSize=10):
+	"""---------------------------
+		This function is used to calibrate the data upon placing the sub into water.
 
+		1) I will collect N number of data points from the Microcontroller
+		2) I will then find the average of all N data points
+		3) There will be a base sensors object that will act as a relative calibration metric to define base values for the sub
+		
+	---------------------------"""
+	dataPool = [] #Used to store list of data objects
+
+	for i in range(0 , dataSampleSize):
+		dataObj = {}
+		fetchData(dataObj)
+		print dataObj
+		dataPool.append(dataObj)
+		
+	# Now we have a list of N data points for each sensor
+	
+
+	# So lets go through each and build up the average
+	averageObj = {
+		'accelerometer' : {
+			'ax' : 0,
+			'ay' : 0,
+			'az' : 0
+		},
+		'gyroscope' : {
+			'gx' : 0,
+			'gy' : 0,
+			'gz' : 0
+		},
+		'depth' : {
+			'value':0
+		},
+		'battery_voltage' : {
+			'voltage': 0
+		},
+		'compass' : {
+			'direction':0
+		}
+	}
+
+	ax = ay = az = gx = gy = gz = depth = voltage = 0
+
+	for obj in dataPool:
+		ax += obj['accelerometer']['ax']
+		ay += obj['accelerometer']['ay']
+		az += obj['accelerometer']['az']	
+
+		gx += obj['gyroscope']['gx']	
+		gy += obj['gyroscope']['gy']
+		gz += obj['gyroscope']['gz']
+
+		depth += obj['depth']['value']
+
+		voltage += obj['battery_voltage']['voltage']
+	
+	averageObj['accelerometer']['ax'] = ax/dataSampleSize
+	averageObj['accelerometer']['ay'] = ay/dataSampleSize
+	averageObj['accelerometer']['az'] = az/dataSampleSize
+	averageObj['gyroscope']['gx'] = gx/dataSampleSize
+	averageObj['gyroscope']['gy'] = gy/dataSampleSize
+	averageObj['gyroscope']['gz'] = gz/dataSampleSize
+	averageObj['depth']['value'] = depth/dataSampleSize
+	averageObj['battery_voltage']['voltage'] = voltage/dataSampleSize
+	print
+	print
+	print averageObj	
+
+def main():
+	
+	# We need a method to calibrate the data
+	calibrateData(100)
+
+	"""while True:
+		# Get data
+		fetchData(sensors)
 		# Finally, we will publish our sensors object to the grapevine for use elsewhere
 		print sensors
-		san.publish_message(sensors)
+		san.publish_message(sensors)"""
 
 
 if __name__ == '__main__':
