@@ -3,10 +3,6 @@
 __author__ = 'Tyler Stubenvoll, Cameron Evans'
 __license__ = 'GPLv3, Robosub Club of the Palouse 2014'
 
-import sys
-sys.path.append("..")
-import FrameProcessor
-from FrameUtils import FrameUtils
 import cv2
 import cv2.cv as cv
 from math import sqrt
@@ -16,8 +12,8 @@ import numpy as np
 
 class Path(object):
 
-    def __init__(self):
-        self._tools = FrameProcessor()
+    def __init__(self, tools):
+        self._tools = tools
 
     # Calculates the longest line from the set of lines, returns index of line
     # should be proceeded by a check to see if the set is empty.
@@ -172,7 +168,7 @@ class Path(object):
         return angle_set1, angle_set2, line_set1, line_set2
 
     # main processor
-    def task_path(self, in_img):
+    def process_image(self, packet):
         """
         calculates the angle of the sub relative to lines seen
         via the camera.
@@ -181,7 +177,7 @@ class Path(object):
         in_img, a numpy array corresponding to an image.
         """
         # crop black bars.
-        img = in_img[10:470, 90:550]
+        img = self._tools.im
 
         # get the edges of every outline.
         edges = self._tools.edge_detect(img)
@@ -193,11 +189,13 @@ class Path(object):
         # clean a little more
         # REVIEWQ: This might not be needed. Discuss validity?
         edges = self._tools.erode_image(edges, 2, 2)
-        cv2.imshow("eroded drawn.", edges)
-        cv2.waitKey()
 
         # finds lines above certain length.
-        lines = cv2.HoughLinesP(image=edges, rho=5, theta=cv.CV_PI/180, threshold=40, minLineLength=100, maxLineGap=1)
+        lines = cv2.HoughLinesP(image=edges, rho=5,
+                                theta=cv.CV_PI/180,
+                                threshold=40,
+                                minLineLength=100,
+                                maxLineGap=1)
 
         if not lines.all():
             print "no lines found"
@@ -215,14 +213,13 @@ class Path(object):
         # divide into two sets
         angle_set1, angle_set2, line_set1, line_set2 = self.divide_angle_set(lines, angle_set, longest_index)
 
-        self.debug_draw_line_set(img, line_set1)
-        self.debug_draw_line_set(img, line_set2)
+        #self.debug_draw_line_set(img, line_set1)
+        #self.debug_draw_line_set(img, line_set2)
 
         if not angle_set2 or not angle_set1:
             # only a single line is found. Find the center of that line.
             center = self.line_center(lines[0][longest_index])
-            return {"angle1": self._tools.lineAngle(lines[0][longest_index]),
-                    "angle2": None, "center": center}
+            packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]), "angle2": None, "center": center}
 
         else:
             longest_line1 = lines[0][longest_index]
@@ -230,20 +227,20 @@ class Path(object):
             longest_line2 = line_set2[0][longest_index2]
 
             center = self.line_intersect(longest_line1, longest_line2)
-            return {"angle1": self._tools.lineAngle(lines[0][longest_index]),
-		            "angle2": self._tools.lineAngle(line_set2[0][longest_index2]),
-		            "center": center}
+            packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]), 
+				    "angle2": self._tools.lineAngle(line_set2[0][longest_index2]),
+				    "center": center}
         # return dictionary of angle, location of image center on camera's image.
 
-def main():
-    print "this main is for debugging purposes only."
-    dimg = cv2.imread("testimage.jpg", cv2.CV_LOAD_IMAGE_COLOR)
-    cv2.imshow("test image", dimg)
-    cv2.waitKey()
-    vtest = Path()
-    set = vtest.task_path(dimg)
+#def main():
+    #print "this main is for debugging purposes only."
+    #dimg = cv2.imread("testimage.jpg", cv2.CV_LOAD_IMAGE_COLOR)
+    #cv2.imshow("test image", dimg)
+    #cv2.waitKey()
+    #vtest = Path()
+    #set = vtest.task_path(dimg)
 
-    print set
+    #print set
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+    #main()
