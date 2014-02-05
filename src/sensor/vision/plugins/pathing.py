@@ -5,7 +5,8 @@ __license__ = 'GPLv3, Robosub Club of the Palouse 2014'
 
 import sys
 sys.path.append("..")
-import FrameProcessor as fp
+import FrameProcessor
+from FrameUtils import FrameUtils
 import cv2
 import cv2.cv as cv
 from math import sqrt
@@ -14,24 +15,29 @@ import numpy as np
 
 
 class Path(object):
-    _debug = 0
-    _tools = 0
 
-    def __init__(self, debug):
-        self._debug = debug
+    def __init__(self):
         self._tools = FrameProcessor()
 
     # Calculates the longest line from the set of lines, returns index of line
     # should be proceeded by a check to see if the set is empty.
-    def get_longest_line(self, line_set):
+    @staticmethod
+    def get_longest_index(line_set):
+        """
+        Returns index to longest line in a set of lines
+
+        args
+        line_set: a set of lines, in the form of line[0][set]
+                  the set element being of form [x1, y1, x2, y2]
+        """
         index = 0
         count = 0
         prev_length = 0
         next_length = 0
 
-        # Review Q: perhaps change to a throw statement?
-        #if len(line_set) == 0 or line_set == None:
-        if not line_set:
+        # ReviewQ: perhaps change to a throw statement?
+        # reviewQ: couldn't get this to work with "not line_set"
+        if len(line_set) == 0 or line_set == None:
             return -1
 
         # length = sqrt(x^2 + y^2)
@@ -48,16 +54,33 @@ class Path(object):
 
     # given a single line, finds the mid point using midpoint form
     # NOTE: This won't find the midpoint of the shape, but of the line
-    def line_center(self, line):
+    @staticmethod
+    def line_center(line):
+        """
+        Returns center point of a line using midpoint formula.
+
+        args
+        line: a line in form of [x1, y1, x2, y2]
+        """
 
         return np.add(line[0], line[2]) / 2, np.add(line[1], line[3])/2
 
+
     # finds if two lines will intersect in the plane.
-    # REVIEWQ: Should this be moved into frame_processor?
-    def line_intersect(self, line1, line2):
+    @staticmethod
+    def line_intersect(line1, line2):
+        """
+        Returns the intercept point line using slope-intercept
+        formula.
+
+        args
+        line1: a line in form of [x1, y1, x2, y2]
+        line2: a line in form of [x1, y1, x2, y2]
+        """
         line1f = np.float32(line1)
         line2f = np.float32(line2)
-        m1flag, m2flag = 0
+        m1flag = False
+        m2flag = False
         b1 = 0
         b2 = 0
 
@@ -91,10 +114,19 @@ class Path(object):
             b2 = line2f[1] - m2 * line2f[0]
             x = (b2 - b1) / (m1 - m2)
             y = m2 * x + b2
-            return x, y
+            return int(x), int(y)
 
     # draws out the entire lineset.
-    def debug_draw_line_set(self, img, line_set):
+    @staticmethod
+    def debug_draw_line_set(img, line_set):
+        """
+        Returns the intercept point line using slope-intercept
+        formula.
+
+        args
+        img: a numpy array form of an image
+        line_set: a line set of lines
+        """
         count = 0
         for line in line_set[0]:
             count += 1
@@ -103,9 +135,21 @@ class Path(object):
         cv2.imshow("lines drawn.", img)
         cv2.waitKey()
 
-        print "DEBUG: Number of lines is: ", count
+        # print "DEBUG: Number of lines is: ", count
 
-    def divide_angle_set(self, line_set, angle_set, longest_index):
+    @staticmethod
+    def divide_angle_set(line_set, angle_set, longest_index):
+        """
+        takes a list of lines and divides them into two
+        two separate lists based on a 10 degree (pi/18) difference
+
+        args
+        line_set: a list of lines.
+        angle_set: a list of angles, same indexing as line_set/
+        longest_index: an int value of longest line in line_set.
+                       the longest is used as the reference for dividing set.
+
+        """
         longest = angle_set[longest_index]
         diff = 0
         angle_set1 = []
@@ -123,22 +167,30 @@ class Path(object):
                 line_set1[0].append(line_set[0][i])
                 angle_set1.append(round(rad, 5))
 
-            #print "DEBUG: iter: ", i, "angle: ", round(rad, 6)
+            # print "DEBUG: iter: ", i, "angle: ", round(rad, 6)
 
         return angle_set1, angle_set2, line_set1, line_set2
 
     # main processor
     def task_path(self, in_img):
+        """
+        calculates the angle of the sub relative to lines seen
+        via the camera.
+
+        args
+        in_img, a numpy array corresponding to an image.
+        """
         # crop black bars.
         img = in_img[10:470, 90:550]
 
         # get the edges of every outline.
-        edges = self._tools.simple_edge(img)
+        edges = self._tools.edge_detect(img)
 
         # remove all things without red, then smooth image for line detection
         edges = cv2.inRange(edges, (0, 0, 15), (255, 255, 255))
         edges = cv2.GaussianBlur(edges, (5, 5), 0)
 
+        # clean a little more
         # REVIEWQ: This might not be needed. Discuss validity?
         edges = self._tools.erode_image(edges, 2, 2)
         cv2.imshow("eroded drawn.", edges)
@@ -147,9 +199,9 @@ class Path(object):
         # finds lines above certain length.
         lines = cv2.HoughLinesP(image=edges, rho=5, theta=cv.CV_PI/180, threshold=40, minLineLength=100, maxLineGap=1)
 
-        if not lines:
+        if not lines.all():
             print "no lines found"
-            return None
+            return {"angle1": None, "angle2": None, "center": None}
 
         # calculate angles of the entire set.
         angle_set = []
@@ -158,33 +210,40 @@ class Path(object):
             angle_set.append(angle)
 
         # find the longest line in the set, which should be the most accurate
-        longest_index = self.get_longest_line(lines)
+        longest_index = self.get_longest_index(lines)
 
         # divide into two sets
         angle_set1, angle_set2, line_set1, line_set2 = self.divide_angle_set(lines, angle_set, longest_index)
 
-        # self.debug_draw_line_set(img, line_set1)
-        # self.debug_draw_line_set(img, line_set2)
-        if not angle_set2:
+        self.debug_draw_line_set(img, line_set1)
+        self.debug_draw_line_set(img, line_set2)
+
+        if not angle_set2 or not angle_set1:
             # only a single line is found. Find the center of that line.
             center = self.line_center(lines[0][longest_index])
-            return {"angle1": self._tools.lineAngle(lines[0][longest_index], 			"angle2": None, "center": center}
+            return {"angle1": self._tools.lineAngle(lines[0][longest_index]),
+                    "angle2": None, "center": center}
+
         else:
             longest_line1 = lines[0][longest_index]
-            longest_line2 = self.get_longest_line(line_set2)
+            longest_index2 = self.get_longest_index(line_set2)
+            longest_line2 = line_set2[0][longest_index2]
+
             center = self.line_intersect(longest_line1, longest_line2)
-	    return {"angle1": self._tools.lineAngle(lines[0][longest_index],
-		    "angle2": self._tools.lineAngle(lines_set2[0][longest_line2],
-		    "center": center}
+            return {"angle1": self._tools.lineAngle(lines[0][longest_index]),
+		            "angle2": self._tools.lineAngle(line_set2[0][longest_index2]),
+		            "center": center}
         # return dictionary of angle, location of image center on camera's image.
-	
+
 def main():
     print "this main is for debugging purposes only."
     dimg = cv2.imread("testimage.jpg", cv2.CV_LOAD_IMAGE_COLOR)
     cv2.imshow("test image", dimg)
     cv2.waitKey()
-    vtest = Path(1)
-    vtest.task_path(dimg)
+    vtest = Path()
+    set = vtest.task_path(dimg)
+
+    print set
 
 if __name__ == "__main__":
     main()
