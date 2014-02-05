@@ -7,6 +7,7 @@
 import json
 import zmq
 import os
+import sys
 import datetime
 sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
@@ -43,34 +44,56 @@ def main():
 		# Get all of the last messages
 
 		# First get all Gyroscope and Accelerometer messages since they come seperately
-		gyro = {}
+		gyro = {
+			'gx':None,
+			'gy':None,
+			'gz':None
+		}
 		
 		while True:
 			gyro_msg = san.get_last_message("sensor/gyroscope")
-			gyro.gx = gyro_msg.get('GYRO_X')
-			gyro.gy = gyro_msg.get('GYRO_Y')
-			gyro.gz = gyro_msg.get('GYRO_Z')
-			if gyro.gx is None or gyro.gy is None or gyro.gz is None:
+			if gyro_msg:
+				if gyro['gx'] is None:
+					gyro['gx'] = gyro_msg.get('GYRO_X')
+
+				if gyro['gy'] is None:
+					gyro['gy'] = gyro_msg.get('GYRO_Y')
+
+				if gyro['gz'] is None:
+					gyro['gz'] = gyro_msg.get('GYRO_Z')
+	
+			if gyro['gx'] is None or gyro['gy'] is None or gyro['gz'] is None:
 				continue
-			else
+			else:
 				# if we have data for all axises then break;
-				break;
+				break
 
 		sensors['gyroscope'] = gyro
 
 		# Now accelerometer
-		accel = {}
+		accel = {
+			'ax':None,
+			'ay':None,
+			'az':None
+		}
 
 		while True:
 			accel_msg = san.get_last_message("sensor/accelerometer")
-			accel.ax = accel_msg.get('ACL_X')
-			accel.ay = accel_msg.get('ACL_Y')
-			accel.az = accel_msg.get('ACL_Z')
-			if accel.ax is None or accel.ay is None or accel.az is None:
-				continue
-			else
-				# if we have data for all axises then break;
-				break;
+			if accel_msg:
+				if accel['ax'] is None:
+					accel['ax'] = accel_msg.get('ACL_X')
+
+				if accel['ay'] is None:
+					accel['ay'] = accel_msg.get('ACL_Y')
+
+				if accel['az'] is None:
+					accel['az'] = accel_msg.get('ACL_Z')
+				
+				if accel['ax'] is None or accel['ay'] is None or accel['az'] is None:
+					continue
+				else:
+					# if we have data for all axises then break;
+					break
 
 		sensors['accelerometer'] = accel
 
@@ -79,31 +102,35 @@ def main():
 		# y = 0.1075x - 54.622
 	
 		depth_msg = san.get_last_message("sensor/depth")
-		depth_raw = depth_msg.get('DEPTH')
-		if depth_raw is None:
-			print 'Error getting depth value'
+		if depth_msg:
+			depth_raw = depth_msg.get('DEPTH')
+			if depth_raw is None:
+				print 'Error getting depth value'
+			else:
 
-		depth_actual = 0.1075 * depth_raw - 54.622
+				depth_actual = 0.1075 * depth_raw - 54.622
+	
+				depth =  {'value' : depth_actual}
 
-		depth =  {'value' : depth_actual}
-
-		sensors['depth'] = depth
+				sensors['depth'] = depth
 
 		# And lastly, battery voltage
 		batt_msg = san.get_last_message("sensor/battery_voltage")
-		batt_raw = batt_msg.get('BATTERY_VOLTAGE')
-		if batt_raw is None:
-			print 'Error getting battery value'
+		if batt_msg:
+			batt_raw = batt_msg.get('BATTERY_VOLTAGE')
+			if batt_raw is None:
+				print 'Error getting battery value'
+			else:
 
-		battery = {'voltage' : batt_raw }
+				battery = {'voltage' : batt_raw }
 
-		sensors['battery_voltage'] = battery
+				sensors['battery_voltage'] = battery
 
 		# We will add compass later
 		#comp_msg = san.get_last_message("sensor/compass")
 
 		# Finally, we will publish our sensors object to the grapevine for use elsewhere
-
+		print sensors
 		san.publish_message(sensors)
 
 

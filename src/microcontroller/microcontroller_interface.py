@@ -282,6 +282,8 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             ACL_1_X_val = (ACL_1_X_val-65536)
 
         accel_com.publish_message({"ACL_X": ACL_1_X_val})
+	print "Published ACL_X: ", ACL_1_X_val
+
     elif device == ACL_1_Y_addr:
         ACL_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -289,6 +291,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             ACL_1_Y_val = (ACL_1_Y_val-65536)
 
         accel_com.publish_message({"ACL_Y": ACL_1_Y_val})
+	print "Published ACL_Y: ", ACL_1_Y_val
     elif device == ACL_1_Z_addr:
         ACL_1_Z_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -296,6 +299,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             ACL_1_Z_val = (ACL_1_Z_val-65536)
 
         accel_com.publish_message({"ACL_Z": ACL_1_Z_val})
+	print "Published ACL_Z: ", ACL_1_Z_val
     elif device == GYRO_1_X_addr:
         GYRO_1_X_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -303,7 +307,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             GYRO_1_X_val = (GYRO_1_X_val-65536)
 
         # XXX com?
-        accel_com.publish_message({"GYRO_X": GYRO_1_X_val})
+        gyro_com.publish_message({"GYRO_X": GYRO_1_X_val})
     elif device == GYRO_1_Y_addr:
         GYRO_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -311,14 +315,14 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             GYRO_1_Y_val = (GYRO_1_Y_val-65536)
 
         # XXX com?
-        accel_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
+        gyro_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
     elif device == GYRO_1_Z_addr:
         GYRO_1_Z_val = ord(packet[2]) | (ord(packet[3]) << 8)
         if GYRO_1_Z_val > 32767:
             GYRO_1_Z_val = (GYRO_1_Z_val-65536)
 
         # XXX com?
-        accel_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
+        gyro_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
     elif device == ADC_DEPTH:
         ADC_DEPTH_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -329,7 +333,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         ADC_BATT_val = ((ADC_BATT_val) * 3.3/1024 * 7.5)
 
         # XXX com?
-        accel_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
+        battery_voltage_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
 
 
 def main(args):
