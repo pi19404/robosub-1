@@ -37,7 +37,7 @@ sensors = {}
 # 		'direction' : 0
 # 	}
 # }
-def fetchData(obj):
+def fetchData(obj, baseData=None):
 	# First get all Gyroscope and Accelerometer messages since they come seperately
 		gyro = {
 			'gx':None,
@@ -60,7 +60,11 @@ def fetchData(obj):
 			if gyro['gx'] is None or gyro['gy'] is None or gyro['gz'] is None:
 				continue
 			else:
-				# if we have data for all axises then break;
+				# if we have data for all axises then adjust for calibration and break;
+				if baseData != None:
+					gyro['gx'] -= baseData['gyroscope']['gx']
+					gyro['gy'] -= baseData['gyroscope']['gy']
+					gyro['gz'] -= baseData['gyroscope']['gz']
 				break
 
 		obj['gyroscope'] = gyro
@@ -88,6 +92,10 @@ def fetchData(obj):
 					continue
 				else:
 					# if we have data for all axises then break;
+					if baseData != None:
+						accel['ax'] -= baseData['accelerometer']['ax']
+						accel['ay'] -= baseData['accelerometer']['ay']
+						accel['az'] -= baseData['accelerometer']['az']
 					break
 
 		obj['accelerometer'] = accel
@@ -105,6 +113,9 @@ def fetchData(obj):
 
 				depth_actual = 0.1075 * depth_raw - 54.622
 	
+				if baseData != None:
+					depth_actual -= baseData['depth']['value']
+
 				depth =  {'value' : depth_actual}
 
 				obj['depth'] = depth
@@ -116,7 +127,8 @@ def fetchData(obj):
 			if batt_raw is None:
 				print 'Error getting battery value'
 			else:
-
+				
+			
 				battery = {'voltage' : batt_raw }
 
 				obj['battery_voltage'] = battery
@@ -135,13 +147,21 @@ def calibrateData(dataSampleSize=10):
 		3) There will be a base sensors object that will act as a relative calibration metric to define base values for the sub
 		
 	---------------------------"""
-	dataPool = [] #Used to store list of data objects
 
+	dataPool = [] #Used to store list of data objects
+	
+	percentComplete = 0
+	dataCounter = 0
 	for i in range(0 , dataSampleSize):
 		dataObj = {}
+		percentComplete = float(float(i) / dataSampleSize * 100)
+		os.system("clear")
+		print "Starting Calibration..."
+		print percentComplete, "% complete..."		
 		fetchData(dataObj)
-		print dataObj
 		dataPool.append(dataObj)
+		++dataCounter
+		
 		
 	# Now we have a list of N data points for each sensor
 	
@@ -193,20 +213,66 @@ def calibrateData(dataSampleSize=10):
 	averageObj['depth']['value'] = depth/dataSampleSize
 	averageObj['battery_voltage']['voltage'] = voltage/dataSampleSize
 	print
-	print
-	print averageObj	
+	print "Calibration complete..."
+	os.system("sleep 1")
+	print 
+	print "----------- Base sensor object ---------"
+	print averageObj
+	return averageObj	
 
 def main():
+	willCalibrate = True
 	
-	# We need a method to calibrate the data
-	calibrateData(100)
+	if len(sys.argv) == 1:
+		arg = "100"
+	elif len(sys.argv) == 2:
+		
+		if sys.argv[1].isdigit():
+			arg = sys.argv[1]
+		elif sys.argv[1] == "--NOCAL":
+			willCalibrate = False
+			arg = "0"
+		else:
+			print "usage: ", sys.argv[0], " NUMBER [--NOCAL]"
+			return
+	else:
+		print "usage: ", sys.argv[0], " NUMBER [--NOCAL]"
+		return
 
-	"""while True:
+	# We need a method to calibrate the data
+
+	if arg.isdigit():
+		numCalibrations = int(arg)
+	
+	if willCalibrate:
+		baseData = calibrateData(numCalibrations)
+	else:
+		baseData = None
+		
+	dataCounter = 0
+	percentComplete = 0
+	while True:
 		# Get data
-		fetchData(sensors)
+		fetchData(sensors, baseData)
+		
 		# Finally, we will publish our sensors object to the grapevine for use elsewhere
-		print sensors
-		san.publish_message(sensors)"""
+		os.system("clear")
+		print "Accelerometer"
+		print "AX: %d" % sensors['accelerometer']['ax']
+		print "AY: %d" % sensors['accelerometer']['ay']
+		print "AZ: %d" % sensors['accelerometer']['az']
+		print
+		print "Gyroscope"
+		print "GX: %d" % sensors['gyroscope']['gx']
+		print "GY: %d" % sensors['gyroscope']['gy']
+		print "GZ: %d" % sensors['gyroscope']['gz']
+		print
+		print "Depth: %d" % sensors['depth']['value']
+		print "Voltage: %d" % sensors['battery_voltage']['voltage']
+		
+		
+		san.publish_message(sensors)
+
 
 
 if __name__ == '__main__':
