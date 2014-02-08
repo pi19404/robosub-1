@@ -178,15 +178,25 @@ class Path(object):
         """
         # crop black bars.
         img = self._tools.im
-        #img = cv2.subtract()
-        cv2.imshow("inside of pathing", img)
-        cv2.waitKey()
+        #cv2.imshow("inside of pathing", img)
+        #cv2.waitKey()
 
         # get the edges of every outline.
         edges = self._tools.edge_detect(img)
+        #edges_b = self._tools.edge_detect(self._tools.im_blue)
+        #edges_g = self._tools.edge_detect(self._tools.im_green)
+        #edges_r = self._tools.edge_detect(self._tools.im_red)
+
+        #edges_b = cv2.inRange(edges_b, np.array(0), np.array(255))
+        #edges_g = cv2.inRange(edges_g, np.array(0), np.array(255))
+        #edges_r = cv2.inRange(edges_r, np.array(15), np.array(255))
+
+        edges = cv2.merge([edges_b, edges_g, edges_r])
+        print type(edges)
 
         # remove all things without red, then smooth image for line detection
-        edges = cv2.inRange(edges, (0, 0, 15), (255, 255, 255))
+        #edges = cv2.inRange(edges, (0, 0, 15), (255, 255, 255))
+        edges = cv2.inRange(edges, np.array(15), np.array(255))
         edges = cv2.GaussianBlur(edges, (5, 5), 0)
 
         # clean a little more

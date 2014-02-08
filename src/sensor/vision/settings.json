@@ -25,7 +25,7 @@
         "fps": 8,
         "width": 640,
         "height": 480,
-        "plugins": ["VideoLogger", "path"]
+        "plugins": ["VideoLogger", "Path"]
     },
     "sensor/vision/cam_front": {
         "stream_port": 50000,

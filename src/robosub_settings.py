@@ -20,47 +20,63 @@ EPOCH = "0.05"
 settings = {
     "publisher_high_water_mark": 1024,
     "publisher_buffer_length": 1024,
-    "sensor/vision/cam_front": {
-        "symlink": "/dev/cam_front",
-        "codec": "MJPG",
-        "log": ["raw", "processed"],
-        "stream": {
-        },
-        "fps": 30,
-        "width": 640,
-        "height": 480,
-        "port": 20052,
-        "plugins": ["tollbooth"],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/vision/cam_down": {
-        "symlink": "/dev/cam_down",
-        "camera": "down",
-        "enabled": False,
-        "dev": 1,
-        "codec": "MJPG",
-        "log": ["raw", "processed"],
-        "stream": {
-        },
-        "fps": 30,
-        "width": 640,
-        "height": 480,
-        "plugins": ["PathDetection"],
-        "port": 20053,
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/vision/fates": {
+    "sensor/vision/visiond": {
         "port": 20054,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None},
+        "release": {"path": None},
+        "mock": {"path": None},
         "maintenance_interval": 5,
+        "max_failed_frames": 150,
         "vision_processors": [
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down"
+            "sensor/vision/cam_front"
         ]
+    },
+    "sensor/vision/cam_fake": {
+        "recorded_video": "/home/cevans/Videos/RoboSub/Obstacles/pathOutOfStartGate640x480.mp4",
+        "recorded_video_": "/home/cevans/Videos/RoboSub/Obstacles/tollBooth640x480.mp4",
+        "stream_port": 50000,
+        "port": 50001,
+        "stream_type": "recorded_video",
+        "codec" : "MJPG",
+        "enable": True,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 8,
+        "width": 640,
+        "height": 480,
+        "plugins": ["VideoLogger", "Path"]
+    },
+    "sensor/vision/cam_front": {
+        "stream_port": 50000,
+        "stream_type": "device",
+        "symlink": "/dev/cam_front",
+        "codec": "MJPG",
+        "enable": True,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 10,
+        "width": 640,
+        "height": 480,
+        "plugins": []
+    },
+    "sensor/vision/cam_down": {
+        "stream_port": 50001,
+        "stream_type": "device",
+        "symlink": "/dev/cam_down",
+        "codec" : "MJPG",
+        "enable": False,
+        "log": [
+            "raw",
+            "processed"
+        ],
+        "fps": 10,
+        "width": 640,
+        "height": 480,
+        "plugins": ["pathing"]
     },
     "util/logger": {
         "port": 20055,
@@ -166,6 +182,8 @@ settings = {
                 "--baudrate", "56818",
                 "--port", '/dev/ttyUSB0',
                 "--magnitude", "100"
+            ],
+        },
         "mock": {
             "name": "microcontroller_interface.py",
             "args": [
@@ -173,25 +191,38 @@ settings = {
                 "--debug",
                 "--baudrate", "56818",
                 "--magnitude", "100"
-            ]}
+            ]
+        }
     },
     "sensor/accelerometer": {
         "port": 20059,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "sensor/gyroscope": {
         "port": 20060,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "sensor/compass": {
         "port": 20061,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "sensor/serial/display_messages": {
         "port": 20062,
@@ -200,8 +231,12 @@ settings = {
             "sensor/serial/gyroscope",
             "sensor/serial/compass"
         ],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "decision": {
         "port": 20063,
@@ -216,17 +251,27 @@ settings = {
         ],
         "release": {
             "name": "ai_state_machine.py",
-            "args": ["--epoch", EPOCH]},
+            "args": [
+                "--epoch", EPOCH
+            ]
+        },
         "mock": {
             "name": "ai_state_machine.py",
-            "args": ["--epoch", EPOCH]},
+            "args": [
+                "--epoch", EPOCH
+            ]
+        },
         "depth_threshold": 550
     },
     "decision/advisor": {
         "port": 20064,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "util/vision_viewer": {
         "port": 20065,
@@ -234,20 +279,32 @@ settings = {
             "sensor/vision/cam_front",
             "sensor/vision/cam_down"
         ],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "sensor/depth": {
         "port": 20066,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "sensor/battery_voltage": {
         "port": 20067,
         "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": None
+        },
+        "mock": {
+            "name": None
+        }
     },
     "sensor/sanitation": {
         "port": 20068,
@@ -258,10 +315,15 @@ settings = {
             "sensor/gyroscope",
             "sensor/compass"
         ],
-        "release": {"name": "sanitation.py"},
+        "release": {
+            "name": "sanitation.py"
+        },
         "mock": {
             "name": "sanitation.py",
-            "args": ["--debug"]}
+            "args": [
+                "--debug"
+            ]
+        }
     }
 }
 

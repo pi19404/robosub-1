@@ -141,10 +141,6 @@ class FrameProcessor(object):
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
             self._channels['h'], self._channels['s'], self._channels['v'] = \
-<<<<<<< HEAD
-=======
-                cv2.split(self.hsv)
->>>>>>> user/cevans87
                     cv2.split(self.hsv)
         return self._channels[key]
 
@@ -159,10 +155,6 @@ class FrameProcessor(object):
 
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
-<<<<<<< HEAD
-=======
-            self._channels['b'], self._channels['g'], self._channels['r'] = cv2.split(self.im)
->>>>>>> user/cevans87
             self._channels['b'], self._channels['g'], self._channels['r'] = \
                     cv2.split(self.im)
         return self._channels[key]
@@ -290,6 +282,8 @@ class FrameProcessor(object):
         im_shift_left = im[shift:x_dim, 0: y_dim - shift]
         vertical_detect = cv2.absdiff(im_crop, im_shift_up)
         horizontal_detect = cv2.absdiff(im_crop, im_shift_left)
+        #ret = cv2.add(vertical_detect, horizontal_detect)
+        #b = cv2.inRange(ret, (0, 0, 0), (255, 255, 255))
         return cv2.add(vertical_detect, horizontal_detect)
 
     def _filter_hue(self, mid, include_distance=5):
