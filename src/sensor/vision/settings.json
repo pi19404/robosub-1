@@ -7,7 +7,7 @@
         "maintenance_interval": 5,
         "max_failed_frames": 150,
         "vision_processors": [
-            "sensor/vision/cam_down"
+            "sensor/vision/cam_front"
         ]
     },
     "sensor/vision/cam_fake": {
@@ -25,13 +25,13 @@
         "fps": 8,
         "width": 640,
         "height": 480,
-        "plugins": []
+        "plugins": ["VideoLogger", "path"]
     },
     "sensor/vision/cam_front": {
         "stream_port": 50000,
         "stream_type": "device",
         "symlink": "/dev/cam_front",
-        "codec" : "MJPG",
+        "codec": "MJPG",
         "enable": true,
         "log": [
             "raw",
@@ -55,7 +55,7 @@
         "fps": 10,
         "width": 640,
         "height": 480,
-        "plugins": ["PathDetection"]
+        "plugins": ["pathing"]
     },
     "sensor/vision/cam_left": {
         "symlink": "/dev/cam_left",
