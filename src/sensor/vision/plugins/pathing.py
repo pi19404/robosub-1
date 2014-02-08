@@ -178,6 +178,9 @@ class Path(object):
         """
         # crop black bars.
         img = self._tools.im
+        #img = cv2.subtract()
+        cv2.imshow("inside of pathing", img)
+        cv2.waitKey()
 
         # get the edges of every outline.
         edges = self._tools.edge_detect(img)
@@ -227,10 +230,11 @@ class Path(object):
             longest_line2 = line_set2[0][longest_index2]
 
             center = self.line_intersect(longest_line1, longest_line2)
-            packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]), 
-				    "angle2": self._tools.lineAngle(line_set2[0][longest_index2]),
-				    "center": center}
+            packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]),
+                                    "angle2": self._tools.lineAngle(line_set2[0][longest_index2]),
+                                    "center": center}
         # return dictionary of angle, location of image center on camera's image.
+        return packet
 
 #def main():
     #print "this main is for debugging purposes only."
