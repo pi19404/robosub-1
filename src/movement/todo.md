@@ -8,7 +8,7 @@
    * The syntax is in this format so that it is easily differentiated from
       the stabilization layer.
 
-## stabalization
+## stabilization
 * This layer will accept commands from the directive layer, and it will
    accomidate those commands if it can do so while satisfying some constraints.
    * One constraint is that we keep a flat orientation. If we descend, this
@@ -27,9 +27,9 @@
 
 * All raw movement commands pass through the physical layer
 * At its most basic form, the physical layer needs to respond to each of the
-   six movement commands from the stabalization layer in a linearly independent
+   six movement commands from the stabilization layer in a linearly independent
    way. Hopefully the command move.x => 1.0 will translate to moving forward
-   rather than doing a barrel roll, but hopefully the stabalization layer will
+   rather than doing a barrel roll, but hopefully the stabilization layer will
    apply a linear transformation to translate what it wants to happen to what
    actually does happen.
 

@@ -69,9 +69,7 @@ def main(args):
     do, but something needs to decide which oligarch is in charge.
 
     """
-    com = Communicator(
-            module_name=args.module_name,
-            settings_path=args.settings_path)
+    com = Communicator(module_name=args.module_name)
 
     oligarchs = {
             "AdvisorsPeon": AdvisorsPeon(com),
@@ -85,8 +83,8 @@ def main(args):
     advice = None
     depth = None
     while True:
-        advice, succ = choose_last_packet(com, "decision/advisor", advice)
-        if succ:
+        advice, success = choose_last_packet(com, "decision/advisor", advice)
+        if success:
             if advice["command"] == "state: keyboard":
                 state = 'keyboard'
             elif advice["command"] == "state: path":
@@ -104,7 +102,7 @@ def main(args):
 
         if state == "stop":
             pass
-        elif state == 'keyboard':
+        elif state == 'keyboard' and success:
             oligarchs["AdvisorsPeon"].decision(advice)
         elif state == 'path':
             oligarchs["PathOligarch"].decision(vision_cam_front, vision_cam_down)
@@ -118,10 +116,6 @@ def main(args):
 def commandline():
     parser = argparse.ArgumentParser(
             description='Path following decision module.')
-    parser.add_argument(
-            '--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument(
             '-m', '--module_name', type=str,
             default='decision',

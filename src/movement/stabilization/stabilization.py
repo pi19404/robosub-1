@@ -10,9 +10,7 @@ sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 
 def main(args):
-    com = Communicator(
-            module_name=args.module_name,
-            settings_path=args.settings_path)
+    com = Communicator(module_name=args.module_name)
 
     # TODO We need to settle on a good convention for these vectors.
     # For now, I'm using these conventions:
@@ -59,14 +57,11 @@ def main(args):
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
     parser.add_argument('-m', '--module_name', type=str,
-            default='movement/stabalization',
+            default='movement/stabilization',
             help='Module name.')
     return parser.parse_args()
 

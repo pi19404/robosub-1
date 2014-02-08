@@ -2,7 +2,7 @@
 
 """This defines the python communication interface.
 
-Initialization settings are found in robosub/src/settings.json
+This assumes that robosub_settings.py is on PYTHONPATH.
 
 """
 
@@ -13,6 +13,7 @@ import sys
 import threading
 import time
 import zmq
+from robosub_settings import settings
 from numpy import array, frombuffer
 
 class Communicator(object):
@@ -41,23 +42,16 @@ class Communicator(object):
 
     def __init__(self, module_name,
                  subscriber_buffer_length=1024,
-                 subscriber_high_water_mark=1024, settings_path=None):
+                 subscriber_high_water_mark=1024):
         """
         'module_name' must follow the folder path name convention that
             specifies a module.
         'subscriber_buffer_length' and 'subscriber_high_water_mark' control zmq
             memory settings.
-        'settings_path' specifies an alternative (testing) communication
-            settings file.
 
         """
+        self.settings = settings
         self.module_name = module_name
-        if not settings_path:
-            up_dir = lambda path: os.path.split(path)[0]
-            settings_path = os.path.join(
-                    up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
-                    'settings.json')
-        self.settings = json.load(open(settings_path, 'r'))
         if not os.path.isdir('/tmp/robosub'):
             os.mkdir('/tmp/robosub')
 
@@ -66,10 +60,9 @@ class Communicator(object):
         self.publisher['next_message_number'] = 1
         self.publisher['context'] = zmq.Context(1)
         self.publisher['socket'] = self.publisher['context'].socket(zmq.PUB)
-        self.publisher['socket'].hwm = \
-                self.settings['publisher_high_water_mark']
+        self.publisher['socket'].hwm = settings['publisher_high_water_mark']
         self.publisher['socket'].setsockopt(
-                zmq.SNDBUF, self.settings['publisher_buffer_length'])
+                zmq.SNDBUF, settings['publisher_buffer_length'])
         self.publisher['socket'].bind(self.get_socket_name(module_name))
         # Note: Even though the bind call returns, the socket isn't actually
         # ready for some short amount of time after this call. zmq will
@@ -98,14 +91,13 @@ class Communicator(object):
     def get_last_message(self, module_name):
         """Reads all messages in the queue and returns the last one.
 
-        The messages prior to the last one will be discarded.
+        The messages prior to the last one will be discarded. If no
+        new messages were received since the last call to this method,
+        this will return the last message again.
 
         """
         # Updates the last message
-        try:
-            self.get_messages(module_name).next()
-        except StopIteration:
-            pass
+        list(self.get_messages(module_name))
         return self.subscribers[module_name]['last_message']
 
     def get_messages(self, module_name):
@@ -147,8 +139,10 @@ class Communicator(object):
 
         metadata = dict(dtype = str(image.dtype), shape = image.shape)
         try:
-            self.publisher['stream']['socket'].send_json(metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
-            self.publisher['stream']['socket'].send(image, copy=True, track=False, flags=zmq.NOBLOCK)
+            self.publisher['stream']['socket'].send_json(
+                    metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
+            self.publisher['stream']['socket'].send(
+                    image, copy=True, track=False, flags=zmq.NOBLOCK)
         except zmq.ZMQError:
             pass
 
@@ -165,11 +159,11 @@ class Communicator(object):
     def get_socket_name(self, module_name):
         """Determines the socket for module_name."""
         return "ipc:///tmp/robosub/{port}.ipc".format(
-                port=self.settings[module_name]['port'])
+                port=settings[module_name]['port'])
 
     def listening(self):
         """Returns a list of modules this Communicator is listening to."""
-        listening_to = self.settings[self.module_name].get('listen')
+        listening_to = settings[self.module_name].get('listen')
         if not listening_to:
             listening_to = []
         return listening_to

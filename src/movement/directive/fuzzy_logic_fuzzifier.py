@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 from random import random
+from robosub_settings import settings
 import argparse
 import json
 import os
@@ -49,26 +50,14 @@ def get_membership(value, set_points):
             proportion * (set_points[idx + 1][1] - set_points[idx][1]))
 
 def main(args):
-    com = Communicator(
-            module_name=args.module_name,
-            settings_path=args.settings_path)
-
-    if not args.settings_path:
-        up_dir = lambda path: os.path.split(path)[0]
-        settings_path = os.path.join(
-                up_dir(up_dir(up_dir(os.path.abspath(__file__)))),
-                'settings.json')
-    else:
-        settings_path = args.settings_path
-
-    settings = json.load(open(settings_path, 'r'))
+    com = Communicator(module_name=args.module_name)
     fuzzy_sets = settings[args.module_name]["fuzzy_sets"]
 
     # These values represent the submarine's membership in 8 fuzzy sets.
     # These sets come in pairs (left/right, back/forward, etc.) and represent
     # where the submarine is in relation to where it wants to be.
     # The roll and yaw sets are not available to directive module since
-    # they should be controlled by either the stabalization module, or by
+    # they should be controlled by either the stabilization module, or by
     # the awesome balancing skills of the mech-e's.
 
     # Expected packet sent by this module:
@@ -120,9 +109,6 @@ def main(args):
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
