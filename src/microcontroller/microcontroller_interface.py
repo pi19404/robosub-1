@@ -86,7 +86,7 @@ def cmd_thruster(thruster_id, magnitude, direction):
 
     # convert the magnitude from a percentage value to a value between 0 and
     # 127
-    magnitude = magnitude * 127 // 100
+    #magnitude = magnitude * 127 // 100
 
     # make sure direction is only one bit
     direction &= 0x01
@@ -373,7 +373,7 @@ def main(args):
 
         get_lock(ser) # get in sync with the stream
 
-    mag = args.magnitude
+    mag = int(args.magnitude)
     last_packet_time = 0.0
     last_advisor_packet = None
     last_advisor_packet_time = 0.0
@@ -411,32 +411,35 @@ def main(args):
                     received_packet, accel_com, gyro_com, compass_com, depth_com,
                     battery_voltage_com)
 
-        #time.sleep(args.epoch)
-	
-
-	time.sleep(0.004) #time.sleep(seconds)
+        time.sleep(args.epoch)
 
     if not DEBUG:
         ser.close()
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('-e', '--epoch', type=float,
+    parser.add_argument(
+            '-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
-    parser.add_argument('-m', '--module_name', type=str,
+    parser.add_argument(
+            '-m', '--module_name', type=str,
             default='movement/physical',
             help='Module name.')
-    parser.add_argument('-b', '--baudrate', type=int,
+    parser.add_argument(
+            '-b', '--baudrate', type=int,
             default=56818,
             help="Serial interface baudrate.")
-    parser.add_argument('-p', '--port', type=str,
+    parser.add_argument(
+            '-p', '--port', type=str,
             default='/dev/ttyUSB0',
             help="Serial interface port.")
-    parser.add_argument('--magnitude', type=str,
-            default=100,
+    parser.add_argument(
+            '--magnitude', type=int,
+            default="100",
             help='Thruster magnitude in percent.')
-    parser.add_argument('-d', '--debug',
+    parser.add_argument(
+            '-d', '--debug',
             default=False,
             action="store_true",
             help='Set debug mode to True.')
