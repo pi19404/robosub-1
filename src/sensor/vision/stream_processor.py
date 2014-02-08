@@ -45,7 +45,8 @@ class StreamProcessor(object):
         for plugin_name in self.settings['plugins']:
             # Name of module and the class should be the same.
             module_obj = getattr(import_module(
-                    '..'+plugin_name, package='plugins.subpkg'), plugin_name)()
+                    '..'+plugin_name, package='plugins.subpkg'),
+                    plugin_name)(self.processor)
             self._plugins += [module_obj]
 
         #Configure the VideoCapture object.
@@ -109,11 +110,15 @@ class StreamProcessor(object):
                     # isn't frozen.
                     self._pipe.send(self._pipe.recv())
 
-                processed_im = self.processor.preprocess(im)
+                self.processor.load_im(im)
+                self.processor.hacky_display() # FIXME this needs to go away.
+                packet = {}
                 for plugin in self._plugins:
-                    retval, new_im = plugin.process_image(im)
-                    if retval is not None:
-                        self._com.publish_message(retval)
+                    plugin.process_image(packet)
+                    #retval, new_im = plugin.process_image(im)
+                    #if retval is not None:
+                    #    self._com.publish_message(retval)
+                self._com.publish_message(packet)
             try:
                 # Try to sleep until we took the correct amount of time.
                 sleep((start_time + (1.0 / self.settings['fps'])) - time())
