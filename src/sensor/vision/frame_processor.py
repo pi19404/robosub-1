@@ -15,7 +15,6 @@ class FrameProcessor(object):
     hue_blue = 120
     hue_orange = 16
     hue_yellow = 30
-    
     # TODO Do some interweb researching for the real duct tape hues.
 
     def __init__(self):
@@ -142,6 +141,10 @@ class FrameProcessor(object):
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
             self._channels['h'], self._channels['s'], self._channels['v'] = \
+<<<<<<< HEAD
+=======
+                cv2.split(self.hsv)
+>>>>>>> user/cevans87
                     cv2.split(self.hsv)
         return self._channels[key]
 
@@ -156,6 +159,10 @@ class FrameProcessor(object):
 
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
+<<<<<<< HEAD
+=======
+            self._channels['b'], self._channels['g'], self._channels['r'] = cv2.split(self.im)
+>>>>>>> user/cevans87
             self._channels['b'], self._channels['g'], self._channels['r'] = \
                     cv2.split(self.im)
         return self._channels[key]
