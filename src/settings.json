@@ -83,14 +83,15 @@
             "is_rotated_left":
                 [[0.0, 0.0], [1.57, 1.0], [3.12, 1.0], [3.13, 0.0]]
         },
-        "release": {"path": "movement/directive/despot.py"},
-        "mock": {"path": "movement/directive/test/despot.py"}
+        "release": {"path": null},
+        "mock": {"path": null}
     },
     "movement/stabalization": {
         "port": 20057,
         "listen": [
             "movement/directive",
-            "sensor/accelerometer"
+            "sensor/accelerometer",
+			"decision/advisor"
         ],
         "release": {"path": "movement/stabalization/tightrope_walker.py"},
         "mock": {"path": "movement/stabalization/test/tightrope_walker.py"}
@@ -143,7 +144,7 @@
           "sensor/compass",
           "sensor/depth"
         ],
-        "release": {"path": "decision/shadow_behind_the_throne.py"},
+        "release": {"path": null},
         "mock": {"path": null},
         "depth_threshold": 550
     },
