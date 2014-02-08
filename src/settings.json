@@ -190,6 +190,18 @@
         "listen": [],
         "release": {"path": null},
         "mock": {"path": null}
+    },
+    "sensor/sanitation":{
+        "port":20068,
+        "listen":[
+            "sensor/depth",
+            "sensor/battery_voltage",
+            "sensor/accelerometer",
+            "sensor/gyroscope",
+            "sensor/compass"
+        ],
+        "release":{"path":null},
+        "mock":{"path":null}
     }
 }
 

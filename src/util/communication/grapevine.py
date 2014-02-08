@@ -98,14 +98,13 @@ class Communicator(object):
     def get_last_message(self, module_name):
         """Reads all messages in the queue and returns the last one.
 
-        The messages prior to the last one will be discarded.
+        The messages prior to the last one will be discarded. If no
+        new messages were received since the last call to this method,
+        this will return the last message again.
 
         """
         # Updates the last message
-        try:
-            self.get_messages(module_name).next()
-        except StopIteration:
-            pass
+        list(self.get_messages(module_name))
         return self.subscribers[module_name]['last_message']
 
     def get_messages(self, module_name):

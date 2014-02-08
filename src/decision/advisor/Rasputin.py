@@ -57,15 +57,19 @@ getch = _Getch()
 
 def main(args):
     print """Usage:
-+-------+-------+-------+-------+
-| q     | w     | e     | r     |
-|       |       |       |       |
-| QUIT  |FORWARD|  N/A  | RISE  |
-++------++------++------++------++
- | a     | s     | d     | f     |
- | ROTATE|       | ROTATE|       |
- | LEFT  |  BACK | RIGHT | FALL  |
- +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+   | 1     | 2     | 3     | 4     |
+   |       |       |       |       |
+   |KEYBOARD PATH  | DEPTH | N/A   |
+   ++------++------++------++------++
+    | q     | w     | e     | r     |
+    |       |       |       |       |
+    | QUIT  |FORWARD| STOP  | RISE  |
+    ++------++------++------++------++
+     | a     | s     | d     | f     |
+     | ROTATE|       | ROTATE|       |
+     | LEFT  |  BACK | RIGHT | FALL  |
+     +-------+-------+-------+-------+
 """
     com = Communicator(
             module_name=args.module_name,
@@ -103,13 +107,13 @@ def main(args):
         elif key == '3':
             advice["command"] = "state: depth"
        #elif key == '6':
-       #    advice["command"] = 
+       #    advice["command"] =
        #elif key == '7':
-       #    advice["command"] = 
+       #    advice["command"] =
        #elif key == '8':
-       #    advice["command"] = 
+       #    advice["command"] =
        #elif key == '9':
-       #    advice["command"] = 
+       #    advice["command"] =
         elif key == 'q':
             sys.exit()
 
