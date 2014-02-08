@@ -180,7 +180,8 @@ def get_packet(ser):
 
         return packet
 
-def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
+#def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
+def respond_to_stabalization_packet(packet, mag):
     # TODO: This would allow us to use cleaner debug messages if we
     # instead had a thruster settings dictionary. E.g.:
     # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
@@ -188,6 +189,7 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
     raw_cmds = []
     intent = None
     # Node: the advisor_packet is for debugging purposes only.
+    """
     if advisor_packet and advisor_packet['command'] == 'stop':
         # Turn off all thrusters.
         intent = 'full stop'
@@ -213,7 +215,8 @@ def respond_to_stabalization_packet(packet, mag, advisor_packet=None):
         raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0, 1))
         raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0, 1))
-    elif packet['vector']['x'] > 0.0:
+    """
+    if packet['vector']['x'] > 0.0:
         intent = 'strafe left (not implemented)'
     elif packet['vector']['x'] < 0.0:
         intent = 'strafe right (not implemented)'
@@ -377,19 +380,21 @@ def main(args):
 
     mag = args.magnitude
     last_packet_time = 0.0
-    last_advisor_packet = None
-    last_advisor_packet_time = 0.0
+    #last_advisor_packet = None
+    #last_advisor_packet_time = 0.0
     while True:
         stabalization_packet = com.get_last_message("movement/stabalization")
-        advisor_packet = com.get_last_message("decision/advisor")
+        #advisor_packet = com.get_last_message("decision/advisor")
         new_event = False
 
+        """
         if (advisor_packet and
             advisor_packet['timestamp'] > last_advisor_packet_time):
             last_advisor_packet_time = advisor_packet['timestamp']
             last_advisor_packet = advisor_packet
             if advisor_packet['command'] == 'stop':
                 new_event = True
+        """
 
         if (stabalization_packet and
             stabalization_packet['timestamp'] > last_packet_time):
@@ -398,8 +403,8 @@ def main(args):
 
         if new_event:
             intent, raw_cmds = respond_to_stabalization_packet(
-                    packet=stabalization_packet, mag=mag,
-                    advisor_packet=last_advisor_packet)
+                    packet=stabalization_packet, mag=mag)
+                    #advisor_packet=last_advisor_packet)
             # Debugging info...
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
