@@ -12,7 +12,7 @@ import numpy as np
 
 class Path(object):
 
-    def __init__(self, tools):
+    def __init__(self, tools, settings):
         self._tools = tools
 
     # Calculates the longest line from the set of lines, returns index of line
@@ -110,7 +110,14 @@ class Path(object):
             b2 = line2f[1] - m2 * line2f[0]
             x = (b2 - b1) / (m1 - m2)
             y = m2 * x + b2
-            return int(x), int(y)
+            try:
+                # FIXME this needs to be handled properly.
+                x = int(x)
+                y = int(y)
+            except ValueError:
+                # np NaN error.
+                return 0, 0
+            return x, y
 
     # draws out the entire lineset.
     @staticmethod
@@ -191,11 +198,11 @@ class Path(object):
         #edges_g = cv2.inRange(edges_g, np.array(0), np.array(255))
         #edges_r = cv2.inRange(edges_r, np.array(15), np.array(255))
 
-        edges = cv2.merge([edges_b, edges_g, edges_r])
+        #edges = cv2.merge([edges_b, edges_g, edges_r])
         print type(edges)
 
         # remove all things without red, then smooth image for line detection
-        #edges = cv2.inRange(edges, (0, 0, 15), (255, 255, 255))
+        edges = cv2.inRange(edges, (0, 0, 15), (255, 255, 255))
         edges = cv2.inRange(edges, np.array(15), np.array(255))
         edges = cv2.GaussianBlur(edges, (5, 5), 0)
 
@@ -210,9 +217,12 @@ class Path(object):
                                 minLineLength=100,
                                 maxLineGap=1)
 
-        if not lines.all():
-            print "no lines found"
-            return {"angle1": None, "angle2": None, "center": None}
+        try:
+            if not lines.all():
+                print "no lines found"
+                return
+        except AttributeError:
+            return
 
         # calculate angles of the entire set.
         angle_set = []
@@ -232,7 +242,7 @@ class Path(object):
         if not angle_set2 or not angle_set1:
             # only a single line is found. Find the center of that line.
             center = self.line_center(lines[0][longest_index])
-            packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]), "angle2": None, "center": center}
+            packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]), "angle2": None, "center": [int(x) for x in center]}
 
         else:
             longest_line1 = lines[0][longest_index]
@@ -242,9 +252,8 @@ class Path(object):
             center = self.line_intersect(longest_line1, longest_line2)
             packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[0][longest_index]),
                                     "angle2": self._tools.lineAngle(line_set2[0][longest_index2]),
-                                    "center": center}
+                                    "center": [int(x) for x in center]}
         # return dictionary of angle, location of image center on camera's image.
-        return packet
 
 #def main():
     #print "this main is for debugging purposes only."

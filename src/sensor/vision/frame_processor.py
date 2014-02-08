@@ -26,8 +26,6 @@ class FrameProcessor(object):
         # Investigate.
         self._hue_histogram_beta = 0
         
-	self._eroded_im = None
-
         # Hue midpoints will shift in different light. Midpoints for current
         # image should be calculated and stored here.
         self._hue_midpoints = {

@@ -7,10 +7,11 @@
         "maintenance_interval": 5,
         "max_failed_frames": 150,
         "vision_processors": [
-            "sensor/vision/cam_front"
+            "sensor/vision/cam_down"
         ]
     },
     "sensor/vision/cam_fake": {
+        "name": "cam_fake",
         "recorded_video": "/home/cevans/Videos/RoboSub/Obstacles/pathOutOfStartGate640x480.mp4",
         "recorded_video_": "/home/cevans/Videos/RoboSub/Obstacles/tollBooth640x480.mp4",
         "stream_port": 50000,
@@ -28,6 +29,7 @@
         "plugins": ["VideoLogger", "Path"]
     },
     "sensor/vision/cam_front": {
+        "name": "cam_front",
         "stream_port": 50000,
         "stream_type": "device",
         "symlink": "/dev/cam_front",
@@ -43,6 +45,7 @@
         "plugins": []
     },
     "sensor/vision/cam_down": {
+        "name": "cam_down",
         "stream_port": 50001,
         "stream_type": "device",
         "symlink": "/dev/cam_down",
@@ -55,7 +58,7 @@
         "fps": 10,
         "width": 640,
         "height": 480,
-        "plugins": ["pathing"]
+        "plugins": ["VideoLogger", "Streamer", "Path"]
     },
     "sensor/vision/cam_left": {
         "symlink": "/dev/cam_left",

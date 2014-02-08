@@ -14,40 +14,48 @@ class VideoLogger(object):
     #XXX does this filepath handling conform with Robosub standards?
     DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
 
-    def __init__(self, fp):
+    def __init__(self, fp, settings):
         """Initialize opencv capture and writer objects.
 
         Args:
 
         """
+        self._settings = settings
         self._writer = None
         self._pool = ThreadPool(1)
         self._fp = fp
+        self._init_writer()
 
-    def _init_writer(self, im):
-        dest = self.DIR + strftime('%yy_%mm_%dd_%Hh_%Mm_%Ss_') + key + '.avi'
+    def _init_writer(self):
+        #dest = self.DIR + strftime('%yy_%mm_%dd_%Hh_%Mm_%Ss_') + key + '.avi'
+        dest = '{dir}{timestamp}{name}.avi'.format(
+                dir=self.DIR,
+                timestamp=strftime('%yy_%mm_%dd_%Hh_%Mm_%Ss_'),
+                name=self._settings['name'])
         self._writer = cv2.VideoWriter()
-        self.writer.open(
+        self._writer.open(
                     filename = dest,
                     fourcc = cv.CV_FOURCC(*list('MJPG')),
                     fps = 5,
-                    frameSize = (im.shape[0], im.shape[1]))
+                    frameSize = (640, 480))
 
     ############################################################################
     # @method _write_image()
     # @brief:  Write self.image to writer file.
     # @param self:  standard python object reference.
     ############################################################################
-    def _write_image(self, writer, im):
+    def _write_image(self, _writer, im):
         try:
-            self.writer.write(im)
-        except AttributeError:
-            self._init_writer(im)
+            self._writer.write(im)
+        except Exception:
+            self._init_writer()
             try:
-                self.writer.write(im)
+                self._writer.write(im)
             except:
                 raise Exception("Could not write image")
 
     def process_image(self, packet):
-        self._pool.apply_async(func=self._write_image, args=(self._fp.im,))
+        print 'logging'
+        self._writer.write(self._fp.im)
+        #self._pool.apply_async(func=self._write_image, args=(self._fp.im,))
 

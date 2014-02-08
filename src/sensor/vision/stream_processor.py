@@ -45,7 +45,7 @@ class StreamProcessor(object):
             # Name of module and the class should be the same.
             module_obj = getattr(import_module(
                     '..'+plugin_name, package='plugins.subpkg'),
-                    plugin_name)(self.processor)
+                    plugin_name)(self.processor, self.settings)
             self._plugins += [module_obj]
 
         #Configure the VideoCapture object.
@@ -102,7 +102,7 @@ class StreamProcessor(object):
         while True:
             start_time = time()
             got_im, im = self._get_frame()
-            print 'new frame'
+            #print 'new frame'
             if self._pipe.poll() is True:
                 # Send the message back to parent to prove this process
                 # isn't frozen.
@@ -115,9 +115,6 @@ class StreamProcessor(object):
                 packet = {}
                 for plugin in self._plugins:
                     plugin.process_image(packet)
-                    #retval, new_im = plugin.process_image(im)
-                    #if retval is not None:
-                    #    self._com.publish_message(retval)
                 self._com.publish_message(packet)
             try:
                 # Try to sleep until we took the correct amount of time.

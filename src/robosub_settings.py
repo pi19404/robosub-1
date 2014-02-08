@@ -50,6 +50,7 @@ settings = {
     },
     "sensor/vision/cam_front": {
         "stream_port": 50000,
+        "port": 50001,
         "stream_type": "device",
         "symlink": "/dev/cam_front",
         "codec": "MJPG",
@@ -65,6 +66,7 @@ settings = {
     },
     "sensor/vision/cam_down": {
         "stream_port": 50001,
+        "port": 50001,
         "stream_type": "device",
         "symlink": "/dev/cam_down",
         "codec" : "MJPG",
@@ -88,7 +90,6 @@ settings = {
             "movement/physical",
             "sensor/vision/cam_front",
             "sensor/vision/cam_down",
-            "sensor/vision/fates",
             "sensor/accelerometer",
             "sensor/gyroscope",
             "sensor/compass",
