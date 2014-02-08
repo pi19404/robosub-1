@@ -15,7 +15,6 @@ class FrameProcessor(object):
     hue_blue = 120
     hue_orange = 16
     hue_yellow = 30
-    
     # TODO Do some interweb researching for the real duct tape hues.
 
     def __init__(self):
@@ -143,6 +142,7 @@ class FrameProcessor(object):
             # Channels haven't been split yet. Memoize them.
             self._channels['h'], self._channels['s'], self._channels['v'] = \
                 cv2.split(self.hsv)
+                    cv2.split(self.hsv)
         return self._channels[key]
 
     def _get_bgr_channel(self, key):
@@ -157,6 +157,8 @@ class FrameProcessor(object):
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
             self._channels['b'], self._channels['g'], self._channels['r'] = cv2.split(self.im)
+            self._channels['b'], self._channels['g'], self._channels['r'] = \
+                    cv2.split(self.im)
         return self._channels[key]
 
     @property
@@ -537,17 +539,19 @@ class FrameProcessor(object):
 # Hack code to be removed.
 ###############################################################################
 
-    def preprocess(self, im):
-        self.load_im(im)
+    def hacky_display(self):
         cv2.imshow("image", self.im)
+        #cv2.imshow('saturation', self.im_saturation)
         #cv2.imshow('yellow', self.filtered_yellow)
         #cv2.imshow('green', self.filtered_green)
         #cv2.imshow('blue', self.filtered_blue)
         #cv2.imshow('red', self.filtered_red)
         #cv2.imshow('orange', self.filtered_orange)
-        cv2.imshow('edge_detect', self.edge_detect(self.im, shift=2))
+        #cv2.imshow('r', cv2.subtract(self.im_red, self.im_saturation))
+        #cv2.imshow('edge_detect', self.edge_detect(self.im, shift = 2))
         high_sat = cv2.inRange(self.im_saturation, np.array(170), np.array(255))
-        cv2.imshow('high_sat', high_sat)
+        cv2.imshow('r-b', cv2.inRange(cv2.subtract(self.im_red, self.im_blue), np.array(30), np.array(255)))
+        #cv2.imshow('high_sat', high_sat)
         #cv2.imshow('hist_hue', hist_curve(cv2.bitwise_and(self.im, cv2.merge([high_sat, high_sat, high_sat]))))
         #cv2.imshow('hist_sat', hist_curve(self.im_saturation))
         cv2.waitKey(10)
