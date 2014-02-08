@@ -9,22 +9,66 @@
 # perhaps leveraging the Pyro library.
 
 import argparse
-import json
 import os
+import pipes
 import re
+import sys
 import time
+from robosub_settings import settings
 from pprint import pprint
 from subprocess import check_output, check_call, Popen, CalledProcessError
 
-def get_fnames(mode, settings):
+def start_modules(mode, quiet=False):
+    if not quiet:
+        print " $ export PYTHONPATH=`pwd`"
+
+    FNULL = open(os.devnull, 'w')
+    for module_name, module_settings in settings.items():
+        if (not isinstance(module_settings, dict) or
+            'not_a_module' in module_settings or
+            mode not in module_settings or
+            not module_settings[mode]["name"]):
+            # This is either not a module settings dictionary, or else
+            # it doesn't specify the information we need to start the module.
+            continue
+
+        full_name = os.path.join(module_name, module_settings[mode]["name"])
+
+        if module_settings[mode]["name"].endswith(".py"):
+            prog = "python"
+        else:
+            print >> sys.stderr, (
+                    "WARNING: {0} looks like a module, but it doesn't have "
+                    "a '.py' suffix. It will not be started.")
+            continue
+
+        cmd = ['python', full_name]
+        if "args" in module_settings[mode]:
+            cmd += module_settings[mode]["args"]
+
+        if not quiet:
+            # This isn't perfect, but it's close enough.
+            print " $ {full_command}".format(full_command=" ".join(cmd))
+
+        Popen(cmd, stdout=FNULL, stderr=FNULL)
+    FNULL.close()
+
+def get_fnames():
+    """These file names will be used to kill all robosub processes."""
     fnames = set()
-    for key, val in settings.items():
-        if isinstance(val, dict):
-            fnames.add(val[mode]['path'])
-    None in fnames and fnames.remove(None)
+    for module_name, module_settings in settings.items():
+        if (not isinstance(module_settings, dict) or
+            'not_a_module' in module_settings):
+            # This is not a real module_settings dict.
+            continue
+        for mode in ["mock", "release"]:
+            if mode in module_settings:
+                fnames.add(module_settings[mode]["name"])
+    if None in fnames:
+        fnames.remove(None)
     return fnames
 
-def get_running(settings):
+def get_running():
     running = []
     running_raw = check_output(['ps', '-e', '-o', 'pid,cmd']).splitlines()
     for entry in running_raw[1:]:
@@ -32,30 +76,22 @@ def get_running(settings):
         pid = pid.strip()
         cmd = cmd.strip()
         running.append([pid, cmd])
-    release_fnames = get_fnames("release", settings)
-    mock_fnames = get_fnames("mock", settings)
     robosub_running = []
     PID, PROG = 0, 1
-    for fname in release_fnames.union(mock_fnames):
+    for fname in get_fnames():
         for entry in running:
             if re.search(fname, entry[PROG]):
                 robosub_running.append((entry[PROG], entry[PID]))
 
     return robosub_running
 
-
 def main(args):
-    settings = json.load(open(args.settings_path, 'r'))
-    release_fnames = get_fnames("release", settings)
-    mock_fnames = get_fnames("mock", settings)
-
     if args.kill:
-        running = get_running(settings)
         PID = 0
         PROG = 1
-        for prog, pid in running:
-            print "Killing '{0}' with pid {1}".format(
-                    prog, pid)
+        for prog, pid in get_running():
+            print " $ kill -9 {pid}  # {program_name}".format(
+                    pid=pid, program_name=prog)
             check_call(['kill', '-9', pid])
 
         print """
@@ -64,27 +100,15 @@ by ties only dissoluble by the annihilation of one of us. You purpose to kill
 me. How dare you sport thus with life?
         """
     elif args.create:
-        # TODO This branch does not check to see if the programs are already
-        # running.
-        FNULL = open(os.devnull, 'w')
+        if get_running():
+            print >> sys.stderr, (
+                    "WARNING: Some robosub modules were already "
+                    "running. Continuing anyway.")
         if not os.environ.get('PYTHONPATH'):
             os.environ['PYTHONPATH'] = os.path.abspath('.')
 
-        # TODO This should check to see if any arguments are specified in
-        # the settings file.
-        if args.create == 'release':
-            fnames = release_fnames
-        elif args.create == 'mock':
-            fnames = mock_fnames
-        else:
-            raise "--create argument not recognized: {0}".format(args.create)
+        start_modules(args.create, args.quiet)
 
-        for fname in fnames:
-            cmd = ['python', fname]
-            print "Electrifying:", cmd
-            Popen(cmd, stdout=FNULL, stderr=FNULL)
-
-        FNULL.close()
         print
         print "I beheld the wretch--the miserable monster whom I had created."
         print
@@ -92,24 +116,25 @@ me. How dare you sport thus with life?
     if args.running:
         print '{0:>6}: {1}'.format("PID", "COMMAND")
         print '{0:=>6}: {1:=>10}'.format("", "")
-        for prog, pid in get_running(settings):
+        for prog, pid in get_running():
             print '{pid:>6}: {prog}'.format(pid=pid, prog=prog)
-
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('--settings_path', type=str,
-            default="./settings.json",
-            help='Settings file path.')
-    parser.add_argument('-c', '--create', type=str,
-                        help="Would you also create for yourself and "
-                             "the world a demoniacal enemy? (mock|release)")
-    parser.add_argument('-k', '--kill', action='store_true',
-                        help="He was tried and condemned to death.")
-    parser.add_argument('-m', '--module_name', type=str,
-            default='movement/directive',
-            help='Module name.')
+    parser.add_argument(
+            '-c', '--create', type=str,
+            help="Would you also create for yourself and "
+                 "the world a demoniacal enemy? (mock|release)")
+    parser.add_argument(
+            '-k', '--kill', action='store_true',
+            help="He was tried and condemned to death.")
+    # TODO: Implement this functionality.
+    #parser.add_argument(
+    #        '-m', '--module_name', type=str,
+    #        default='movement/directive',
+    #        help='Module name.')
     parser.add_argument('-r', '--running', action='store_true')
+    parser.add_argument('-q', '--quiet', action='store_true')
     return parser.parse_args()
 
 

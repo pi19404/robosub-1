@@ -69,9 +69,7 @@ def main(args):
     do, but something needs to decide which oligarch is in charge.
 
     """
-    com = Communicator(
-            module_name=args.module_name,
-            settings_path=args.settings_path)
+    com = Communicator(module_name=args.module_name)
 
     oligarchs = {
             "AdvisorsPeon": AdvisorsPeon(com),
@@ -118,10 +116,6 @@ def main(args):
 def commandline():
     parser = argparse.ArgumentParser(
             description='Path following decision module.')
-    parser.add_argument(
-            '--settings_path', type=str,
-            default=None,
-            help='Settings file path.')
     parser.add_argument(
             '-m', '--module_name', type=str,
             default='decision',
