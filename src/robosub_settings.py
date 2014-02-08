@@ -161,10 +161,19 @@ settings = {
         "port": 20069,
         "release": {
             "name": "microcontroller_interface.py",
-            "args": ["--epoch", EPOCH]},
+            "args": [
+                "--epoch", "0.004",
+                "--baudrate", "56818",
+                "--port", '/dev/ttyUSB0',
+                "--magnitude", "100"]},
         "mock": {
             "name": "microcontroller_interface.py",
-            "args": ["--epoch", EPOCH, "--debug"]}
+            "args": [
+                "--epoch", "0.004",
+                "--debug",
+                "--baudrate", "56818",
+                "--magnitude", "100"
+            ]}
     },
     "sensor/accelerometer": {
         "port": 20059,
@@ -240,17 +249,25 @@ settings = {
         "release": {"name": None},
         "mock": {"name": None}
     },
-    "sensor/sanitation":{
-        "port":20068,
-        "listen":[
+    "sensor/sanitation": {
+        "port": 20068,
+        "listen": [
             "sensor/depth",
             "sensor/battery_voltage",
             "sensor/accelerometer",
             "sensor/gyroscope",
             "sensor/compass"
         ],
-        "release":{"name":None},
-        "mock":{"name":None}
+        "release": {
+            "name": "sanitation.py",
+            "args": [
+                "--calibration_samples", 10]
+        },
+        "mock": {
+            "name": "sanitation.py",
+            "args": [
+                "--debug",
+                "--calibration_samples", 10]}
     }
 }
 

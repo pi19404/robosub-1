@@ -58,9 +58,9 @@ getch = _Getch()
 def main(args):
     print """Usage:
    +-------+-------+-------+-------+
-   | 1     | 2     | 3     | 4     |
-   |       |       |       |       |
-   |KEYBOARD PATH  | DEPTH | N/A   |
+   | 1     | 2     | 3     | 4     |        magnitude will always be between
+   |       |       |       |       |        0 and 127. Use '[' to decrease the
+   |KEYBOARD PATH  | DEPTH | N/A   |        magnitude and ']' to increase it.
    ++------++------++------++------++
     | q     | w     | e     | r     |
     |       |       |       |       |
@@ -74,10 +74,11 @@ def main(args):
     com = Communicator(module_name=args.module_name)
 
     advice_template = {"command": None}
+    magnitude = 91
 
     while True:
         key = getch()
-        print "{0}\r".format(key),
+        print "magnitude: {0:3} key: {1}\r".format(magnitude, key),
         advice = deepcopy(advice_template)
 
         if key == 'w':
@@ -104,6 +105,11 @@ def main(args):
             advice["command"] = "state: path"
         elif key == '3':
             advice["command"] = "state: depth"
+        elif key == '[':
+            magnitude -= 1
+        elif key == ']':
+            magnitude += 1
+
        #elif key == '6':
        #    advice["command"] =
        #elif key == '7':
@@ -114,6 +120,13 @@ def main(args):
        #    advice["command"] =
         elif key == 'q':
             sys.exit()
+
+        if magnitude > 127:
+            magnitude = 127
+        if magnitude < 0:
+            magnitude = 0
+
+        advice["magnitude"] = magnitude
 
         com.publish_message(advice)
 
