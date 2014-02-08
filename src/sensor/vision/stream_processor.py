@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import cv2
 import cv2.cv as cv
-from logging.video_logger import VideoLogger
 from time import sleep, time
 import sys
 import os
@@ -104,12 +103,12 @@ class StreamProcessor(object):
             start_time = time()
             got_im, im = self._get_frame()
             print 'new frame'
+            if self._pipe.poll() is True:
+                # Send the message back to parent to prove this process
+                # isn't frozen.
+                self._pipe.send(self._pipe.recv())
             if got_im:
                 # Check if parent sent a message over the pipe.
-                if self._pipe.poll() is True:
-                    # Send the message back to parent to prove this process
-                    # isn't frozen.
-                    self._pipe.send(self._pipe.recv())
 
                 self.processor.load_im(im)
                 # self.processor.hacky_display() # FIXME this needs to go away.
