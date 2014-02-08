@@ -3,6 +3,8 @@
 import cv2
 import cv2.cv as cv
 import numpy as np
+from math import atan2
+
 
 class FrameProcessor(object):
     """Image processing functions for Robosub VisionProcessor plugins."""
@@ -13,6 +15,7 @@ class FrameProcessor(object):
     hue_blue = 120
     hue_orange = 16
     hue_yellow = 30
+    
     # TODO Do some interweb researching for the real duct tape hues.
 
     def __init__(self):
@@ -23,6 +26,8 @@ class FrameProcessor(object):
         # XXX Slope might also be a good way to detect these colors.
         # Investigate.
         self._hue_histogram_beta = 0
+        
+	self._eroded_im = None
 
         # Hue midpoints will shift in different light. Midpoints for current
         # image should be calculated and stored here.
@@ -48,8 +53,8 @@ class FrameProcessor(object):
 
         self.im = im
         self._hsv = None
-	# Used for filtering noise.
-	self._eroded_im = None
+        # Used for filtering noise.
+        self._eroded_im = None
         # Use to detect objects of interest and hue shifts due to weather.
         self._histogram_hue = None
 
@@ -62,15 +67,15 @@ class FrameProcessor(object):
         # Bitmasks of pixels with attributes unique to robosub obstacles.
         self._filtered_images = {
             # High saturation colors (colored duct tape).
-            'b': None, # blue
-            'g': None, # green
-            'r': None, # red
-            'y': None, # yellow
-            'o': None, # orange
-            # High value colors (colored LED buoys).
-            'buoy_b': None, # blue
-            'buoy_r': None, # red
-            'buoy_g': None # green
+            'b': None,  # blue
+            'g': None,  # green
+            'r': None,  # red
+            'y': None,  # yellow
+            'o': None,  # orange
+            # High values colors (colored LED buoys).
+            'buoy_b': None,  # blue
+            'buoy_r': None,  # red
+            'buoy_g': None   # green
         }
 
         # Channels of BGR and HSV images.
@@ -97,41 +102,34 @@ class FrameProcessor(object):
 
         # Reset the processor and clear out stale image data.
         self._reset(im)
-     
-     def lineAngle(self, line):
-       """returns angle from a single line
 
-        Args:
-
-            line - An np array of four elements, [x1, y1, x2, y2].
-
-        """
-        theta = -atan2(int(line[2]-line[0]), int(line[3] - line[1]))
+    @staticmethod
+    def lineAngle(line):
+        theta = -atan2(int(line[2] - line[0]), int(line[3] - line[1]))
         # FIXME, make math good.
-        if(abs(theta) > cv2.cv.CV_PI/2):
-	  theta = -atan2(int(line[0]-line[2]), int(line[1]-line[3]))
+        if abs(theta) > cv2.cv.CV_PI / 2:
+            theta = -atan2(int(line[0] - line[2]), int(line[1] - line[3]))
         return theta
-    def eroded_im(
-   
-    
-    def erode_image(self, im=self.im, kernel_size=3, iterations=2):
-       """ erodes the image. Useful for cleaning image.
+
+    def erode_image(self, im=None, kernel_size=3, iterations=2):
+        """ erodes the image. Useful for cleaning image.
 
         Args:
 
             im - the normal im.
-            
+
             kernel_size - the size of kernel pixel, e.g. 3x3 pixels
-            
+
             iterations - the number of iterations cv will do.
 
         """
-	if self.eroded_im is None:
-	  kernel = np.ones((kernel_size, kernel_size), np.uint8)
-	  self._eroded_im = cv2.erode(img, kernel, iterations=iterations)
-	return self._eroded_im
-   
-   
+        if im is None:
+            im = self.im
+        if self._eroded_im is None:
+            kernel = np.ones((kernel_size, kernel_size), np.uint8)
+            self._eroded_im = cv2.erode(im, kernel, iterations=iterations)
+        return self._eroded_im
+
     def _get_hsv_channel(self, key):
         """Return hue, saturation, or value channel of current image.
 
@@ -144,7 +142,7 @@ class FrameProcessor(object):
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
             self._channels['h'], self._channels['s'], self._channels['v'] = \
-                    cv2.split(self.hsv)
+                cv2.split(self.hsv)
         return self._channels[key]
 
     def _get_bgr_channel(self, key):
@@ -158,8 +156,7 @@ class FrameProcessor(object):
 
         if self._channels[key] is None:
             # Channels haven't been split yet. Memoize them.
-            self._channels['b'], self._channels['g'], self._channels['r'] = \
-                    cv2.split(self.im)
+            self._channels['b'], self._channels['g'], self._channels['r'] = cv2.split(self.im)
         return self._channels[key]
 
     @property
@@ -185,10 +182,10 @@ class FrameProcessor(object):
         if self._filtered_images[key] is None:
             # The filtered image hasn't been created yet. Memoize it.
             self._filtered_images[key] = \
-                    cv2.bitwise_and(
+                cv2.bitwise_and(
                         self._filter_hue(self._hue_midpoints[key]),
-                        cv2.inRange(self.im_saturation, 
-                            np.array(170), np.array(255)))
+                        cv2.inRange(self.im_saturation,
+                        np.array(170), np.array(255)))
 
         return self._filtered_images[key]
 
@@ -320,7 +317,7 @@ class FrameProcessor(object):
                     np.array(mid - include_distance),
                     np.array(180))
             return cv2.bitwise_or(low_side, high_side)
-        return cv2.inRange(self.im_hue, 
+        return cv2.inRange(self.im_hue,
                 np.array(mid - include_distance),
                 np.array(mid + include_distance))
 
@@ -548,7 +545,7 @@ class FrameProcessor(object):
         #cv2.imshow('blue', self.filtered_blue)
         #cv2.imshow('red', self.filtered_red)
         #cv2.imshow('orange', self.filtered_orange)
-        cv2.imshow('edge_detect', self.edge_detect(self.im, shift = 2))
+        cv2.imshow('edge_detect', self.edge_detect(self.im, shift=2))
         high_sat = cv2.inRange(self.im_saturation, np.array(170), np.array(255))
         cv2.imshow('high_sat', high_sat)
         #cv2.imshow('hist_hue', hist_curve(cv2.bitwise_and(self.im, cv2.merge([high_sat, high_sat, high_sat]))))
@@ -557,17 +554,19 @@ class FrameProcessor(object):
         return
 
 bins = np.arange(256).reshape(256, 1)
+
+
 def hist_curve(im):
-    h = np.zeros((300,256,3))
+    h = np.zeros((300, 256, 3))
     if len(im.shape) == 2:
-        color = [(255,255,255)]
+        color = [(255, 255, 255)]
     elif im.shape[2] == 3:
-        color = [ (255,0,0),(0,255,0),(0,0,255) ]
+        color = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
     for ch, col in enumerate(color):
-        hist_item = cv2.calcHist([im],[ch],None,[256],[0,255])
-        cv2.normalize(hist_item,hist_item,0,255,cv2.NORM_MINMAX)
+        hist_item = cv2.calcHist([im], [ch], None, [256], [0, 255])
+        cv2.normalize(hist_item, hist_item, 0, 255, cv2.NORM_MINMAX)
         hist=np.int32(np.around(hist_item))
-        pts = np.int32(np.column_stack((bins,hist)))
-        cv2.polylines(h,[pts],False,col)
+        pts = np.int32(np.column_stack((bins, hist)))
+        cv2.polylines(h, [pts], False, col)
     y=np.flipud(h)
     return y
