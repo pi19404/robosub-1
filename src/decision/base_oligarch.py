@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 class BaseOligarch(object):
     __metaclass__ = ABCMeta
@@ -7,6 +7,10 @@ class BaseOligarch(object):
     def __init__(self, communicator):
         self.communicator = communicator
         # Subclasses must specify self.face_of_power
+
+    @abstractproperty
+    def face_of_power(self):
+        pass
 
     @abstractmethod
     def decision(self, *args):

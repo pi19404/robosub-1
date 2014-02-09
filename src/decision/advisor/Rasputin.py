@@ -62,8 +62,8 @@ def main(args):
    |       |       |       |       |        0 and 127. Use '[' to decrease the
    |KEYBOARD PATH  | DEPTH | N/A   |        magnitude and ']' to increase it.
    ++------++------++------++------++
-    | q     | w     | e     | r     |
-    |       |       |       |       |
+    | q     | w     | e     | r     |       Use '-' to decrease desired depth.
+    |       |       |       |       |       Use '=' to increase desired depth.
     | QUIT  |FORWARD| STOP  | RISE  |
     ++------++------++------++------++
      | a     | s     | d     | f     |
@@ -75,10 +75,13 @@ def main(args):
 
     advice_template = {"command": None}
     magnitude = 91
+    desired_depth = 500
 
     while True:
         key = getch()
-        print "magnitude: {0:3} key: {1}\r".format(magnitude, key),
+        msg = "magnitude: {0:3} last key: {1} desired depth: {2}\r"
+        msg = msg.format(magnitude, key, desired_depth)
+        print msg,
         advice = deepcopy(advice_template)
 
         if key == 'w':
@@ -109,7 +112,10 @@ def main(args):
             magnitude -= 1
         elif key == ']':
             magnitude += 1
-
+        elif key == '-':
+            desired_depth -= 1
+        elif key == '=':
+            desired_depth += 1
        #elif key == '6':
        #    advice["command"] =
        #elif key == '7':
@@ -127,6 +133,7 @@ def main(args):
             magnitude = 0
 
         advice["magnitude"] = magnitude
+        advice["desired_depth"] = desired_depth
 
         com.publish_message(advice)
 
