@@ -1,5 +1,19 @@
 CMakeCache.txt
 CMakeFiles
+<<<<<<< HEAD
 Makefile
+=======
+>>>>>>> 335fd7aff464a17898c6844f204982bf2da89f18
 cmake_install.cmake
 install_manifest.txt
+
+*.swp
+*.swo
+*.o
+*~
+*.lock
+*.DS_Store
+*.out
+*.pyc
+*.avi
+
