@@ -199,7 +199,7 @@ class Path(object):
         #edges_r = cv2.inRange(edges_r, np.array(15), np.array(255))
 
         #edges = cv2.merge([edges_b, edges_g, edges_r])
-        print type(edges)
+        #print type(edges)
 
         # remove all things without red, then smooth image for line detection
         edges = cv2.inRange(edges, (0, 0, 15), (255, 255, 255))
@@ -219,7 +219,7 @@ class Path(object):
 
         try:
             if not lines.all():
-                print "no lines found"
+                #print "no lines found"
                 return
         except AttributeError:
             return

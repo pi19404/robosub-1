@@ -4,10 +4,8 @@ import cv2.cv as cv
 from time import sleep, time
 import sys
 import os
-import json
-import zmq
-from multiprocessing.pool import ThreadPool
-from threading import Thread
+#from multiprocessing.pool import ThreadPool
+from threading import Thread, Event
 from importlib import import_module
 from frame_processor import FrameProcessor
 sys.path.append(os.path.abspath('../..'))
@@ -26,13 +24,14 @@ class StreamProcessor(object):
 
         """
         self.module_name = module_name
-        self.master_settings = settings['sensor/vision/visiond']
+        self.master_settings = settings['sensor/vision/control']
         self.settings = settings[module_name]
         self.processor = FrameProcessor()
         self._com = Communicator(module_name)
         # Nagging messages from the parent come from here. The process must
         # respond quickly enough or be killed by the parent.
         self._pipe = pipe
+        self._fresh_frame_available = Event()
 
         self._got_im, self._im = None, None
         self._init_stream()
@@ -48,7 +47,7 @@ class StreamProcessor(object):
                     plugin_name)(self.processor, self.settings)
             self._plugins += [module_obj]
 
-        #Configure the VideoCapture object.
+        # Configure the VideoCapture object.
         self._vision_process()
 
     def _init_stream(self):
@@ -61,6 +60,7 @@ class StreamProcessor(object):
                 raise Exception('Broken symlink {sym}'.format(
                         sym=self.settings['symlink']))
             self._cap = cv2.VideoCapture(int(cam_path[-1]))
+            self._cap.set(cv.CV_CAP_PROP_FPS, self.settings['fps'])
             self._frame_grabber_thread = Thread(target=self.refresh_frame)
             self._frame_grabber_thread.daemon = True
             self._frame_grabber_thread.start()
@@ -80,6 +80,7 @@ class StreamProcessor(object):
         """Get the most recent frame from the video stream."""
 
         if self._frame_grabber_thread is not None:
+            self._fresh_frame_available.wait()
             return (self._got_im, self._im)
         else:
             return self._cap.read()
@@ -90,6 +91,8 @@ class StreamProcessor(object):
         # Assuming 30fps, 150 fails in a row means 5s of no video.
         while failed_count < self.master_settings['max_failed_frames']:
             self._got_im, self._im = self._cap.read()
+            self._fresh_frame_available.set()
+            self._fresh_frame_available.clear()
             if not self._got_im:
                 failed_count += 1
             else:
@@ -116,9 +119,3 @@ class StreamProcessor(object):
                 for plugin in self._plugins:
                     plugin.process_image(packet)
                 self._com.publish_message(packet)
-            try:
-                # Try to sleep until we took the correct amount of time.
-                sleep((start_time + (1.0 / self.settings['fps'])) - time())
-            except IOError:
-                print 'took too much time'
-                pass

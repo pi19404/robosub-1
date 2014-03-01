@@ -8,7 +8,8 @@ robosub/src/settings.json.
 
 """
 
-import json # TODO remove this once the hack main function is removed
+#import json # TODO remove this once the hack main function is removed
+from vision_settings import vision_settings
 import sys
 import os
 import cv2
@@ -103,13 +104,14 @@ class VisionController(object):
 
 def _main(args):
     """Start the vision daemon."""
-    settings = json.loads(open(args.settings_path, 'r').read())
+    #settings = json.loads(open(args.settings_path, 'r').read())
+    settings = vision_settings
     if args.video:
-        settings['sensor/vision/visiond']['vision_processors'] = ['sensor/vision/cam_fake']
+        settings['sensor/vision/control']['vision_processors'] = ['sensor/vision/cam_fake']
         settings['sensor/vision/cam_fake']['recorded_video'] = args.video
     if args.plugins:
         settings['sensor/vision/cam_fake']['plugins'] = args.plugins
-    v = VisionController('sensor/vision/visiond', settings)
+    v = VisionController('sensor/vision/control', settings)
 
 def _command_line():
     """Parse command line arguments."""

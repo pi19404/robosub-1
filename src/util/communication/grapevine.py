@@ -112,7 +112,7 @@ class Communicator(object):
             except Queue.Empty:
                 raise StopIteration()
 
-    def bind_video_stream(self, port):
+    def bind_video_stream(self, port, n_ports=30):
         """Bind one end of a socket pair for video streaming."""
         # FIXME change the dictionary structure for stream socket pair.
         # Maybe make an entirely new dictionary.
@@ -120,8 +120,10 @@ class Communicator(object):
         self.publisher['stream']['context'] = zmq.Context(1)
         self.publisher['stream']['socket'] = \
                     self.publisher['stream']['context'].socket(zmq.PAIR)
-        self.publisher['stream']['socket'].bind(
-                    "tcp://*:{port}".format(port=port))
+
+        for i in xrange(n_ports):
+            self.publisher['stream']['socket'].bind(
+                        "tcp://*:{port}".format(port=port + i))
         #self.poller = zmq.Poller()
         #self.poller.register(self.publisher['stream']['socket'], zmq.POLLOUT)
 
