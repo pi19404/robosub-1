@@ -25,6 +25,7 @@ class ButtonCode():
     LOCK = 9
     TOGGLE = 10
     MODE = 11
+    HOVER = 12
 
 
 class SliderDebugger():
@@ -37,7 +38,10 @@ class SliderDebugger():
 
         # set up the window
         self.windowSurface = pygame.display.set_mode(screenSize, 0, 32)
-        pygame.display.set_caption('Hello world!')
+        if listen_only:
+            pygame.display.set_caption('Movement Eavesdropper')
+        else:
+            pygame.display.set_caption('Thruster Controller')
         self.windowSize = screenSize
         # set up the colors
         self.BLACK = (0, 0, 0)
@@ -92,7 +96,6 @@ class SliderDebugger():
                                          self.slider_angles[i]*math.pi/180.))
 
         #implement buttons
-
         self.buttons = []
         self.button_size = [self.windowSize[0]/11,self.windowSize[1]/11]
         self.button_txt = ["TrnL",
@@ -104,7 +107,8 @@ class SliderDebugger():
                            "TOGL",
                            "BWD",
                            "LOCK",
-                           "MODE"]
+                           "MODE",
+                           "HOVR"]
         self.button_codes = [ ButtonCode.TURNLEFT,
                               ButtonCode.FORWARD,
                               ButtonCode.TURNRIGHT,
@@ -114,7 +118,8 @@ class SliderDebugger():
                               ButtonCode.TOGGLE,
                               ButtonCode.BACKWARD,
                               ButtonCode.LOCK,
-                              ButtonCode.MODE]
+                              ButtonCode.MODE,
+                              ButtonCode.HOVER]
         self.button_pos = [
              [ self.windowSize[0]/10 + self.windowSize[0]/16, self.windowSize[1]/8 + self.windowSize[1]/4],
              [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, self.windowSize[1]/8 + self.windowSize[1]/4],
@@ -128,7 +133,8 @@ class SliderDebugger():
              [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, 3*self.windowSize[1]/8 + self.windowSize[1]/4],
              [ 3*self.windowSize[0]/10 + self.windowSize[0]/16, 3*self.windowSize[1]/8 + self.windowSize[1]/4],
 
-             [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, 4*self.windowSize[1]/8 + self.windowSize[1]/4]
+             [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, 4*self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 3*self.windowSize[0]/10 + self.windowSize[0]/16, 4*self.windowSize[1]/8 + self.windowSize[1]/4]
             ]
         for i in range(len(self.button_txt)):
             self.buttons.append(
@@ -218,6 +224,13 @@ class SliderDebugger():
                                     -self.buttonThrustSetting,
                                     self.sliders[4].value,
                                     -self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.HOVER:
+            self.setThrusterValues( 0,
+                                    self.sliders[1].value,
+                                    0,
+                                    0,
+                                    self.sliders[4].value,
+                                    0 )
         elif buttonCode == ButtonCode.TOGGLE:
             self.buttonThrustSetting = (self.buttonThrustSetting+0.1)%1.0  #ranges [0.1,1.0]
             if not self.buttonThrustSetting: self.buttonThrustSetting = 0.1
@@ -229,10 +242,13 @@ class SliderDebugger():
             #set mode, depending on what we do
             if self.mode == "Controller":
                 self.mode = "Listener"
+                pygame.display.set_caption('Movement Eavesdropper')
             else:
                 self.mode = "Controller"
+                pygame.display.set_caption('Thruster Controller')
             #send a safety stop command
             self.setThrusterValues( 0,0,0,0,0,0 )
+            
             #TODO: ADD PUBLISH ALL ZEROS
             
             
@@ -265,6 +281,29 @@ class SliderDebugger():
             self.buttonAction(ButtonCode.MODE)
         elif keyevent.key == K_l:
             self.buttonAction(ButtonCode.LOCK)
+        elif keyevent.key == K_RCTRL or keyevent.key == K_LCTRL or keyevent.key == K_x:
+            self.buttonAction(ButtonCode.HOVER)
+        #Set the Thrust key by percent
+        elif keyevent.key == K_1:
+            self.buttonThrustSetting = 0.1
+        elif keyevent.key == K_2:
+            self.buttonThrustSetting = 0.2
+        elif keyevent.key == K_3:
+            self.buttonThrustSetting = 0.3
+        elif keyevent.key == K_4:
+            self.buttonThrustSetting = 0.4
+        elif keyevent.key == K_5:
+            self.buttonThrustSetting = 0.5
+        elif keyevent.key == K_6:
+            self.buttonThrustSetting = 0.6
+        elif keyevent.key == K_7:
+            self.buttonThrustSetting = 0.7
+        elif keyevent.key == K_8:
+            self.buttonThrustSetting = 0.8
+        elif keyevent.key == K_9:
+            self.buttonThrustSetting = 0.9
+        elif keyevent.key == K_0:
+            self.buttonThrustSetting = 1.0
                 
             
     def getStatusText(self):
@@ -328,5 +367,19 @@ class SliderDebugger():
             self.drawOther()
             pygame.display.update()
 
-sd = SliderDebugger()
-sd.run()
+
+
+if __name__ == "__main__":
+    """
+    -c : in the command line opens in Controller mode.
+         Normally just opens in listener mode.
+    """
+    started = False
+    for arg in sys.argv:
+        if arg == "-c": #Start in Command Mode !
+            sd = SliderDebugger()
+            started = True
+    if not started: #Start in Listener Only Mode!
+        sd = SliderDebugger(listen_only=True)
+    sd.run()
+
