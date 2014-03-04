@@ -2,13 +2,36 @@
 
 import pygame, sys
 from pygame.locals import *
+import math
+import time
+
+from Slider import MySlider
+from SimpleButton import MySimpleButton
+
+
+
+#Button Codes
+class ButtonCode():
+    INVALID = -1
+    STOP = 0
+    FORWARD = 1
+    TURNLEFT = 2
+    TURNRIGHT = 3
+    BACKWARD = 4
+    STRAFELEFT = 5
+    STRAFERIGHT = 6
+    DIVE = 7
+    SURFACE = 8
+    LOCK = 9
+    TOGGLE = 10
+    MODE = 11
 
 
 class SliderDebugger():
     """
     INFO!
     """
-    def __init__(self, screenSize=(500, 400)):
+    def __init__(self, screenSize=(600, 600),listen_only=False):
         # set up pygame
         pygame.init()
 
@@ -22,8 +45,20 @@ class SliderDebugger():
         self.RED = (255, 0, 0)
         self.GREEN = (0, 255, 0)
         self.BLUE = (0, 0, 255)
-        # set up fonts
 
+        #Submarine Variables
+        self.buttonThrustSetting = 0.5
+        self.dive_lock = False
+        self.publish_interval = 0.100 #seconds
+        self.latest_publish_time = 0
+
+        #set mode, depending on what we do
+        if listen_only:
+            self.mode = "Listener"
+        else:
+            self.mode = "Controller"
+        
+        # set up fonts
         print "Attempting to initialize Font (if I fail, this is probably what went wrong!!)"
         try:
             self.basicFont = pygame.font.SysFont("monospace", 15)
@@ -33,52 +68,231 @@ class SliderDebugger():
         if(self.basicFont):
             print "Font Initialized!"
 
-        # set up the text
-        self.text = self.basicFont.render('Hello world!', True, self.WHITE, self.BLUE)
-        self.textRect = self.text.get_rect()
-        self.textRect.centerx = self.windowSurface.get_rect().centerx
-        self.textRect.centery = self.windowSurface.get_rect().centery
 
+        #Setup Top Menu Text
+        self.statusText = self.basicFont.render(self.getStatusText(), True, self.WHITE, (255, 200, 255))
+        self.statusTextRect = self.statusText.get_rect()
+        self.statusTextRect.left, self.statusTextRect.top = (0,0)
+        self.statusTextRect.width, self.statusTextRect.height = (self.windowSize[0]/2,40)
+
+
+        #implement sliders (cheez & fried onions)
+        self.sliders = []
+        self.slider_positions = [[self.windowSize[0]/2,0],
+                                 [self.windowSize[0]/2,self.windowSize[1]/3],
+                                 [self.windowSize[0]/2,2*self.windowSize[1]/3],
+                                 [3*self.windowSize[0]/4,2*self.windowSize[1]/3],
+                                 [3*self.windowSize[0]/4,self.windowSize[1]/3],
+                                 [3*self.windowSize[0]/4,0]] # in order [ A,B,C,D,E,F]
+        self.slider_angles = [135,90,225,135,-90,-135]
+        self.slider_size = [self.windowSize[0]/5,self.windowSize[1]/4]
+        for i in range(len(self.slider_positions)):
+            self.sliders.append(MySlider(self.slider_positions[i], self.windowSurface,
+                                         self.slider_size, 0, 0, self.BLUE,
+                                         self.slider_angles[i]*math.pi/180.))
+
+        #implement buttons
+
+        self.buttons = []
+        self.button_size = [self.windowSize[0]/11,self.windowSize[1]/11]
+        self.button_txt = ["TrnL",
+                           "FWD",
+                           "TrnR",
+                           "StfL",
+                           "STOP",
+                           "StfR",
+                           "TOGL",
+                           "BWD",
+                           "LOCK",
+                           "MODE"]
+        self.button_codes = [ ButtonCode.TURNLEFT,
+                              ButtonCode.FORWARD,
+                              ButtonCode.TURNRIGHT,
+                              ButtonCode.STRAFELEFT,
+                              ButtonCode.STOP,
+                              ButtonCode.STRAFERIGHT,
+                              ButtonCode.TOGGLE,
+                              ButtonCode.BACKWARD,
+                              ButtonCode.LOCK,
+                              ButtonCode.MODE]
+        self.button_pos = [
+             [ self.windowSize[0]/10 + self.windowSize[0]/16, self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 3*self.windowSize[0]/10 + self.windowSize[0]/16, self.windowSize[1]/8 + self.windowSize[1]/4],
+
+             [ self.windowSize[0]/10 + self.windowSize[0]/16, 2*self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, 2*self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 3*self.windowSize[0]/10 + self.windowSize[0]/16, 2*self.windowSize[1]/8 + self.windowSize[1]/4],
+
+             [ self.windowSize[0]/10 + self.windowSize[0]/16, 3*self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, 3*self.windowSize[1]/8 + self.windowSize[1]/4],
+             [ 3*self.windowSize[0]/10 + self.windowSize[0]/16, 3*self.windowSize[1]/8 + self.windowSize[1]/4],
+
+             [ 2*self.windowSize[0]/10 + self.windowSize[0]/16, 4*self.windowSize[1]/8 + self.windowSize[1]/4]
+            ]
+        for i in range(len(self.button_txt)):
+            self.buttons.append(
+                MySimpleButton(self.windowSurface, self.button_pos[i],
+                               self.button_size,self.button_txt[i],((70+i*20)%255),self.button_codes[i])
+                )
+
+
+    def drawOther(self):
         # draw the white background onto the surface
         self.windowSurface.fill(self.WHITE)
 
-        # draw a green polygon onto the surface
-        pygame.draw.polygon(self.windowSurface, self.GREEN, ((146, 0), (291, 106), (236, 277), (56, 277), (0, 106)))
+        self.drawGrid(75,(222,222,222))
+        def tmp(x):
+            print x
+        for s in self.sliders:
+            s.draw()
+        for b in self.buttons:
+            b.draw()
 
-        # draw some blue lines onto the surface
-        pygame.draw.line(self.windowSurface, self.BLUE, (60, 60), (120, 60), 4)
-        pygame.draw.line(self.windowSurface, self.BLUE, (120, 60), (60, 120))
-        pygame.draw.line(self.windowSurface, self.BLUE, (60, 120), (120, 120), 4)
+        #Draw Status
+        self.statusText = self.basicFont.render(self.getStatusText(), True, (0,0,0), (20,200,20))
+        #pygame.draw.rect(self.window, (200,200,200), self.textRect, 0)
+        self.windowSurface.blit(self.statusText, self.statusTextRect)
 
-        # draw a blue circle onto the surface
-        #pygame.draw.circle(windowSurface, self.BLUE, (300, 50), 20, 0)
-
-        # draw a red ellipse onto the surface
-        #pygame.draw.ellipse(windowSurface, self.RED, (300, 250, 40, 80), 1)
-
-        # draw the text's background rectangle onto the surface
-        pygame.draw.rect(self.windowSurface, self.RED, (self.textRect.left - 20, self.textRect.top - 20, self.textRect.width + 40, self.textRect.height + 40))
-
-        # get a pixel array of the surface
-        #pixArray = pygame.PixelArray(windowSurface)
-        #pixArray[480][380] = BLACK
-        #del pixArray
-
-        # draw the text onto the surface
-        self.windowSurface.blit(self.text, self.textRect)
-
-        # draw the window onto the screen
-        pygame.display.update()
         
     def drawGrid(self, squareSize, color):
         """
-        Draws a centered grid of size specified
+        Draws a centered grid of size specified. for debugging purposes
         """
-        h,w = self.windowSize
+        w,h = self.windowSize
         #draw horizontal lines
-        pygame.draw.line(self.windowSurface, color, start_pos, end_pos, width=1) -> Rect
-        
+        for y in range(0-(h%squareSize), h+squareSize/2, squareSize):
+            pygame.draw.line(self.windowSurface, color, (0,y), (w,y), 1)
+        for x in range(0-(w%squareSize), w+squareSize/2, squareSize):
+            pygame.draw.line(self.windowSurface, color, (x,0), (x,h), 1)
+
+    def setThrusterValues(self, A,B,C,D,E,F):
+        thrust_vals = [ A,B,C,D,E,F]
+        for i in range(len(thrust_vals)):
+            self.sliders[i].setValue(thrust_vals[i])
     
+    def buttonAction(self, buttonCode, *largs):
+        print "Button Code:", buttonCode
+        
+        if buttonCode == ButtonCode.STOP:
+            self.setThrusterValues( 0,0,0,0,0,0 )
+        elif buttonCode == ButtonCode.FORWARD:
+            self.setThrusterValues( self.buttonThrustSetting,
+                                    self.sliders[1].value,
+                                    self.buttonThrustSetting,
+                                    self.buttonThrustSetting,
+                                    self.sliders[4].value,
+                                    self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.TURNLEFT:
+            self.setThrusterValues( -self.buttonThrustSetting,
+                                    self.sliders[1].value,
+                                    -self.buttonThrustSetting,
+                                    self.buttonThrustSetting,
+                                    self.sliders[4].value,
+                                    self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.TURNRIGHT:
+            self.setThrusterValues( self.buttonThrustSetting,
+                                    self.sliders[1].value,
+                                    self.buttonThrustSetting,
+                                    -self.buttonThrustSetting,
+                                    self.sliders[4].value,
+                                    -self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.STRAFELEFT:
+            self.setThrusterValues( -self.buttonThrustSetting,
+                                    self.sliders[1].value,
+                                    self.buttonThrustSetting,
+                                    -self.buttonThrustSetting,
+                                    self.sliders[4].value,
+                                    self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.STRAFERIGHT:
+            self.setThrusterValues( self.buttonThrustSetting,
+                                    self.sliders[1].value,
+                                    -self.buttonThrustSetting,
+                                    self.buttonThrustSetting,
+                                    self.sliders[4].value,
+                                    -self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.BACKWARD:
+            self.setThrusterValues( -self.buttonThrustSetting,
+                                    self.sliders[1].value,
+                                    -self.buttonThrustSetting,
+                                    -self.buttonThrustSetting,
+                                    self.sliders[4].value,
+                                    -self.buttonThrustSetting )
+        elif buttonCode == ButtonCode.TOGGLE:
+            self.buttonThrustSetting = (self.buttonThrustSetting+0.1)%1.0  #ranges [0.1,1.0]
+            if not self.buttonThrustSetting: self.buttonThrustSetting = 0.1
+        elif buttonCode == ButtonCode.LOCK:
+            self.dive_lock = not self.dive_lock
+            self.sliders[1].lock = self.sliders[4].lock = self.dive_lock
+            self.sliders[1].dirtyLockValue = self.dive_lock #to lock them up initially
+        elif buttonCode == ButtonCode.MODE:
+            #set mode, depending on what we do
+            if self.mode == "Controller":
+                self.mode = "Listener"
+            else:
+                self.mode = "Controller"
+            #send a safety stop command
+            self.setThrusterValues( 0,0,0,0,0,0 )
+            #TODO: ADD PUBLISH ALL ZEROS
+            
+            
+    def handleLockedSliders(self):
+        if self.sliders[1].dirtyLockValue:
+            self.sliders[4].setValue(self.sliders[1].value)
+        if self.sliders[4].dirtyLockValue:
+            self.sliders[1].setValue(self.sliders[4].value)
+        self.sliders[1].dirtyLockValue = False
+        self.sliders[4].dirtyLockValue = False
+
+    def keyCommands(self, keyevent):
+        if keyevent.key == K_UP or keyevent.key == K_w:
+            self.buttonAction(ButtonCode.FORWARD)
+        elif keyevent.key == K_DOWN or keyevent.key == K_s:
+            self.buttonAction(ButtonCode.BACKWARD)
+        elif keyevent.key == K_RIGHT or keyevent.key == K_d:
+            self.buttonAction(ButtonCode.TURNRIGHT)
+        elif keyevent.key == K_LEFT or keyevent.key == K_a:
+            self.buttonAction(ButtonCode.TURNLEFT)
+        elif keyevent.key == K_e:
+            self.buttonAction(ButtonCode.STRAFERIGHT)
+        elif keyevent.key == K_q:
+            self.buttonAction(ButtonCode.STRAFELEFT)
+        elif keyevent.key == K_SPACE:
+            self.buttonAction(ButtonCode.STOP)
+        elif keyevent.key == K_t:
+            self.buttonAction(ButtonCode.TOGGLE)
+        elif keyevent.key == K_m:
+            self.buttonAction(ButtonCode.MODE)
+        elif keyevent.key == K_l:
+            self.buttonAction(ButtonCode.LOCK)
+                
+            
+    def getStatusText(self):
+        txt = self.mode + " | "
+        if self.dive_lock:
+            txt += "DIVE LOCKED"
+        else:
+            txt += "DIVE UNLOCKED"
+        txt += " | Thrust: " + str(self.buttonThrustSetting) + " "
+        return txt
+
+    def getSliderValues(self):
+        s_vals = []
+        for s in self.sliders:
+            s_vals.append(s.value)
+        return s_vals
+    
+    def listenToMovement(self):
+        #This is a silly stub that pushes some things
+        self.setThrusterValues( 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 )
+
+    def publishCommands(self):
+        next_publish_time = self.latest_publish_time + self.publish_interval
+        if next_publish_time <= time.time() and self.mode == "Controller":
+            #here is the foo publish command
+            print self.getSliderValues()
+            self.latest_publish_time = time.time()
+        
     def run(self):
         # run the game loop
         while True:
@@ -86,8 +300,33 @@ class SliderDebugger():
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
-            pygame.display.update()
+                if event.type == MOUSEBUTTONUP:
+                    for s in self.sliders:
+                        s.onClickUp()
+                    for b in self.buttons:
+                        b.onClickUp(self.buttonAction)
+                if event.type == MOUSEBUTTONDOWN:
+                    for s in self.sliders:
+                        s.onClickDown(event.pos)
+                    for b in self.buttons:
+                        b.onClickDown(event.pos)
+                if event.type == MOUSEMOTION:
+                    for s in self.sliders:
+                        s.onMouseMove(event.pos)
+                if event.type == KEYDOWN:
+                    self.keyCommands(event)
 
+            #handle lock
+            if self.dive_lock:
+                self.handleLockedSliders()
+
+            if self.mode == "Listener":
+                self.listenToMovement()
+            else:
+                self.publishCommands()
+            
+            self.drawOther()
+            pygame.display.update()
 
 sd = SliderDebugger()
 sd.run()
