@@ -1,0 +1,40 @@
+Rate of broadcast: 10/sec?
+
+Fuzzification:
+    Outgoing:
+        Range: -1 - 1
+
+        {
+        "forward/backward":
+        "right/left":
+        "up/down":
+        "yaw":
+        "roll":
+        "pitch":
+        }
+
+Defuzzification:
+    Outgoing:
+        Range: 0 - 1
+
+        {
+        "front_left":
+        "front_right":
+        "middle_left":
+        "middle_right":
+        "back_left":
+        "back_right":
+        }
+
+Translation
+    Outgoing:
+        Range: 0 - 255
+
+        {
+        "front_left":
+        "front_right":
+        "middle_left":
+        "middle_right":
+        "back_left":
+        "back_right":
+        }

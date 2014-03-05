@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 from random import random
-from robosub_settings import settings
 import argparse
 import json
 import os
@@ -10,10 +9,7 @@ import sys
 import time
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
-
-
-# FIXME: Everything but the fuzzy sets is different. Don't use this.
-
+from robosub_settings import settings
 
 def get_membership(value, set_points):
     """Returns the membership quantity for a value in a fuzzy set.
@@ -84,6 +80,7 @@ def main(args):
 
     last_timestamp = 0.0
     while True:
+        # TODO: Figure out AI module name
         missive = com.get_last_message("decision")
 
         if missive and missive['timestamp'] > last_timestamp:
@@ -117,7 +114,7 @@ def commandline():
             default=0.05,
             help='Sleep time per cycle.')
     parser.add_argument('-m', '--module_name', type=str,
-            default='movement/directive',
+            default='movement/fuzzification',
             help='Module name.')
     return parser.parse_args()
 

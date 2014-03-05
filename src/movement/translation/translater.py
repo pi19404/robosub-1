@@ -20,11 +20,11 @@ from util.communication.grapevine import Communicator
 # module.
 
 def main(args):
-    com = Communicator("movement/physical")
+    com = Communicator("movement/translation")
 
     last_packet_time = 0.0
     while True:
-        rx_packet = com.get_last_message("movement/stabilization")
+        rx_packet = com.get_last_message("movement/defuzzification")
         if rx_packet and rx_packet['timestamp'] > last_packet_time:
             last_packet_time = rx_packet['timestamp']
             tx_packet = {

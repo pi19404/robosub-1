@@ -22,13 +22,10 @@ def main(args):
     #   x is pitch
     #   y is roll
     #   z is yaw. Negative yaws left, positive yaws right.
-    packet = {
-            'vector': {'x': 0.0, 'y': 0.0, 'z': 0.0},
-            'rotation': {'yaw': 0.0, 'pitch': 0.0, 'roll': 0.0}}
+    packet = {"forward/backward": 0.0, "right/left": 0.0, "up/down": 0.0, "yaw": 0.0, "roll": 0.0, "pitch": 0.0}
 
-    last_packet_time = 0.0
     while True:
-        directive_packet = com.get_last_message("movement/directive")
+        directive_packet = com.get_last_message("movement/fuzzification")
         if directive_packet and directive_packet['timestamp'] > last_packet_time:
             last_packet_time = directive_packet['timestamp']
 
@@ -61,7 +58,7 @@ def commandline():
             default=0.05,
             help='Sleep time per cycle.')
     parser.add_argument('-m', '--module_name', type=str,
-            default='movement/stabilization',
+            default='movement/defuzzification',
             help='Module name.')
     return parser.parse_args()
 
