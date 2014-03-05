@@ -20,7 +20,6 @@ def get_socket_name(module_name):
         ip = settings[module_name]['ip']
     except KeyError:
         ip = '*'
-    print 'running {mname} with tcp!'.format(mname=module_name)
     return 'tcp://{ip}:{port}'.format(ip=ip, port=settings[module_name]['port'])
 
 class Communicator(object):
