@@ -276,9 +276,14 @@ class Localization(object):
         
 class SubmarinePhysics():
 
+
+	#= q*[1-exp(-x*t)] / [1+exp(-x*t)] 
+	#####################################################################
+	# Website >>  http://my.execpc.com/~culp/rockets/rckt_eqn.html#Method 				
+
     # kinematic_viscosity_of_water?
     def get_coef_drag(v,kvw):
-        
+        pass
         """
         drag coefficient Cd
         pass
