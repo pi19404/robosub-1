@@ -144,10 +144,12 @@ class Accelerometer(Sensor):
                 if accel['az'] is None:
                     accel['az'] = accel_msg.get('ACL_Z')
 
-                if None not in accel:
-                    break
+                if accel['ax'] is None or accel['ay'] is None or accel['az'] is None:
+                    continue
+                else:
+					break
             self.sleep()
-
+		
         return accel
 
     def calibrate(self, samples=10):
@@ -157,9 +159,9 @@ class Accelerometer(Sensor):
 
         for _ in xrange(samples):
             data = self.fetch_data()
-            self.ax += data['gx']
-            self.ay += data['gy']
-            self.az += data['gz']
+            self.ax += data['ax']
+            self.ay += data['ay']
+            self.az += data['az']
 
         self.ax /= samples
         self.ay /= samples
@@ -199,7 +201,7 @@ class BatteryVoltage(Sensor):
     def calibrate(self, samples=10):
         self.voltage = 0.0
         for _ in xrange(samples):
-            self.voltage += self.fetch_data()['battery_voltage']
+            self.voltage += self.fetch_data()['voltage']
         self.voltage /= samples
         self.calibrated = True
 

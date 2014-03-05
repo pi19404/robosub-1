@@ -103,7 +103,7 @@ def cmd_thruster(thruster_id, magnitude, direction):
         cmd_thruster.ser.write(raw_cmd)
     return raw_cmd
 
-def get_lock(ser):
+def get_lock(ser, com):
     """
     Here we are trying to make sure we have actually found a control byte, so
     we receive several packets, then look at where we expect the control bytes
@@ -123,7 +123,7 @@ def get_lock(ser):
     ser.close()
     ser.open()
 
-    com.debug("Aquiring stream sync")
+    print "Aquiring stream sync"
 
     while not in_sync:
         # read a packet from the serial port
@@ -152,7 +152,7 @@ def get_lock(ser):
                 # say we are in sync so we can break out of the
                 # loop
                 in_sync = True
-                com.debug("sync locked")
+                print "sync locked"
 
 def get_packet(ser, com):
     """
@@ -173,7 +173,7 @@ def get_packet(ser, com):
                       "to re-sync")
             #raw_input() # waits for the user to press the enter key
             ser.flushInput() # flushes the serial rx buffer
-            get_lock(ser) # get back into sync
+            get_lock(ser, com) # get back into sync
         else:
             # if we are in sync, break out of loop
             success = True
