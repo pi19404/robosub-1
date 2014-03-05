@@ -1,0 +1,3 @@
+[submodule "src/microcontroller"]
+	path = src/microcontroller
+	url = git@github.com:PalouseRobosub/microcontroller.git
