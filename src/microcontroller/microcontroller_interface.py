@@ -5,6 +5,7 @@ import time
 import os
 import sys
 import serial
+sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
 
 CONTROL_BYTE = '\n'
@@ -26,6 +27,16 @@ THRUSTER_STERN_SB = 0x14
 THRUSTER_STERN_PORT = 0x15
 
 DEBUG = None
+
+#Initialize some variables
+ACL_1_X_val = -1
+ACL_1_Y_val = -1
+ACL_1_Z_val = -1
+GYRO_1_X_val = -1
+GYRO_1_Y_val = -1
+GYRO_1_Z_val = -1
+ADC_DEPTH_val = -1
+ADC_BATT_val = -1
 
 def cmd_thruster(thruster_id, magnitude, direction):
     """
@@ -69,14 +80,14 @@ def cmd_thruster(thruster_id, magnitude, direction):
     raw_thruster_id = chr(thruster_id)
 
     # make sure magnitude is within bounds
-    if magnitude > 100:
-        magnitude = 100
-    elif magnitude < 0:
-        magnitude = 0
+   #if magnitude > 100:
+   #    magnitude = 100
+   #elif magnitude < 0:
+   #    magnitude = 0
 
     # convert the magnitude from a percentage value to a value between 0 and
     # 127
-    magnitude = magnitude * 127 // 100
+    #magnitude = magnitude * 127 // 100
 
     # make sure direction is only one bit
     direction &= 0x01
@@ -92,7 +103,7 @@ def cmd_thruster(thruster_id, magnitude, direction):
         cmd_thruster.ser.write(raw_cmd)
     return raw_cmd
 
-def get_lock(ser):
+def get_lock(ser, com):
     """
     Here we are trying to make sure we have actually found a control byte, so
     we receive several packets, then look at where we expect the control bytes
@@ -142,9 +153,8 @@ def get_lock(ser):
                 # loop
                 in_sync = True
                 print "sync locked"
-# end get_lock()
 
-def get_packet(ser):
+def get_packet(ser, com):
     """
     This function reads a 4-byte packet from the serial port.  It will also
     check to make sure we are still in sync, and pauses the program if we lose
@@ -159,21 +169,23 @@ def get_packet(ser):
         # ensure we are in sync by checking that the control byte is in the
         # correct place
         if packet[0] != CONTROL_BYTE: # if we are not in sync
-            print "Error: lost sync. Press the [Enter] key to attempt to re-sync"
+            com.debug("Error: lost sync. Press the [Enter] key to attempt "
+                      "to re-sync")
             #raw_input() # waits for the user to press the enter key
             ser.flushInput() # flushes the serial rx buffer
-            get_lock(ser) # get back into sync
+            get_lock(ser, com) # get back into sync
         else:
             # if we are in sync, break out of loop
             success = True
 
         return packet
 
-def respond_to_stabilization_packet(packet, mag, advisor_packet=None):
+def respond_to_rx_packet(packet, mag, advisor_packet=None):
     # TODO: This would allow us to use cleaner debug messages if we
     # instead had a thruster settings dictionary. E.g.:
     # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
     # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
+    # XXX: This code should be moved to movement/physical
     raw_cmds = []
     intent = None
     # Node: the advisor_packet is for debugging purposes only.
@@ -281,6 +293,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             ACL_1_X_val = (ACL_1_X_val-65536)
 
         accel_com.publish_message({"ACL_X": ACL_1_X_val})
+
     elif device == ACL_1_Y_addr:
         ACL_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -288,6 +301,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             ACL_1_Y_val = (ACL_1_Y_val-65536)
 
         accel_com.publish_message({"ACL_Y": ACL_1_Y_val})
+
     elif device == ACL_1_Z_addr:
         ACL_1_Z_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -295,6 +309,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             ACL_1_Z_val = (ACL_1_Z_val-65536)
 
         accel_com.publish_message({"ACL_Z": ACL_1_Z_val})
+
     elif device == GYRO_1_X_addr:
         GYRO_1_X_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -302,7 +317,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             GYRO_1_X_val = (GYRO_1_X_val-65536)
 
         # XXX com?
-        accel_com.publish_message({"GYRO_X": GYRO_1_X_val})
+        gyro_com.publish_message({"GYRO_X": GYRO_1_X_val})
     elif device == GYRO_1_Y_addr:
         GYRO_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -310,14 +325,14 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             GYRO_1_Y_val = (GYRO_1_Y_val-65536)
 
         # XXX com?
-        accel_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
+        gyro_com.publish_message({"GYRO_Y": GYRO_1_Y_val})
     elif device == GYRO_1_Z_addr:
         GYRO_1_Z_val = ord(packet[2]) | (ord(packet[3]) << 8)
         if GYRO_1_Z_val > 32767:
             GYRO_1_Z_val = (GYRO_1_Z_val-65536)
 
         # XXX com?
-        accel_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
+        gyro_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
     elif device == ADC_DEPTH:
         ADC_DEPTH_val = ord(packet[2]) | (ord(packet[3]) << 8)
 
@@ -328,7 +343,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         ADC_BATT_val = ((ADC_BATT_val) * 3.3/1024 * 7.5)
 
         # XXX com?
-        accel_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
+        battery_voltage_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
 
 
 def main(args):
@@ -336,13 +351,26 @@ def main(args):
     global DEBUG
     DEBUG = args.debug
 
-    # Expected: args.module_name == "movement/physical"
-    com = Communicator(module_name=args.module_name)
-    accel_com = Communicator(module_name='sensor/accelerometer')
-    gyro_com = Communicator(module_name='sensor/gyroscope')
-    compass_com = Communicator(module_name='sensor/compass')
-    depth_com = Communicator(module_name='sensor/depth')
-    battery_voltage_com = Communicator(module_name='sensor/battery_voltage')
+    com = Communicator("microcontroller")
+    accel_com = Communicator('datafeed/raw/accelerometer')
+    gyro_com = Communicator('datafeed/raw/gyroscope')
+    compass_com = Communicator('datafeed/raw/compass')
+    depth_com = Communicator('datafeed/raw/depth')
+    battery_voltage_com = Communicator('datafeed/raw/battery_voltage')
+
+    # If we want to insert a mock module for these sensors, we want to prevent
+    # multiple input sources from inserting messages into the pipe.
+    disabled_publish = lambda *args: None
+    if args.disable_accel_com:
+        accel_com.publish_message = disabled_publish
+    if args.disable_gyro_com:
+        gyro_com.publish_message = disabled_publish
+    if args.disable_compass_com:
+        compass_com.publish_message = disabled_publish
+    if args.disable_depth_com:
+        depth_com.publish_message = disabled_publish
+    if args.disable_battery_voltage_com:
+        battery_voltage_com.publish_message = disabled_publish
 
     if not DEBUG:
         ser = serial.Serial()
@@ -357,14 +385,15 @@ def main(args):
         ser.open()
         cmd_thruster.ser = ser
 
-        get_lock(ser) # get in sync with the stream
+        get_lock(ser, com) # get in sync with the stream
 
-    mag = args.magnitude
+    mag = int(args.magnitude)
     last_packet_time = 0.0
     last_advisor_packet = None
     last_advisor_packet_time = 0.0
     while True:
-        stabilization_packet = com.get_last_message("movement/stabilization")
+        rx_packet = com.get_last_message(
+                "movement/physical")
         advisor_packet = com.get_last_message("decision/advisor")
         new_event = False
 
@@ -372,59 +401,73 @@ def main(args):
             advisor_packet['timestamp'] > last_advisor_packet_time):
             last_advisor_packet_time = advisor_packet['timestamp']
             last_advisor_packet = advisor_packet
+            mag = int(advisor_packet['magnitude'])
             if advisor_packet['command'] == 'stop':
                 new_event = True
 
-        if (stabilization_packet and
-            stabilization_packet['timestamp'] > last_packet_time):
-            last_packet_time = stabilization_packet['timestamp']
+        if rx_packet and rx_packet['timestamp'] > last_packet_time:
+            last_packet_time = rx_packet['timestamp']
             new_event = True
 
         if new_event:
-            intent, raw_cmds = respond_to_stabilization_packet(
-                    packet=stabilization_packet, mag=mag,
+            intent, raw_cmds = respond_to_rx_packet(
+                    packet=rx_packet, mag=mag,
                     advisor_packet=last_advisor_packet)
             # Debugging info...
             msg = {"intent": intent,
                    "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
-            print msg
+            com.debug(msg)
             com.publish_message(msg)
 
         # receive a packet
         if not DEBUG:
-            received_packet = get_packet(ser)
+            received_packet = get_packet(ser, com)
             respond_to_serial_packet(
-                    received_packet, accel_com, gyro_com, compass_com, depth_com,
-                    battery_voltage_com)
+                    received_packet, accel_com, gyro_com, compass_com,
+                    depth_com, battery_voltage_com)
 
-        #time.sleep(args.epoch)
+        time.sleep(args.epoch)
 
     if not DEBUG:
         ser.close()
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('-e', '--epoch', type=float,
+    parser.add_argument(
+            '-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
-    parser.add_argument('-m', '--module_name', type=str,
-            default='movement/physical',
-            help='Module name.')
-    parser.add_argument('-b', '--baudrate', type=int,
+    parser.add_argument(
+            '-b', '--baudrate', type=int,
             default=56818,
             help="Serial interface baudrate.")
-    parser.add_argument('-p', '--port', type=str,
+    parser.add_argument(
+            '-p', '--port', type=str,
             default='/dev/ttyUSB0',
             help="Serial interface port.")
-    parser.add_argument('--magnitude', type=str,
-            default=100,
+    parser.add_argument(
+            '--magnitude', type=int,
+            default="100",
             help='Thruster magnitude in percent.')
-    parser.add_argument('-d', '--debug',
+    parser.add_argument(
+            '-d', '--debug',
             default=False,
             action="store_true",
             help='Set debug mode to True.')
+    parser.add_argument(
+            "--disable_accel_com", default=False, action="store_true")
+    parser.add_argument(
+            "--disable_gyro_com", default=False, action="store_true")
+    parser.add_argument(
+            "--disable_compass_com", default=False, action="store_true")
+    parser.add_argument(
+            "--disable_depth_com", default=False, action="store_true")
+    parser.add_argument(
+            "--disable_battery_voltage_com", default=False,
+            action="store_true")
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = commandline()
     main(args)
+

@@ -98,7 +98,8 @@ def main(args):
                 com, "sensor/vision/cam_front", vision_cam_front)
         vision_cam_down, _ = choose_last_packet(
                 com, "sensor/vision/cam_down", vision_cam_front)
-        depth, _ = choose_last_packet(com, "sensor/depth", depth)
+        # TODO: Allow this to look at sanitized data.
+        depth, _ = choose_last_packet(com, "datafeed/raw/depth", depth)
 
         if state == "stop":
             pass
@@ -107,8 +108,7 @@ def main(args):
         elif state == 'path':
             oligarchs["PathOligarch"].decision(vision_cam_front, vision_cam_down)
         elif state == 'depth':
-            print "state: depth"
-            oligarchs["DepthOligarch"].decision(depth)
+            oligarchs["DepthOligarch"].decision(depth, advice)
 
         time.sleep(args.epoch)
 

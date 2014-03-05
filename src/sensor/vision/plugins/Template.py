@@ -3,11 +3,21 @@ import cv2.cv as cv
 
 #TODO make a proper template out of this.
 class Template(object):
-    def __init__(self):
+    def __init__(self, fp, settings):
+        """
+        Args:
+            self - Standard python object reference.
+            fp - Frame processor object.
+            settings - Stream processor settings.
+
+        """
         pass
 
-    def process_image(self, image):
+    def process_image(self, packet):
+        """
+        Args:
+            self - Standard python object reference.
+            packet - Dict to add reply data to.
+
+        """
         pass
-        #TODO fill this in. It should return a tuple in the format
-        #(bool, dict) where the bool is whether to report the dict
-        #to the grapevine, and the dict is the obect to be reported.

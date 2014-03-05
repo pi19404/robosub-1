@@ -10,20 +10,17 @@
 
 import argparse
 import os
-import pipes
 import re
 import sys
-import time
 from robosub_settings import settings
-from pprint import pprint
-from subprocess import check_output, check_call, Popen, CalledProcessError
+from subprocess import check_output, check_call, Popen
 
 def start_modules(mode, quiet=False):
     if not quiet:
         print " $ export PYTHONPATH=`pwd`"
 
-    FNULL = open(os.devnull, 'w')
-    for module_name, module_settings in settings.items():
+    fnull = open(os.devnull, 'w')
+    for module_name, module_settings in sorted(settings.items()):
         if (not isinstance(module_settings, dict) or
             'not_a_module' in module_settings or
             mode not in module_settings or
@@ -45,18 +42,20 @@ def start_modules(mode, quiet=False):
         cmd = ['python', full_name]
         if "args" in module_settings[mode]:
             cmd += module_settings[mode]["args"]
+        cmd = [str(x) for x in cmd]
 
         if not quiet:
             # This isn't perfect, but it's close enough.
-            print " $ {full_command}".format(full_command=" ".join(cmd))
+            print " $ {full_command}".format(
+                    full_command=" ".join(cmd))
 
-        Popen(cmd, stdout=FNULL, stderr=FNULL)
-    FNULL.close()
+        Popen(cmd, stdout=fnull, stderr=fnull)
+    fnull.close()
 
 def get_fnames():
     """These file names will be used to kill all robosub processes."""
     fnames = set()
-    for module_name, module_settings in settings.items():
+    for module_name, module_settings in sorted(settings.items()):
         if (not isinstance(module_settings, dict) or
             'not_a_module' in module_settings):
             # This is not a real module_settings dict.
@@ -77,18 +76,16 @@ def get_running():
         cmd = cmd.strip()
         running.append([pid, cmd])
     robosub_running = []
-    PID, PROG = 0, 1
+    pid, PROG = 0, 1
     for fname in get_fnames():
         for entry in running:
-            if re.search(fname, entry[PROG]):
-                robosub_running.append((entry[PROG], entry[PID]))
+            if re.search("python.*{fname}".format(fname=fname), entry[PROG]):
+                robosub_running.append((entry[PROG], entry[pid]))
 
-    return robosub_running
+    return sorted(robosub_running)
 
 def main(args):
     if args.kill:
-        PID = 0
-        PROG = 1
         for prog, pid in get_running():
             print " $ kill -9 {pid}  # {program_name}".format(
                     pid=pid, program_name=prog)
@@ -120,7 +117,8 @@ me. How dare you sport thus with life?
             print '{pid:>6}: {prog}'.format(pid=pid, prog=prog)
 
 def commandline():
-    parser = argparse.ArgumentParser(description='Mock module.')
+    parser = argparse.ArgumentParser(
+            description='This jumpstarts the various robosub modules.')
     parser.add_argument(
             '-c', '--create', type=str,
             help="Would you also create for yourself and "

@@ -13,9 +13,10 @@
 # will set that for you, but if you launch a program manually, it could be
 # a hassle.
 
+import os
+
 # Maximum time a program might wait before checking for input.
 EPOCH = "0.05"
-
 
 settings = {
     "publisher_high_water_mark": 1024,
@@ -29,7 +30,6 @@ settings = {
         "fps": 30,
         "width": 640,
         "height": 480,
-        "port": 20052,
         "plugins": ["tollbooth"],
         "release": {"name": None},
         "mock": {"name": None}
@@ -47,12 +47,10 @@ settings = {
         "width": 640,
         "height": 480,
         "plugins": ["PathDetection"],
-        "port": 20053,
         "release": {"name": None},
         "mock": {"name": None}
     },
     "sensor/vision/fates": {
-        "port": 20054,
         "listen": [],
         "release": {"name": None},
         "mock": {"name": None},
@@ -63,32 +61,16 @@ settings = {
         ]
     },
     "util/logger": {
-        "port": 20055,
-        "listen": [
-            "decision",
-            "decision/advisor",
-            "movement/directive",
-            "movement/stabilization",
-            "movement/physical",
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down",
-            "sensor/vision/fates",
-            "sensor/accelerometer",
-            "sensor/gyroscope",
-            "sensor/compass",
-            "sensor/depth",
-            "sensor/battery_voltage",
-            "util/logger"
-        ],
+        # The "listen" value is populated at the end of this file.
+        "listen": [],
         "release": {
             "name": "logger.py",
-            "args": ["--epoch", EPOCH]},
+            "args": ["--epoch", 0.005]},
         "mock": {
             "name": "logger.py",
-            "args": ["--epoch", EPOCH]}
+            "args": ["--epoch", 0.005]}
     },
     "movement/directive": {
-        "port": 20056,
         "listen": [
             "decision",
             "sensor/vision/cam_front",
@@ -98,21 +80,21 @@ settings = {
         # The first number represents an x value whlie the second number
         # represents a y value. All points left of the lowest x value will have
         # the same y value. The regions between specified points will have
-        # a value determined by connecting a straight line between those points.
+        # a value determined by connecting a straight line between those points
         # All points to the right of the highest value have the same y value.
         # For example, the values
         # [[-3.0, 1.0], [-1.0, 0.5], [0.0, 0.0], [2.0, 1.0], [3.0, 0.0]] will
         # look (something) like:
-        #-----------\                     1.0           /                        
-        #            ---\                 |            / \                       
-        #                ---\             |          /    \                      
-        #                    ---\         |         /      \                     
-        #                        ---\     0.5     /         \                    
-        #                            \    |      /           \                   
-        #                             \   |    /              \                  
-        #                              \  |   /                \                 
-        #                               \ | /                   \                
-        #        ------------------------\-/---------------------\---------------
+        #-----------\                     1.0           /                      
+        #            ---\                 |            / \                     
+        #                ---\             |          /    \                    
+        #                    ---\         |         /      \                   
+        #                        ---\     0.5     /         \                  
+        #                            \    |      /           \                 
+        #                             \   |    /              \                
+        #                              \  |   /                \               
+        #                               \ | /                   \              
+        #        ------------------------\-/---------------------\-------------
         #-4.0    -3.0    -2.0    -1.0     0.0    1.0    2.0    3.0
         "fuzzy_sets": {
             "is_right": [[-2.0, 1.0], [0.0, 0.0]],
@@ -134,10 +116,9 @@ settings = {
             "args": ["--epoch", EPOCH]}
     },
     "movement/stabilization": {
-        "port": 20057,
         "listen": [
             "movement/directive",
-            "sensor/accelerometer"
+            "datafeed/raw/accelerometer"
         ],
         "release": {
             "name": "stabilization.py",
@@ -147,63 +128,57 @@ settings = {
             "args": ["--epoch", EPOCH]}
     },
     "movement/physical": {
-        "port": 20058,
         "listen": [
-            "decision/advisor",
             "movement/stabilization"
         ],
-        "release": {"name": None},
-        "mock": {"name": None}
+        "release": {
+            "name": "fuzzy_logic_defuzzifier.py",
+            "args": ["--epoch", EPOCH]
+        },
+        "mock": {
+            "name": "fuzzy_logic_defuzzifier.py",
+            "args": ["--epoch", EPOCH]
+        },
     },
     # TODO: The commandline arguments are quite meaningful here, so they
     # should have something of a comment.
     "microcontroller": {
-        "port": 20069,
+        "listen": [
+            "decision/advisor",
+            "movement/physical",
+        ],
         "release": {
             "name": "microcontroller_interface.py",
-            "args": ["--epoch", EPOCH]},
+            "args": [
+                "--epoch", "0.01",
+                "--baudrate", "56818",
+                "--port", '/dev/ttyUSB0',
+                #"--magnitude", "100",
+            ]
+        },
         "mock": {
             "name": "microcontroller_interface.py",
-            "args": ["--epoch", EPOCH, "--debug"]}
-    },
-    "sensor/accelerometer": {
-        "port": 20059,
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/gyroscope": {
-        "port": 20060,
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/compass": {
-        "port": 20061,
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/serial/display_messages": {
-        "port": 20062,
-        "listen": [
-            "sensor/serial/accelerometer",
-            "sensor/serial/gyroscope",
-            "sensor/serial/compass"
-        ],
-        "release": {"name": None},
-        "mock": {"name": None}
+            "args": [
+                "--epoch", "0.01",
+                "--debug",
+                "--baudrate", "56818",
+                "--disable_depth",
+                #"--magnitude", "100"
+            ]
+        },
     },
     "decision": {
-        "port": 20063,
         "listen": [
           "decision/advisor",
           "sensor/vision/cam_front",
           "sensor/vision/cam_down",
-          "sensor/accelerometer",
-          "sensor/gyroscope",
-          "sensor/compass",
-          "sensor/depth"
+          "datafeed/sanitized/accelerometer",
+          "datafeed/sanitized/gyroscope",
+          "datafeed/sanitized/compass",
+          "datafeed/sanitized/depth",
+          # XXX: Remove "datafeed/raw/depth".
+          # This is for initial calibration of the depth only.
+          "datafeed/raw/depth",
         ],
         "release": {
             "name": "ai_state_machine.py",
@@ -214,13 +189,11 @@ settings = {
         "depth_threshold": 550
     },
     "decision/advisor": {
-        "port": 20064,
         "listen": [],
         "release": {"name": None},
         "mock": {"name": None}
     },
     "util/vision_viewer": {
-        "port": 20065,
         "listen": [
             "sensor/vision/cam_front",
             "sensor/vision/cam_down"
@@ -228,29 +201,102 @@ settings = {
         "release": {"name": None},
         "mock": {"name": None}
     },
-    "sensor/depth": {
-        "port": 20066,
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/battery_voltage": {
-        "port": 20067,
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/sanitation":{
-        "port":20068,
-        "listen":[
-            "sensor/depth",
-            "sensor/battery_voltage",
-            "sensor/accelerometer",
-            "sensor/gyroscope",
-            "sensor/compass"
+    "sensor/sanitation": {
+        "listen": [
+            "datafeed/raw/depth",
+            "datafeed/raw/battery_voltage",
+            "datafeed/raw/accelerometer",
+            "datafeed/raw/gyroscope",
+            "datafeed/raw/compass"
         ],
-        "release":{"name":None},
-        "mock":{"name":None}
-    }
+        "release": {
+            "name": "sanitation.py",
+            "args": [
+                "--calibration_samples", 10]
+        },
+        "mock": {
+            "name": "sanitation.py",
+            "args": [
+                "--debug",
+                "--calibration_samples", 10]}
+    },
+    # The datafeed "modules" represent the data at its various stages, and
+    # unless a mock module is faking a stage of the data pipeline, these
+    # modules will not specify "release" or "mock" entries. However, they do
+    # need to have dict values so that the automatic port assignment will work.
+    # The phases are (currently) aranged like this:
+    # datafeed/raw/*: This is data that is straight from the microcontroller.
+    # datafeed/sanitized/*: This is data that has been converted to a more
+    #   sane format by the sanitation.py module.
+    # datafeed/filtered/*: This is data that has been sent through a Kalman
+    #   filter.
+    # The format for the messages out of datafeed/sanitized/* should match
+    # the format for the messages out of datafeed/filtered/*.
+    "datafeed/raw/accelerometer": {
+    },
+    "datafeed/sanitized/accelerometer": {
+        "listen": [
+            "datafeed/raw/accelerometer"
+        ]
+    },
+    "datafeed/filtered/accelerometer": {
+    },
+    "datafeed/raw/gyroscope": {
+    },
+    "datafeed/sanitized/gyroscope": {
+        "listen": [
+            "datafeed/raw/gyroscope"
+        ]
+    },
+    "datafeed/filtered/gyroscope": {
+    },
+    "datafeed/raw/compass": {
+    },
+    "datafeed/sanitized/compass": {
+        "listen": [
+            "datafeed/raw/compass"
+        ]
+    },
+    "datafeed/filtered/compass": {
+    },
+    "datafeed/raw/depth": {
+        "mock": {
+            "name": "mock.py",
+            "args": ["--epoch", EPOCH, "--depth", 450]
+        }
+    },
+    "datafeed/sanitized/depth": {
+        "listen": [
+            "datafeed/raw/depth"
+        ]
+    },
+    "datafeed/filtered/depth": {
+    },
+    "datafeed/raw/battery_voltage": {
+    },
+    "datafeed/sanitized/battery_voltage": {
+        "listen": [
+            "datafeed/raw/battery_voltage"
+        ]
+    },
+    "datafeed/filtered/battery_voltage": {
+    },
 }
+
+# We need some extra lines for the debug channels. Aside from the logger,
+# nothing should see debug messages.
+debug_coms_to_add = []
+for key, val in settings.items():
+    if isinstance(val, dict):
+        debug_coms_to_add.append(os.path.join(key, "debug"))
+
+for debug_com in debug_coms_to_add:
+    settings[debug_com] = {}
+
+BASE_PORT = 20000
+for key in sorted(settings.keys()):
+    if isinstance(settings[key], dict):
+        settings["util/logger"]["listen"].append(key)
+        settings[key]["port"] = BASE_PORT
+        BASE_PORT += 1
 

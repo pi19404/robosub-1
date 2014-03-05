@@ -5,7 +5,10 @@ import math
 class AdvisorsPeon(BaseOligarch):
     def __init__(self, communicator):
         BaseOligarch.__init__(self, communicator)
-        self.face_of_power = "AdvisorsPeon"
+
+    @property
+    def face_of_power(self):
+        return "AdvisorsPeon"
 
     def decision(self, advice):
         missive = self._get_missive_template()

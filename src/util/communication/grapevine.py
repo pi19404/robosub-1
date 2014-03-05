@@ -7,14 +7,17 @@ This assumes that robosub_settings.py is on PYTHONPATH.
 """
 
 import Queue
-import json
 import os
-import sys
 import threading
 import time
 import zmq
 from robosub_settings import settings
 from numpy import array, frombuffer
+
+def get_socket_name(module_name):
+    """Determines the socket for module_name."""
+    return "ipc:///tmp/robosub/{port}_{module}.ipc".format(
+            port=settings[module_name]['port'], module=module_name.replace("/", "_"))
 
 class Communicator(object):
     """The robosub communication interface."""
@@ -52,6 +55,8 @@ class Communicator(object):
         """
         self.settings = settings
         self.module_name = module_name
+        self.module_name_debug = os.path.join(self.module_name, "debug")
+
         if not os.path.isdir('/tmp/robosub'):
             os.mkdir('/tmp/robosub')
 
@@ -63,7 +68,21 @@ class Communicator(object):
         self.publisher['socket'].hwm = settings['publisher_high_water_mark']
         self.publisher['socket'].setsockopt(
                 zmq.SNDBUF, settings['publisher_buffer_length'])
-        self.publisher['socket'].bind(self.get_socket_name(module_name))
+        self.publisher['socket'].bind(get_socket_name(self.module_name))
+
+        # Prepare the debug channel
+        self.publisher_debug = {}
+        self.publisher_debug['next_message_number'] = 1
+        self.publisher_debug['context'] = zmq.Context(1)
+        self.publisher_debug['socket'] = \
+                self.publisher_debug['context'].socket(zmq.PUB)
+        self.publisher_debug['socket'].hwm = \
+                settings['publisher_high_water_mark']
+        self.publisher_debug['socket'].setsockopt(
+                zmq.SNDBUF, settings['publisher_buffer_length'])
+        self.publisher_debug['socket'].bind(
+                get_socket_name(self.module_name_debug))
+
         # Note: Even though the bind call returns, the socket isn't actually
         # ready for some short amount of time after this call. zmq will
         # drop messages that are published in this time.
@@ -78,7 +97,7 @@ class Communicator(object):
             mdata['socket'].setsockopt(zmq.SUBSCRIBE, '')
             mdata['socket'].setsockopt(zmq.RCVBUF, subscriber_buffer_length)
             mdata['socket'].hwm = subscriber_high_water_mark
-            mdata['socket'].connect(self.get_socket_name(mname))
+            mdata['socket'].connect(get_socket_name(mname))
             mdata['queue'] = Queue.Queue()
             mdata['refresh_lock'] = threading.Semaphore(value=1)
             mdata['last_message'] = None
@@ -112,7 +131,7 @@ class Communicator(object):
             except Queue.Empty:
                 raise StopIteration()
 
-    def bind_video_stream(self, port):
+    def bind_video_stream(self, port, n_ports=30):
         """Bind one end of a socket pair for video streaming."""
         # FIXME change the dictionary structure for stream socket pair.
         # Maybe make an entirely new dictionary.
@@ -120,8 +139,10 @@ class Communicator(object):
         self.publisher['stream']['context'] = zmq.Context(1)
         self.publisher['stream']['socket'] = \
                     self.publisher['stream']['context'].socket(zmq.PAIR)
-        self.publisher['stream']['socket'].bind(
-                    "tcp://*:{port}".format(port=port))
+
+        for i in xrange(n_ports):
+            self.publisher['stream']['socket'].bind(
+                        "tcp://*:{port}".format(port=port + i))
         #self.poller = zmq.Poller()
         #self.poller.register(self.publisher['stream']['socket'], zmq.POLLOUT)
 
@@ -155,12 +176,6 @@ class Communicator(object):
         image = frombuffer(buf, dtype=metadata['dtype'])
         return image.reshape(metadata['shape'])
 
-
-    def get_socket_name(self, module_name):
-        """Determines the socket for module_name."""
-        return "ipc:///tmp/robosub/{port}.ipc".format(
-                port=settings[module_name]['port'])
-
     def listening(self):
         """Returns a list of modules this Communicator is listening to."""
         listening_to = settings[self.module_name].get('listen')
@@ -185,11 +200,22 @@ class Communicator(object):
         message['module_name'] = self.module_name
         self.publisher['socket'].send_json(message)
 
+    def debug(self, *args):
+        message = {}
+        message['message'] = ' '.join([str(x) for x in args])
+        message['message_number'] = self.publisher_debug['next_message_number']
+        self.publisher_debug['next_message_number'] += 1
+        message['timestamp'] = time.time()
+        message['module_name'] = self.module_name_debug
+        self.publisher_debug['socket'].send_json(message)
+
     def _refresh(self, module_name):
         """Reads the zmq socket and stores all messages into a queue."""
         subscriber_data = self.subscribers.get(module_name)
         if not subscriber_data:
-            assert False, "'{0}' not recognized".format(module_name)
+            raise KeyError(
+                    "Module '{0}' is not listening to '{1}'."
+                    "".format(self.module_name, module_name))
 
         while True:
             try:
