@@ -70,7 +70,7 @@ settings = {
             "name": "logger.py",
             "args": ["--epoch", 0.005]}
     },
-    "movement/directive": {
+    "movement/fuzzification": {
         "listen": [
             "decision",
             "sensor/vision/cam_front",
@@ -112,31 +112,31 @@ settings = {
             "name": "fuzzy_logic_fuzzifier.py",
             "args": ["--epoch", EPOCH]},
         "mock": {
-            "name": "fuzzy_logic_fuzzifier.py",
+            "name": "/test/xbox_controller.py",
             "args": ["--epoch", EPOCH]}
     },
-    "movement/stabilization": {
+    "movement/defuzzification": {
         "listen": [
-            "movement/directive",
+            "movement/fuzzification"
             "datafeed/raw/accelerometer"
         ],
         "release": {
-            "name": "stabilization.py",
+            "name": "defuzzifier.py",
             "args": ["--epoch", EPOCH]},
         "mock": {
-            "name": "stabilization.py",
+            "name": "slider1.py",
             "args": ["--epoch", EPOCH]}
     },
-    "movement/physical": {
+    "movement/translation": {
         "listen": [
-            "movement/stabilization"
+            "movement/defuzzification"
         ],
         "release": {
-            "name": "fuzzy_logic_defuzzifier.py",
+            "name": "translater.py",
             "args": ["--epoch", EPOCH]
         },
         "mock": {
-            "name": "fuzzy_logic_defuzzifier.py",
+            "name": "slider2.py",
             "args": ["--epoch", EPOCH]
         },
     },
@@ -145,7 +145,7 @@ settings = {
     "microcontroller": {
         "listen": [
             "decision/advisor",
-            "movement/physical",
+            "movement/translater",
         ],
         "release": {
             "name": "microcontroller_interface.py",
