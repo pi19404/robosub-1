@@ -16,8 +16,12 @@ from numpy import array, frombuffer
 
 def get_socket_name(module_name):
     """Determines the socket for module_name."""
-    return "ipc:///tmp/robosub/{port}_{module}.ipc".format(
-            port=settings[module_name]['port'], module=module_name.replace("/", "_"))
+    try:
+        ip = settings[module_name]['ip']
+    except KeyError:
+        ip = '*'
+    print 'running {mname} with tcp!'.format(mname=module_name)
+    return 'tcp://{ip}:{port}'.format(ip=ip, port=settings[module_name]['port'])
 
 class Communicator(object):
     """The robosub communication interface."""
