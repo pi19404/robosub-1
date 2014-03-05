@@ -58,12 +58,12 @@ getch = _Getch()
 def main(args):
     print """Usage:
    +-------+-------+-------+-------+
-   | 1     | 2     | 3     | 4     |
-   |       |       |       |       |
-   |KEYBOARD PATH  | DEPTH | N/A   |
+   | 1     | 2     | 3     | 4     |        magnitude will always be between
+   |       |       |       |       |        0 and 127. Use '[' to decrease the
+   |KEYBOARD PATH  | DEPTH | N/A   |        magnitude and ']' to increase it.
    ++------++------++------++------++
-    | q     | w     | e     | r     |
-    |       |       |       |       |
+    | q     | w     | e     | r     |       Use '-' to decrease desired depth.
+    |       |       |       |       |       Use '=' to increase desired depth.
     | QUIT  |FORWARD| STOP  | RISE  |
     ++------++------++------++------++
      | a     | s     | d     | f     |
@@ -74,10 +74,14 @@ def main(args):
     com = Communicator(module_name=args.module_name)
 
     advice_template = {"command": None}
+    magnitude = 91
+    desired_depth = 500
 
     while True:
         key = getch()
-        print "{0}\r".format(key),
+        msg = "magnitude: {0:3} last key: {1} desired depth: {2}\r"
+        msg = msg.format(magnitude, key, desired_depth)
+        print msg,
         advice = deepcopy(advice_template)
 
         if key == 'w':
@@ -104,6 +108,14 @@ def main(args):
             advice["command"] = "state: path"
         elif key == '3':
             advice["command"] = "state: depth"
+        elif key == '[':
+            magnitude -= 1
+        elif key == ']':
+            magnitude += 1
+        elif key == '-':
+            desired_depth -= 1
+        elif key == '=':
+            desired_depth += 1
        #elif key == '6':
        #    advice["command"] =
        #elif key == '7':
@@ -114,6 +126,14 @@ def main(args):
        #    advice["command"] =
         elif key == 'q':
             sys.exit()
+
+        if magnitude > 127:
+            magnitude = 127
+        if magnitude < 0:
+            magnitude = 0
+
+        advice["magnitude"] = magnitude
+        advice["desired_depth"] = desired_depth
 
         com.publish_message(advice)
 

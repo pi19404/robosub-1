@@ -6,7 +6,10 @@ from base_oligarch import BaseOligarch
 class PathOligarch(BaseOligarch):
     def __init__(self, communicator):
         BaseOligarch.__init__(self, communicator)
-        self.face_of_power = "PathOligarch"
+
+    @property
+    def face_of_power(self):
+        return "PathOligarch"
 
     def decision(self, vision_front, vision_down):
         missive = self._get_missive_template()

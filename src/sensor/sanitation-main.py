@@ -56,7 +56,9 @@ def fetchData(obj, baseData=None):
 
 				if gyro['gz'] is None:
 					gyro['gz'] = gyro_msg.get('GYRO_Z')
-	
+			else:
+				print "Cannot get data"	
+				return None
 			if gyro['gx'] is None or gyro['gy'] is None or gyro['gz'] is None:
 				continue
 			else:
@@ -158,7 +160,10 @@ def calibrateData(dataSampleSize=10):
 		os.system("clear")
 		print "Starting Calibration..."
 		print percentComplete, "% complete..."		
-		fetchData(dataObj)
+		ret = fetchData(dataObj)
+		if ret is None:
+			print "Cannot connect to microcontroller"
+			return None
 		dataPool.append(dataObj)
 		++dataCounter
 		
@@ -253,7 +258,11 @@ def main():
 	percentComplete = 0
 	while True:
 		# Get data
-		fetchData(sensors, baseData)
+		ret = fetchData(sensors, baseData)
+		
+		if ret is None:
+			print "Cannot connect to microcontroller"
+			return
 		
 		# Finally, we will publish our sensors object to the grapevine for use elsewhere
 		os.system("clear")
