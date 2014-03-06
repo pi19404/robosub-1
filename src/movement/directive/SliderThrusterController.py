@@ -9,10 +9,10 @@ from Slider import MySlider
 from SimpleButton import MySimpleButton
 
 #Copy pasta imports
-#import json
-#import os
-#sys.path.append(os.path.abspath("../.."))
-#from util.communication.grapevine import Communicator
+import json
+import os
+sys.path.append(os.path.abspath("../.."))
+from util.communication.grapevine import *#Communicator
 
 
 #Button Codes
@@ -75,7 +75,11 @@ class SliderDebugger():
             print "RUH ROH! Font type problem!  I probably crashed :("
 
         if(self.basicFont):
-            print "Font Initialized!"
+            print "Font Initialized!"	
+            
+        #Initiallize Comms!
+        self.com = Communicator(module_name="movement/translation")#module_name=args.module_name)
+        
 
 
         #Setup Top Menu Text
@@ -330,11 +334,37 @@ class SliderDebugger():
         #This is a silly stub that pushes some things
         self.setThrusterValues( 0.1, 0.2, 0.3, 0.4, 0.5, 0.6 )
 
+    """
+    {
+        "Thruster_Values":
+        {
+            "front_left": 0 # Range -127, 127
+            "front_right": 0 # Range 0 - 255
+            "middle_left": 0 # Range 0 - 255
+            "middle_right": 0 # Range 0 - 255
+            "back_left": 0 # Range 0 - 255
+            "back_right": 0 # Range 0 - 255
+        }
+    }
+    """
+    def getTranslationPacket(self):
+        tp = { "Thruster_Values":
+                {
+                    "front_left": int(self.sliders[0].value * 127), # Range -127, 127
+                    "middle_left": int(self.sliders[1].value* 127), # Range -127, 127
+                    "back_left": int(self.sliders[2].value * 127), 
+                    "back_right": int(self.sliders[3].value * 127), 
+                    "middle_right": int(self.sliders[4].value * 127), 
+                    "front_right": int(self.sliders[5].value * 127)
+                }
+            }
+        return tp
+
     def publishCommands(self):
         next_publish_time = self.latest_publish_time + self.publish_interval
         if next_publish_time <= time.time() and self.mode == "Controller":
             #here is the foo publish command
-            print self.getSliderValues()
+            self.com.publish_message( self.getTranslationPacket() )#self.getSliderValues()
             self.latest_publish_time = time.time()
         
     def run(self):
