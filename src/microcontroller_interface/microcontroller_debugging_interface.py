@@ -26,7 +26,7 @@ THRUSTER_DEPTH_PORT 	= 0x13
 THRUSTER_STERN_SB 	= 0x14
 THRUSTER_STERN_PORT 	= 0x15
 
-mag = 100
+mag = 127
 
 #Function Definitions#########################################################################
 
@@ -112,10 +112,9 @@ def get_packet() :
 
 """
 	cmd_thruster() sends a thruster control command to the microncontroller
-	It takes an id, a magnitude (between 0 and 100), and a direction (0 or 1)
-	0 is forward, 1 is reverse
+	It takes an id, and a value between +127 and -127 (negative is reverse)
 """
-def cmd_thruster(thruster_id, magnitude, direction) :
+def cmd_thruster(thruster_id, magnitude) :
 
 	raw_thruster_id = '\0'
 	direction_mag = 0;
@@ -128,25 +127,17 @@ def cmd_thruster(thruster_id, magnitude, direction) :
 	raw_thruster_id = chr(thruster_id)
 	
 	#make sure magnitude is within bounds
-	if (magnitude > 100) :
-		magnitude = 100
-	elif (magnitude < 0) :
-		magnitude = 0
-
-	#convert the magnitude from a percentage value to a value between 0 and 127
-	magnitude = magnitude * 127/100
-	
-	#make sure direction is only one bit
-	direction &= 0x01
-
-	#combine magnitude and direction data into one variable
-	direction_mag = magnitude | (direction << 7)
+	if (magnitude > 127) :
+		magnitude = 127
+	elif (magnitude < -127) :
+		magnitude = -127
 	
 	#convert direction and magnitude variable into a raw byte
-	raw_direction_mag = chr(direction_mag)
+	raw_magnitude = chr(magnitude & 0xFF)
+
 	CONTROL_BYTE = '\n'
 	#combine the raw bytes
-	raw_cmd = CONTROL_BYTE + raw_thruster_id + raw_direction_mag
+	raw_cmd = CONTROL_BYTE + raw_thruster_id + raw_magnitude
 
 	#send the commmand to the microcontroller
 	s.write(raw_cmd)
@@ -159,10 +150,10 @@ def cmd_thruster(thruster_id, magnitude, direction) :
 
 #causes the sub to move forward
 def cmd_move_forward() :
-	cmd_thruster(THRUSTER_BOW_SB, mag, 1)
-	cmd_thruster(THRUSTER_BOW_PORT, mag, 0) 
-	cmd_thruster(THRUSTER_STERN_SB, mag, 0) 
-	cmd_thruster(THRUSTER_STERN_PORT, mag, 1)  
+	cmd_thruster(THRUSTER_BOW_SB, -mag)
+	cmd_thruster(THRUSTER_BOW_PORT, mag) 
+	cmd_thruster(THRUSTER_STERN_SB, mag) 
+	cmd_thruster(THRUSTER_STERN_PORT, -mag)  
 
 
 #end cmd_move_forward()
@@ -170,44 +161,44 @@ def cmd_move_forward() :
 
 #causes the sub to move backwards
 def cmd_move_backward() :
-	cmd_thruster(THRUSTER_BOW_SB, mag, 0)
-	cmd_thruster(THRUSTER_BOW_PORT, mag, 1) 
-	cmd_thruster(THRUSTER_STERN_SB, mag, 1) 
-	cmd_thruster(THRUSTER_STERN_PORT, mag, 0)  
+	cmd_thruster(THRUSTER_BOW_SB, mag)
+	cmd_thruster(THRUSTER_BOW_PORT, -mag) 
+	cmd_thruster(THRUSTER_STERN_SB, -mag) 
+	cmd_thruster(THRUSTER_STERN_PORT, mag)  
 #end cmd_move_forward()
 
 
 #causes the sub to dive
 def cmd_dive() :
-	cmd_thruster(THRUSTER_DEPTH_SB, mag, 0)
-	cmd_thruster(THRUSTER_DEPTH_PORT, mag, 0) 
+	cmd_thruster(THRUSTER_DEPTH_SB, mag)
+	cmd_thruster(THRUSTER_DEPTH_PORT, mag) 
 #end cmd_move_forward()
 
 
 #causes the sub to surface
 def cmd_surface() :
-	cmd_thruster(THRUSTER_DEPTH_SB, mag, 1)
-	cmd_thruster(THRUSTER_DEPTH_PORT, mag, 1) 
+	cmd_thruster(THRUSTER_DEPTH_SB, -mag)
+	cmd_thruster(THRUSTER_DEPTH_PORT, -mag) 
 #end cmd_move_forward()
 
 
 
 #causes the sub to rotate clockwise
 def cmd_rotate_cw() :
-	cmd_thruster(THRUSTER_BOW_SB, mag, 0)
-	cmd_thruster(THRUSTER_BOW_PORT, mag, 0) 
-	cmd_thruster(THRUSTER_STERN_SB, mag, 1) 
-	cmd_thruster(THRUSTER_STERN_PORT, mag, 1)  
+	cmd_thruster(THRUSTER_BOW_SB, mag)
+	cmd_thruster(THRUSTER_BOW_PORT, mag) 
+	cmd_thruster(THRUSTER_STERN_SB, -mag) 
+	cmd_thruster(THRUSTER_STERN_PORT, -mag)  
 #end cmd_rotate_cw()
 
 
 
 #causes the sub to rotate counter-clockwise
 def cmd_rotate_ccw() :
-	cmd_thruster(THRUSTER_BOW_SB, mag, 1)
-	cmd_thruster(THRUSTER_BOW_PORT, mag, 1) 
-	cmd_thruster(THRUSTER_STERN_SB, mag, 0) 
-	cmd_thruster(THRUSTER_STERN_PORT, mag, 0)  
+	cmd_thruster(THRUSTER_BOW_SB, -mag)
+	cmd_thruster(THRUSTER_BOW_PORT, -mag) 
+	cmd_thruster(THRUSTER_STERN_SB, mag) 
+	cmd_thruster(THRUSTER_STERN_PORT, mag)  
 
 #end cmd_rotate_ccw()
 
@@ -215,19 +206,19 @@ def cmd_rotate_ccw() :
 
 #stops the depth control thrusters
 def cmd_stop_depth() :
-	cmd_thruster(THRUSTER_DEPTH_SB, 0, 0)
-	cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0) 
+	cmd_thruster(THRUSTER_DEPTH_SB, 0)
+	cmd_thruster(THRUSTER_DEPTH_PORT, 0) 
 #end cmd_move_forward()	
 
 
 #stops all thrusters
 def cmd_stop_all() :
-	cmd_thruster(THRUSTER_BOW_SB, 0, 0)
-	cmd_thruster(THRUSTER_BOW_PORT, 0, 0) 
-	cmd_thruster(THRUSTER_STERN_SB, 0, 0) 
-	cmd_thruster(THRUSTER_STERN_PORT, 0, 0)
-	cmd_thruster(THRUSTER_DEPTH_SB, 0, 0)
-	cmd_thruster(THRUSTER_DEPTH_PORT, 0, 0)   
+	cmd_thruster(THRUSTER_BOW_SB, 0)
+	cmd_thruster(THRUSTER_BOW_PORT, 0) 
+	cmd_thruster(THRUSTER_STERN_SB, 0) 
+	cmd_thruster(THRUSTER_STERN_PORT, 0)
+	cmd_thruster(THRUSTER_DEPTH_SB, 0)
+	cmd_thruster(THRUSTER_DEPTH_PORT, 0)   
 #end cmd_move_forward()
 
 
@@ -321,6 +312,7 @@ while 1 :
 	#cmd_move_forward() 
 	if (time.time() > wait_time) :
 		#cmd_dive()
+
 		if flipflop == 0 :
 			cmd_move_forward()
 			cmd_dive()
@@ -354,7 +346,7 @@ while 1 :
 		cmd_stop_all()
 		"""
 		sent_time = time.time()
-		wait_time = sent_time + .05
+		wait_time = sent_time + .5
 		
 	#receive a packet
 	received_packet = get_packet()
