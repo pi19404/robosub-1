@@ -39,7 +39,7 @@ def main(args):
 
                 print outgoing_packet
 
-                com.publish_message(outgoing_packet)
+                com.publish_message({"Defuzzified_Sets": outgoing_packet})
             except KeyError as e:
                 pass
 

@@ -118,7 +118,7 @@ settings = {
     },
     "movement/defuzzification": {
         "listen": [
-            "movement/fuzzification"
+            "movement/fuzzification",
             "datafeed/raw/accelerometer"
         ],
         "release": {

@@ -23,6 +23,9 @@ from robosub_settings import settings
 def translate(motor, defuzzified_value):
     """Translate motor thrust percentage to 8-bit value. """
 
+    if defuzzified_value == 0.0:
+        return 0
+
     motor_range = settings['movement/translation']['thresholds'][motor]
     # Fix value for motors that are wired backwards.
     # FIXME this logic may be bugged. When should this really be flipped?
@@ -52,6 +55,7 @@ def main(args):
                 tx_packet['Thruster_Values'][k] = \
                         translate(k, rx_packet['Defuzzified_Sets'][k])
             com.publish_message(tx_packet)
+            print tx_packet
 
         time.sleep(args.epoch)
 
