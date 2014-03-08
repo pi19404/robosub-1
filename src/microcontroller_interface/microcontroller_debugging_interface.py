@@ -19,6 +19,11 @@ GYRO_1_Z_addr = 0x22
 ADC_DEPTH = 0x30
 ADC_BATT  = 0x31
 
+MAG_0_X = 0x40
+MAG_0_Y = 0x41
+MAG_0_Z = 0x42
+
+
 THRUSTER_BOW_SB 	= 0x10
 THRUSTER_BOW_PORT 	= 0x11
 THRUSTER_DEPTH_SB 	= 0x12
@@ -247,6 +252,9 @@ ACL_1_Z_val = -1
 GYRO_1_X_val = -1
 GYRO_1_Y_val = -1
 GYRO_1_Z_val = -1
+MAG_0_X_val = -1
+MAG_0_Y_val = -1
+MAG_0_Z_val = -1
 ADC_DEPTH_val = -1
 ADC_BATT_val = -1
 buffer_size_max = 0
@@ -368,7 +376,7 @@ while 1 :
 		if ACL_1_X_val > 32767 :
 			ACL_1_X_val = (ACL_1_X_val-65536)
 			
-		f.write("X," + str(ACL_1_X_val) + '\n')
+		f.write("ACL_X," + str(ACL_1_X_val) + '\n')
 	
 	elif device == ACL_1_Y_addr :
 		ACL_1_Y_val = ( ord(received_packet[2]) ) | \
@@ -377,7 +385,7 @@ while 1 :
 		if ACL_1_Y_val > 32767 :
 			ACL_1_Y_val = (ACL_1_Y_val-65536)
 			
-		f.write("Y," + str(ACL_1_Y_val) + '\n')
+		f.write("ACL_Y," + str(ACL_1_Y_val) + '\n')
 
 	elif device == ACL_1_Z_addr :
 		ACL_1_Z_val = ( ord(received_packet[2]) ) | \
@@ -386,7 +394,7 @@ while 1 :
 		if ACL_1_Z_val > 32767 :
 			ACL_1_Z_val = (ACL_1_Z_val-65536)
 			
-		f.write("Z," + str(ACL_1_Z_val) + '\n')
+		f.write("ACL_Z," + str(ACL_1_Z_val) + '\n')
 			
 	elif device == GYRO_1_X_addr :
 		GYRO_1_X_val = ( ord(received_packet[2]) ) | \
@@ -394,6 +402,8 @@ while 1 :
 
 		if GYRO_1_X_val > 32767 :
 			GYRO_1_X_val = (GYRO_1_X_val-65536)
+		
+		f.write("GYRO_X," + str(GYRO_1_X_val) + '\n')
 	
 	elif device == GYRO_1_Y_addr :
 		GYRO_1_Y_val = ( ord(received_packet[2]) ) | \
@@ -401,20 +411,52 @@ while 1 :
 
 		if GYRO_1_Y_val > 32767 :
 			GYRO_1_Y_val = (GYRO_1_Y_val-65536)
+
+		f.write("GYRO_Y," + str(GYRO_1_Y_val) + '\n')		
 			
 	elif device == GYRO_1_Z_addr :
 		GYRO_1_Z_val = ( ord(received_packet[2]) ) | \
 		( ord(received_packet[3]) << 8 )
 		if GYRO_1_Z_val > 32767 :
 			GYRO_1_Z_val = (GYRO_1_Z_val-65536)
+
+		f.write("GYRO_Z," + str(GYRO_1_Z_val) + '\n')
 			
 	elif device == ADC_DEPTH :
 		ADC_DEPTH_val = ( ord(received_packet[2]) ) | \
 		( ord(received_packet[3]) << 8 )
+
+		f.write("ADC_DEPTH," + str(ADC_DEPTH_val) + '\n')
 		
 	elif device == ADC_BATT :
 		ADC_BATT_val = ( ord(received_packet[2]) ) | \
 		( ord(received_packet[3]) << 8 )
+
+		f.write("ADC_BATT," + str(ADC_BATT_val) + '\n')
+		
+	elif device == MAG_0_X :
+		MAG_0_X_val = ( ord(received_packet[2]) ) | \
+		( ord(received_packet[3]) << 8 )
+		if MAG_0_X_val > 32767 :
+			MAG_0_X_val = (MAG_0_X_val-65536)
+
+		f.write("MAG_X," + str(MAG_0_X_val) + '\n')
+	
+	elif device == MAG_0_Y :
+		MAG_0_Y_val = ( ord(received_packet[2]) ) | \
+		( ord(received_packet[3]) << 8 )
+		if MAG_0_Y_val > 32767 :
+			MAG_0_Y_val = (MAG_0_Y_val-65536)
+
+		f.write("MAG_Y," + str(MAG_0_Y_val) + '\n')
+		
+	elif device == MAG_0_Z :
+		MAG_0_Z_val = ( ord(received_packet[2]) ) | \
+		( ord(received_packet[3]) << 8 )
+		if MAG_0_Z_val > 32767 :
+			MAG_0_Z_val = (MAG_0_Z_val-65536)
+
+		f.write("MAG_Z," + str(MAG_0_Z_val) + '\n')
 		
 			
 	elif device == ord('P') :
@@ -433,6 +475,9 @@ while 1 :
 	print "GYRO X: %d" % (GYRO_1_X_val)
 	print "GYRO Y: %d" % (GYRO_1_Y_val)
 	print "GYRO Z: %d" % (GYRO_1_Z_val)
+	print "MAG X: %d" % (MAG_0_X_val)
+	print "MAG Y: %d" % (MAG_0_Y_val)
+	print "MAG Z: %d" % (MAG_0_Z_val)
 	print "ADC Depth: %d" % ((ADC_DEPTH_val) )
 	print "ADC Battery: %lf" % ((ADC_BATT_val) * 3.3/1024 * 7.5)
 	print "Average Ping Time: %lf" % (ping_total/ping_tick)
