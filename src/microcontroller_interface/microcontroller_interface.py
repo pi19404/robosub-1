@@ -19,6 +19,10 @@ GYRO_1_Z_addr = 0x22
 ADC_DEPTH = 0x30
 ADC_BATT = 0x31
 
+MAG_0_X = 0x40
+MAG_0_Y = 0x41
+MAG_0_Z = 0x42
+
 THRUSTER_BOW_SB = 0x10
 THRUSTER_BOW_PORT = 0x11
 THRUSTER_DEPTH_SB = 0x12
@@ -233,6 +237,8 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         gyro_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
     elif device == ADC_DEPTH:
         ADC_DEPTH_val = ord(packet[2]) | (ord(packet[3]) << 8)
+		
+		ADC_DEPT_val = ADC_DEPT_val*0.1075 + 54.622
 
         # XXX Shouldn't this be depth_com?
         depth_com.publish_message({"DEPTH": ADC_DEPTH_val})
@@ -243,6 +249,29 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         # XXX com?
         battery_voltage_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
 
+	elif device == MAG_0_X :
+		MAG_0_X_val = ( ord(received_packet[2]) ) | \
+		( ord(received_packet[3]) << 8 )
+		if MAG_0_X_val > 32767 :
+			MAG_0_X_val = (MAG_0_X_val-65536)
+
+		mag_com.publish_message({"MAG_X": MAG_0_X_val})
+	
+	elif device == MAG_0_Y :
+		MAG_0_Y_val = ( ord(received_packet[2]) ) | \
+		( ord(received_packet[3]) << 8 )
+		if MAG_0_Y_val > 32767 :
+			MAG_0_Y_val = (MAG_0_Y_val-65536)
+
+		mag_com.publish_message({"MAG_Y": MAG_0_Y_val})
+		
+	elif device == MAG_0_Z :
+		MAG_0_Z_val = ( ord(received_packet[2]) ) | \
+		( ord(received_packet[3]) << 8 )
+		if MAG_0_Z_val > 32767 :
+			MAG_0_Z_val = (MAG_0_Z_val-65536)
+
+		mag_com.publish_message({"MAG_Z": MAG_0_Z_val})
 
 def main(args):
     # Someone SHOULD complain about this.
