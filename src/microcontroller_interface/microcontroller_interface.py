@@ -41,9 +41,9 @@ ADC_BATT_val = -1
 def cmd_thruster(thruster_id, value):
     """
     cmd_thruster() sends a thruster control command to the microncontroller
-	It takes an id, and a value between +127 and -127 (negative is reverse)
-	*Note that two of the thrusters are wired backwards, so the sign of the input
-	should be flipped
+        It takes an id, and a value between +127 and -127 (negative is reverse)
+        *Note that two of the thrusters are wired backwards, so the sign of the input
+        should be flipped
 
     -------------------------
     |                       |
@@ -82,10 +82,10 @@ def cmd_thruster(thruster_id, value):
 
     #make sure value is within bounds
     if (value > 127) :
-    	value = 127
+        value = 127
     elif (value < -127) :
-    	value = -127
-	
+        value = -127
+
     #convert value variable into a raw byte
     raw_value = chr(value & 0xFF)
 
@@ -163,8 +163,7 @@ def get_packet(ser, com):
         # ensure we are in sync by checking that the control byte is in the
         # correct place
         if packet[0] != CONTROL_BYTE: # if we are not in sync
-            com.debug("Error: lost sync. Press the [Enter] key to attempt "
-                      "to re-sync")
+            com.debug("Error: lost sync.")
             #raw_input() # waits for the user to press the enter key
             ser.flushInput() # flushes the serial rx buffer
             get_lock(ser, com) # get back into sync
@@ -173,101 +172,6 @@ def get_packet(ser, com):
             success = True
 
         return packet
-
-def respond_to_rx_packet(packet, mag, advisor_packet=None):
-    # TODO: This would allow us to use cleaner debug messages if we
-    # instead had a thruster settings dictionary. E.g.:
-    # {'port': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)},
-    # 'starboard': {'bow': (0, 0), 'port': (0, 0), 'stern': (0, 0)}}
-    # XXX: This code should be moved to movement/physical
-    raw_cmds = []
-    intent = None
-    # Node: the advisor_packet is for debugging purposes only.
-    if advisor_packet and advisor_packet['command'] == 'stop':
-        # Turn off all thrusters.
-        intent = 'full stop'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0))
-    elif advisor_packet and advisor_packet['command'] == 'roll left':
-        intent = 'roll left'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0))
-    elif advisor_packet and advisor_packet['command'] == 'roll right':
-        intent = 'roll right'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0))
-    elif packet['vector']['x'] > 0.0:
-        intent = 'strafe left (not implemented)'
-    elif packet['vector']['x'] < 0.0:
-        intent = 'strafe right (not implemented)'
-    elif packet['vector']['y'] > 0.0:
-        # causes the sub to move forward
-        intent = 'move forward'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, -mag))
-    elif packet['vector']['y'] < 0.0:
-        # causes the sub to move backwards
-        intent = 'move backward'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag))
-    elif packet['vector']['z'] > 0.0:
-        # causes the sub to surface
-        intent = 'rise'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0))
-    elif packet['vector']['z'] < -0.0:
-        # causes the sub to dive
-        intent = 'dive'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, 0))
-    elif packet['rotation']['yaw'] > 0.0:
-        # causes the sub to rotate clockwise
-        intent = 'rotate right'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, -mag))
-    elif packet['rotation']['yaw'] < -0.0:
-        # causes the sub to rotate counter-clockwise
-        intent = 'rotate left'
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_SB, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_BOW_PORT, -mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_SB, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_DEPTH_PORT, 0))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_SB, mag))
-        raw_cmds.append(cmd_thruster(THRUSTER_STERN_PORT, mag))
-
-    return intent, raw_cmds
 
 def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
                              depth_com, battery_voltage_com):
@@ -366,8 +270,10 @@ def main(args):
     if args.disable_battery_voltage_com:
         battery_voltage_com.publish_message = disabled_publish
 
+
     if not DEBUG:
         ser = serial.Serial()
+        cmd_thruster.ser = ser
         # this may change, depending on what port the OS gives the
         # microcontroller
         ser.port = args.port
@@ -377,53 +283,31 @@ def main(args):
         # attempt to open the serial port (there is no guard code, I'm assuming
         # this does not fail)
         ser.open()
-        cmd_thruster.ser = ser
-
         get_lock(ser, com) # get in sync with the stream
 
-    mag = int(args.magnitude)
-    last_packet_time = 0.0
-    last_advisor_packet = None
-    last_advisor_packet_time = 0.0
+    prev_gv_timestamp = 0.0
     while True:
-        rx_packet = com.get_last_message(
-                "movement/physical")
-        advisor_packet = com.get_last_message("decision/advisor")
-        new_event = False
-
-        if (advisor_packet and
-            advisor_packet['timestamp'] > last_advisor_packet_time):
-            last_advisor_packet_time = advisor_packet['timestamp']
-            last_advisor_packet = advisor_packet
-            mag = int(advisor_packet['magnitude'])
-            if advisor_packet['command'] == 'stop':
-                new_event = True
-
-        if rx_packet and rx_packet['timestamp'] > last_packet_time:
-            last_packet_time = rx_packet['timestamp']
-            new_event = True
-
-        if new_event:
-            intent, raw_cmds = respond_to_rx_packet(
-                    packet=rx_packet, mag=mag,
-                    advisor_packet=last_advisor_packet)
-            # Debugging info...
-            msg = {"intent": intent,
-                   "raw_cmds": [[ord(x) for x in cmd] for cmd in raw_cmds]}
-            com.debug(msg)
-            com.publish_message(msg)
-
-        # receive a packet
+        gv_packet = com.get_last_message("movement/translation")
+        # handle values from grapevine.py
+        if gv_packet['timestamp'] > prev_gv_timestamp:
+            cmd_thruster(THRUSTER_BOW_PORT, gv_packet["thruster_values"]["front_left"])
+            cmd_thruster(THRUSTER_BOW_SB, gv_packet["thruster_values"]["front_right"])
+            cmd_thruster(THRUSTER_DEPTH_PORT, gv_packet["thruster_values"]["middle_left"])
+            cmd_thruster(THRUSTER_DEPTH_SB, gv_packet["thruster_values"]["middle_right"])
+            cmd_thruster(THRUSTER_BOW_PORT, gv_packet["thruster_values"]["back_left"])
+            cmd_thruster(THRUSTER_BOW_SB, gv_packet["thruster_values"]["back_right"])
+            prev_gv_timestamp = gv_packet['timestamp']
+        #handle values from uC, USB port.
         if not DEBUG:
-            received_packet = get_packet(ser, com)
-            respond_to_serial_packet(
-                    received_packet, accel_com, gyro_com, compass_com,
-                    depth_com, battery_voltage_com)
+            uC_packet = get_packet(ser, com)
+            respond_to_serial_packet(uC_packet, accel_com, gyro_com, compass_com,
+                                    depth_com, battery_voltage_com)
 
         time.sleep(args.epoch)
-
     if not DEBUG:
         ser.close()
+
+
 
 def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
@@ -464,4 +348,3 @@ def commandline():
 if __name__ == '__main__':
     args = commandline()
     main(args)
-
