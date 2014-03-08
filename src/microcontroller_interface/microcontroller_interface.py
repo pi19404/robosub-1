@@ -256,6 +256,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 			MAG_0_X_val = (MAG_0_X_val-65536)
 
 		compass_com.publish_message({"MAG_X": MAG_0_X_val})
+		mlog.write("MAG_X," + str(MAG_0_X_val) + '\n')
 	
 	elif device == MAG_0_Y :
 		MAG_0_Y_val = ( ord(received_packet[2]) ) | \
@@ -264,6 +265,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 			MAG_0_Y_val = (MAG_0_Y_val-65536)
 
 		compass_com.publish_message({"MAG_Y": MAG_0_Y_val})
+		mlog.write("MAG_Y," + str(MAG_0_Y_val) + '\n')
 		
 	elif device == MAG_0_Z :
 		MAG_0_Z_val = ( ord(received_packet[2]) ) | \
@@ -272,6 +274,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 			MAG_0_Z_val = (MAG_0_Z_val-65536)
 
 		compass_com.publish_message({"MAG_Z": MAG_0_Z_val})
+		mlog.write("MAG_Z," + str(MAG_0_Z_val) + '\n')
 
 def main(args):
     # Someone SHOULD complain about this.
@@ -298,6 +301,9 @@ def main(args):
         depth_com.publish_message = disabled_publish
     if args.disable_battery_voltage_com:
         battery_voltage_com.publish_message = disabled_publish
+		
+	#open up a log file
+	mlog = open("mlog", "w")
 
 
     if not DEBUG:
