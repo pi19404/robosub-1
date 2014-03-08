@@ -72,6 +72,7 @@ settings = {
     },
     "movement/fuzzification": {
         "listen": [
+            "movement/translation",
             "decision",
             "sensor/vision/cam_front",
             "sensor/vision/cam_down"
@@ -131,6 +132,45 @@ settings = {
         "listen": [
             "movement/defuzzification"
         ],
+        "thresholds": {
+            "front_left": {
+                # TODO we may need to specify different numbers for forward vs
+                # backward.
+                "positive": [1, 127],
+                "negative": [1, 127],
+                # Multipler may flip the motor direction for motors that are
+                # wired backwards. Note that multiplier is applied before the
+                # positive and negative thresholds are applied, so positive and
+                # negative are the same direction for each thruster regardless
+                # of wiring.
+                "multiplier": 1
+            },
+            "front_right": {
+                "positive": [1, 127],
+                "negative": [1, 127],
+                "multiplier": -1
+            },
+            "middle_left": {
+                "positive": [1, 127],
+                "negative": [1, 127],
+                "multiplier": 1
+            },
+            "middle_right": {
+                "positive": [1, 127],
+                "negative": [1, 127],
+                "multiplier": 1
+            },
+            "back_left": {
+                "positive": [1, 127],
+                "negative": [1, 127],
+                "multiplier": -1
+            },
+            "back_right": {
+                "positive": [1, 127],
+                "negative": [1, 127],
+                "multiplier": 1
+            }
+        },
         "release": {
             "name": "translater.py",
             "args": ["--epoch", EPOCH]

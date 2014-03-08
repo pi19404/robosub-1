@@ -8,6 +8,7 @@ from copy import deepcopy
 from random import random
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
+from robosub_settings import settings
 
 # TODO: This module should take the fuzzy sets produced by
 # movement/stabilization and should translate them into raw digital
@@ -19,6 +20,25 @@ from util.communication.grapevine import Communicator
 # translating a magnitude into a raw value, should be moved into this
 # module.
 
+def translate(motor, defuzzified_value):
+    """Translate motor thrust percentage to 8-bit value. """
+
+    motor_range = settings['movement/translation']['thresholds'][motor]
+    # Fix value for motors that are wired backwards.
+    # FIXME this logic may be bugged. When should this really be flipped?
+    # Instinct says it doesn't matter, but prove it.
+    defuzzified_value *= motor_range['multiplier']
+    #
+    if defuzzified_value >= 0:
+        low = motor_range['positive'][0]
+        high = motor_range['positive'][1]
+    else:
+        low = -motor_range['negative'][0]
+        high = -motor_range['negative'][1]
+    absdif = abs(high - low)
+
+    return int(defuzzified_value * absdif) + low
+
 def main(args):
     com = Communicator("movement/translation")
 
@@ -26,10 +46,11 @@ def main(args):
     while True:
         rx_packet = com.get_last_message("movement/defuzzification")
         if rx_packet and rx_packet['timestamp'] > last_packet_time:
+            tx_packet = {'Thruster_Values': {}}
             last_packet_time = rx_packet['timestamp']
-            tx_packet = {
-                    'vector': rx_packet['vector'],
-                    'rotation': rx_packet['rotation']}
+            for k in rx_packet['Defuzzified_Sets']:
+                tx_packet['Thruster_Values'][k] = \
+                        translate(k, rx_packet['Defuzzified_Sets'][k])
             com.publish_message(tx_packet)
 
         time.sleep(args.epoch)

@@ -14,12 +14,16 @@ import zmq
 from robosub_settings import settings
 from numpy import array, frombuffer
 
-def get_socket_name(module_name):
+def get_socket_name(module_name, socket_type='pub'):
     """Determines the socket for module_name."""
     try:
         ip = settings[module_name]['ip']
     except KeyError:
-        ip = '*'
+        # FIXME this isn't the best solution for pub vs sub.
+        if socket_type == 'pub':
+            ip = '*'
+        else:
+            ip = '127.0.0.1'
     return 'tcp://{ip}:{port}'.format(ip=ip, port=settings[module_name]['port'])
 
 class Communicator(object):
@@ -100,7 +104,7 @@ class Communicator(object):
             mdata['socket'].setsockopt(zmq.SUBSCRIBE, '')
             mdata['socket'].setsockopt(zmq.RCVBUF, subscriber_buffer_length)
             mdata['socket'].hwm = subscriber_high_water_mark
-            mdata['socket'].connect(get_socket_name(mname))
+            mdata['socket'].connect(get_socket_name(mname, 'sub'))
             mdata['queue'] = Queue.Queue()
             mdata['refresh_lock'] = threading.Semaphore(value=1)
             mdata['last_message'] = None
