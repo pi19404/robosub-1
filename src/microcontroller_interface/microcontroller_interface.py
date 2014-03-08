@@ -237,8 +237,8 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         gyro_com.publish_message({"GYRO_Z": GYRO_1_Z_val})
     elif device == ADC_DEPTH:
         ADC_DEPTH_val = ord(packet[2]) | (ord(packet[3]) << 8)
-		
-		ADC_DEPT_val = ADC_DEPT_val*0.1075 + 54.622
+        
+        ADC_DEPT_val = ADC_DEPT_val*0.1075 + 54.622
 
         # XXX Shouldn't this be depth_com?
         depth_com.publish_message({"DEPTH": ADC_DEPTH_val})
@@ -249,32 +249,32 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
         # XXX com?
         battery_voltage_com.publish_message({"BATTERY_VOLTAGE": ADC_BATT_val})
 
-	elif device == MAG_0_X :
-		MAG_0_X_val = ( ord(received_packet[2]) ) | \
-		( ord(received_packet[3]) << 8 )
-		if MAG_0_X_val > 32767 :
-			MAG_0_X_val = (MAG_0_X_val-65536)
+    elif device == MAG_0_X :
+        MAG_0_X_val = ( ord(received_packet[2]) ) | \
+        ( ord(received_packet[3]) << 8 )
+        if MAG_0_X_val > 32767 :
+            MAG_0_X_val = (MAG_0_X_val-65536)
 
-		compass_com.publish_message({"MAG_X": MAG_0_X_val})
-		mlog.write("MAG_X," + str(MAG_0_X_val) + '\n')
-	
-	elif device == MAG_0_Y :
-		MAG_0_Y_val = ( ord(received_packet[2]) ) | \
-		( ord(received_packet[3]) << 8 )
-		if MAG_0_Y_val > 32767 :
-			MAG_0_Y_val = (MAG_0_Y_val-65536)
+        compass_com.publish_message({"MAG_X": MAG_0_X_val})
+        mlog.write("MAG_X," + str(MAG_0_X_val) + '\n')
+    
+    elif device == MAG_0_Y :
+        MAG_0_Y_val = ( ord(received_packet[2]) ) | \
+        ( ord(received_packet[3]) << 8 )
+        if MAG_0_Y_val > 32767 :
+            MAG_0_Y_val = (MAG_0_Y_val-65536)
 
-		compass_com.publish_message({"MAG_Y": MAG_0_Y_val})
-		mlog.write("MAG_Y," + str(MAG_0_Y_val) + '\n')
-		
-	elif device == MAG_0_Z :
-		MAG_0_Z_val = ( ord(received_packet[2]) ) | \
-		( ord(received_packet[3]) << 8 )
-		if MAG_0_Z_val > 32767 :
-			MAG_0_Z_val = (MAG_0_Z_val-65536)
+        compass_com.publish_message({"MAG_Y": MAG_0_Y_val})
+        mlog.write("MAG_Y," + str(MAG_0_Y_val) + '\n')
+        
+    elif device == MAG_0_Z :
+        MAG_0_Z_val = ( ord(received_packet[2]) ) | \
+        ( ord(received_packet[3]) << 8 )
+        if MAG_0_Z_val > 32767 :
+            MAG_0_Z_val = (MAG_0_Z_val-65536)
 
-		compass_com.publish_message({"MAG_Z": MAG_0_Z_val})
-		mlog.write("MAG_Z," + str(MAG_0_Z_val) + '\n')
+        compass_com.publish_message({"MAG_Z": MAG_0_Z_val})
+        mlog.write("MAG_Z," + str(MAG_0_Z_val) + '\n')
 
 def main(args):
     # Someone SHOULD complain about this.
@@ -301,9 +301,9 @@ def main(args):
         depth_com.publish_message = disabled_publish
     if args.disable_battery_voltage_com:
         battery_voltage_com.publish_message = disabled_publish
-		
-	#open up a log file
-	mlog = open("mlog", "w")
+        
+    #open up a log file
+    mlog = open("mlog", "w")
 
 
     if not DEBUG:
