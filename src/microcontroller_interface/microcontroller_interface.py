@@ -255,7 +255,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 		if MAG_0_X_val > 32767 :
 			MAG_0_X_val = (MAG_0_X_val-65536)
 
-		mag_com.publish_message({"MAG_X": MAG_0_X_val})
+		compass_com.publish_message({"MAG_X": MAG_0_X_val})
 	
 	elif device == MAG_0_Y :
 		MAG_0_Y_val = ( ord(received_packet[2]) ) | \
@@ -263,7 +263,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 		if MAG_0_Y_val > 32767 :
 			MAG_0_Y_val = (MAG_0_Y_val-65536)
 
-		mag_com.publish_message({"MAG_Y": MAG_0_Y_val})
+		compass_com.publish_message({"MAG_Y": MAG_0_Y_val})
 		
 	elif device == MAG_0_Z :
 		MAG_0_Z_val = ( ord(received_packet[2]) ) | \
@@ -271,7 +271,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
 		if MAG_0_Z_val > 32767 :
 			MAG_0_Z_val = (MAG_0_Z_val-65536)
 
-		mag_com.publish_message({"MAG_Z": MAG_0_Z_val})
+		compass_com.publish_message({"MAG_Z": MAG_0_Z_val})
 
 def main(args):
     # Someone SHOULD complain about this.
