@@ -290,14 +290,14 @@ def main(args):
         gv_packet = com.get_last_message("movement/translation")
         # handle values from grapevine.py
         if gv_packet['timestamp'] > prev_gv_timestamp:
-            cmd_thruster(THRUSTER_BOW_PORT, gv_packet["thruster_values"]["front_left"])
-            cmd_thruster(THRUSTER_BOW_SB, gv_packet["thruster_values"]["front_right"])
-            cmd_thruster(THRUSTER_DEPTH_PORT, gv_packet["thruster_values"]["middle_left"])
-            cmd_thruster(THRUSTER_DEPTH_SB, gv_packet["thruster_values"]["middle_right"])
-            cmd_thruster(THRUSTER_BOW_PORT, gv_packet["thruster_values"]["back_left"])
-            cmd_thruster(THRUSTER_BOW_SB, gv_packet["thruster_values"]["back_right"])
+            cmd_thruster(THRUSTER_BOW_PORT, gv_packet["Thruster_Values"]["front_left"])
+            cmd_thruster(THRUSTER_BOW_SB, gv_packet["Thruster_Values"]["front_right"])
+            cmd_thruster(THRUSTER_DEPTH_PORT, gv_packet["Thruster_Values"]["middle_left"])
+            cmd_thruster(THRUSTER_DEPTH_SB, gv_packet["Thruster_Values"]["middle_right"])
+            cmd_thruster(THRUSTER_STERN_PORT, gv_packet["Thruster_Values"]["back_left"])
+            cmd_thruster(THRUSTER_STERN_SB, gv_packet["Thruster_Values"]["back_right"])
             prev_gv_timestamp = gv_packet['timestamp']
-        #handle values from uC, USB port.
+        # handle values from uC, USB port.
         if not DEBUG:
             uC_packet = get_packet(ser, com)
             respond_to_serial_packet(uC_packet, accel_com, gyro_com, compass_com,

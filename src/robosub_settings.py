@@ -138,17 +138,17 @@ settings = {
                 # backward.
                 "positive": [1, 127],
                 "negative": [1, 127],
-                # Multipler may flip the motor direction for motors that are
+                # Multiplier may flip the motor direction for motors that are
                 # wired backwards. Note that multiplier is applied before the
                 # positive and negative thresholds are applied, so positive and
                 # negative are the same direction for each thruster regardless
                 # of wiring.
-                "multiplier": 1
+                "multiplier": -1
             },
             "front_right": {
                 "positive": [1, 127],
                 "negative": [1, 127],
-                "multiplier": -1
+                "multiplier": 1
             },
             "middle_left": {
                 "positive": [1, 127],
@@ -163,12 +163,12 @@ settings = {
             "back_left": {
                 "positive": [1, 127],
                 "negative": [1, 127],
-                "multiplier": -1
+                "multiplier": 1
             },
             "back_right": {
                 "positive": [1, 127],
                 "negative": [1, 127],
-                "multiplier": 1
+                "multiplier": -1
             }
         },
         "release": {
@@ -185,7 +185,7 @@ settings = {
     "microcontroller": {
         "listen": [
             "decision/advisor",
-            "movement/translater",
+            "movement/translation",
         ],
         "release": {
             "name": "microcontroller_interface.py",
