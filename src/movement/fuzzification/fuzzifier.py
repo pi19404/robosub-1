@@ -11,6 +11,11 @@ sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 from robosub_settings import settings
 
+#################################################################
+# TODO: Figure out name of AI module and desired packet format. #
+# This module is unusable until then.                           #
+#################################################################
+
 def get_membership(value, set_points):
     """Returns the membership quantity for a value in a fuzzy set.
 
