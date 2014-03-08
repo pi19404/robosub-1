@@ -12,43 +12,36 @@ from util.communication.grapevine import Communicator
 def main(args):
     com = Communicator(module_name=args.module_name)
 
-    # TODO We need to settle on a good convention for these vectors.
-    # For now, I'm using these conventions:
-    # vector:
-    #   x is left and right
-    #   y is forward and backward
-    #   z is up and down.
-    # rotation:
-    #   x is pitch
-    #   y is roll
-    #   z is yaw. Negative yaws left, positive yaws right.
-    packet = {"forward/backward": 0.0, "right/left": 0.0, "up/down": 0.0, "yaw": 0.0, "roll": 0.0, "pitch": 0.0}
+    #incoming_packet = {"forward/backward": 0.0, "right/left": 0.0, "up/down": 0.0, "yaw": 0.0, "roll": 0.0, "pitch": 0.0}
 
+    last_packet_time = 0
     while True:
-        directive_packet = com.get_last_message("movement/fuzzification")
-        if directive_packet and directive_packet['timestamp'] > last_packet_time:
-            last_packet_time = directive_packet['timestamp']
+        incoming_packet = com.get_last_message("movement/fuzzification")
+        if incoming_packet and incoming_packet['timestamp'] > last_packet_time:
+            last_packet_time = incoming_packet['timestamp']
 
-            # Kludges to handle keyboard inputs.
-            tx_packet = deepcopy(packet)
-            if directive_packet['is_left'] > 0.0:
-                tx_packet['vector']['x'] = 1.0
-            elif directive_packet['is_right'] > 0.0:
-                tx_packet['vector']['x'] = -1.0
-            elif directive_packet['is_back'] > 0.0:
-                tx_packet['vector']['y'] = 1.0
-            elif directive_packet['is_forward'] > 0.0:
-                tx_packet['vector']['y'] = -1.0
-            elif directive_packet['is_low'] > 0.0:
-                tx_packet['vector']['z'] = 1.0
-            elif directive_packet['is_high'] > 0.0:
-                tx_packet['vector']['z'] = -1.0
-            elif directive_packet['is_rotated_left'] > 0.0:
-                tx_packet['rotation']['yaw'] = 1.0
-            elif directive_packet['is_rotated_right'] > 0.0:
-                tx_packet['rotation']['yaw'] = -1.0
+            try:
+                outgoing_packet = {"front_left": 0.0, "front_right": 0.0, "middle_left": 0.0, "middle_right": 0.0, "back_left": 0.0, "back_right": 0.0}
 
-            com.publish_message(tx_packet)
+                # Possible TODO: Scale all values except for forward/backward by some constant so yaw, strafe, etc, are easier to control
+                outgoing_packet["front_left"] = incoming_packet["Fuzzy_Sets"]["forward/backward"] + incoming_packet["Fuzzy_Sets"]["right/left"] + incoming_packet["Fuzzy_Sets"]["yaw"]
+                outgoing_packet["front_right"] = incoming_packet["Fuzzy_Sets"]["forward/backward"] - incoming_packet["Fuzzy_Sets"]["right/left"] - incoming_packet["Fuzzy_Sets"]["yaw"]
+
+                outgoing_packet["back_left"] = incoming_packet["Fuzzy_Sets"]["forward/backward"] - incoming_packet["Fuzzy_Sets"]["right/left"] + incoming_packet["Fuzzy_Sets"]["yaw"]
+                outgoing_packet["back_right"] = incoming_packet["Fuzzy_Sets"]["forward/backward"] + incoming_packet["Fuzzy_Sets"]["right/left"] - incoming_packet["Fuzzy_Sets"]["yaw"]
+
+                outgoing_packet["middle_left"] = incoming_packet["Fuzzy_Sets"]["up/down"] + incoming_packet["Fuzzy_Sets"]["roll"]
+                outgoing_packet["middle_right"] = incoming_packet["Fuzzy_Sets"]["up/down"] - incoming_packet["Fuzzy_Sets"]["roll"]
+
+                for key in outgoing_packet.keys():
+                    if outgoing_packet[key] > 1.0: outgoing_packet[key] = 1.0
+                    if outgoing_packet[key] < -1.0: outgoing_packet[key] = -1.0
+
+                print outgoing_packet
+
+                com.publish_message(outgoing_packet)
+            except KeyError as e:
+                pass
 
         time.sleep(args.epoch)
 
