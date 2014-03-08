@@ -192,10 +192,11 @@ cmd_stop_all()
 
 #control parameters
 control_period = 1
-proportion_factor = 10
-integral_factor = 0
+proportion_factor = 20
+integral_factor = 2
 
-desired_depth = 7
+desired_depth = 12
+
 
 #Main reading loop
 while 1 :
