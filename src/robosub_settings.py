@@ -71,6 +71,7 @@ settings = {
             "args": ["--epoch", 0.005]}
     },
     "movement/fuzzification": {
+        #"ip": "192.168.1.7", # IP address of computer with ps3 controller
         "listen": [
             "movement/translation",
             "decision",
@@ -129,6 +130,7 @@ settings = {
             "args": ["--epoch", EPOCH]}
     },
     "movement/translation": {
+        #"ip": "192.168.1.7", # IP address of person with slider control
         "listen": [
             "movement/defuzzification"
         ],

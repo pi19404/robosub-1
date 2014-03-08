@@ -289,7 +289,7 @@ def main(args):
     while True:
         gv_packet = com.get_last_message("movement/translation")
         # handle values from grapevine.py
-        if gv_packet['timestamp'] > prev_gv_timestamp:
+        if gv_packet is not None and gv_packet['timestamp'] > prev_gv_timestamp:
             cmd_thruster(THRUSTER_BOW_PORT, gv_packet["Thruster_Values"]["front_left"])
             cmd_thruster(THRUSTER_BOW_SB, gv_packet["Thruster_Values"]["front_right"])
             cmd_thruster(THRUSTER_DEPTH_PORT, gv_packet["Thruster_Values"]["middle_left"])

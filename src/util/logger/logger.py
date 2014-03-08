@@ -24,7 +24,7 @@ def commandline():
             '-e', '--epoch',  type=float, default=0.05,
             help='Sleep time per cycle.')
     parser.add_argument(
-            '-o', '--output', type=str, default="/tmp/robosub/log.out",
+            '-o', '--output', type=str, default="/home/robosub/logging/log.out",
             help='Location of the log file.')
     return parser.parse_args()
 
@@ -34,7 +34,7 @@ def main(args):
 
     try:
         check_call(['mv', args.output,
-                    "/tmp/robosub/log.out." + str(time.time())])
+                    "/home/robosub/logging/log.out." + str(time.time())])
     except CalledProcessError:
         pass
 
