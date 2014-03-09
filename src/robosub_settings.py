@@ -140,6 +140,7 @@ settings = {
 settings.update(vision_settings)
 settings.update(movement_settings)
 settings.update(util_settings)
+settings.update(decision_settings)
 
 # We need some extra lines for the debug channels. Aside from the logger,
 # nothing should see debug messages.
