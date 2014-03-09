@@ -9,7 +9,7 @@ robosub/src/settings.json.
 """
 
 #import json # TODO remove this once the hack main function is removed
-from vision_settings import vision_settings
+#from vision_settings import vision_settings
 import sys
 import os
 import cv2
@@ -19,23 +19,21 @@ from multiprocessing import Process, Pipe
 from stream_processor import StreamProcessor
 from time import sleep
 sys.path.append(os.path.abspath('../..'))
+from robosub_settings import settings
 from util.communication.grapevine import Communicator
 
 # TODO figure out how to initialize the camera driver settings through guvcview.
 
 class VisionController(object):
     """Create and maintain Robosub video logic processes."""
-    def __init__(self, module_name, settings):
+    def __init__(self):
         """Create and maintain all video logic processes defined in settings.
 
         Args:
-        settings -- dictionary of settings for VisionController and processes managed
-            by VisionController.
 
         """
+
         #sys.stdout, sys.stdin, sys.stderr = [open('/dev/null', 'w')] * 3
-        self.module_name = module_name
-        self.settings = settings # XXX consider making this a deepcopy?
 
         #self._vision_processors = []
         self._vision_processors = {}
@@ -49,21 +47,21 @@ class VisionController(object):
         self._maintain_vision_processors()
 
     def _init_vision_processors(self):
-        """Initialize process for each self.settings['vision_processors']."""
-        for vp_name in self.settings[self.module_name]['vision_processors']:
+        """Initialize process for each settings['vision_processors']."""
+        for vp_name in settings['sensor/vision/control']['vision_processors']:
             self._init_vision_process(vp_name)
 
     def _init_vision_process(self, process_name):
         """Initialize a process using settings given in vp_settings dict.
 
         Args:
-        process_name: Name of process. Must match a process key entry in self.settings.
+        process_name: Name of process. Must match a process key entry in settings.
 
         """
         parent_conn, child_conn = Pipe()
         proc = Process(target = StreamProcessor,
                        name = process_name,
-                       args = (process_name, self.settings, child_conn))
+                       args = (process_name, child_conn))
         #We want all managed processes to die if VisionController dies.
         proc.daemon = True
         proc.start()
@@ -83,7 +81,7 @@ class VisionController(object):
         #sure they are still responsive too. Pipe message passing?
 
         while True:
-            sleep(self.settings[self.module_name]['maintenance_interval'])
+            sleep(settings['sensor/vision/control']['maintenance_interval'])
             for process_name in self._vision_processors.keys():
                 self._maintain_proc(process_name)
 
@@ -105,20 +103,16 @@ class VisionController(object):
 def _main(args):
     """Start the vision daemon."""
     #settings = json.loads(open(args.settings_path, 'r').read())
-    settings = vision_settings
     if args.video:
         settings['sensor/vision/control']['vision_processors'] = ['sensor/vision/cam_fake']
         settings['sensor/vision/cam_fake']['recorded_video'] = args.video
     if args.plugins:
         settings['sensor/vision/cam_fake']['plugins'] = args.plugins
-    v = VisionController('sensor/vision/control', settings)
+    v = VisionController()
 
 def _command_line():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='Mock module.')
-    parser.add_argument('-s', '--settings_path', type=str,
-            default='./settings.json',
-            help='Settings file path.')
     parser.add_argument('-v', '--video', type=str,
             help='Video file or stream to open.')
     # TODO figure out how to list plugins?

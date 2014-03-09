@@ -10,11 +10,12 @@ from importlib import import_module
 from frame_processor import FrameProcessor
 sys.path.append(os.path.abspath('../..'))
 from util.communication.grapevine import Communicator
+from robosub_settings import settings
 
 
 class StreamProcessor(object):
     """Open a video stream and process frames. Report finds to the grapevine."""
-    def __init__(self, module_name, settings, pipe):
+    def __init__(self, module_name, pipe):
         """Initialize video capture, logger, and processing plugins.
 
         Args:
@@ -44,7 +45,7 @@ class StreamProcessor(object):
             # Name of module and the class should be the same.
             module_obj = getattr(import_module(
                     '..'+plugin_name, package='plugins.subpkg'),
-                    plugin_name)(self.processor, self.settings)
+                    plugin_name)(self.processor, self.module_name)
             self._plugins += [module_obj]
 
         # Configure the VideoCapture object.
