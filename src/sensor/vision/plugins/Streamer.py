@@ -14,6 +14,7 @@ from robosub_settings import settings
 
 # TODO send video over multiple sockets to parallelize the unpacking on the other side.
 # TODO split each image into smaller parts and send those over multiple
+# TODO add a control port that listens for commands from the vision_monitor.
 
 class Streamer(object):
 
@@ -35,7 +36,7 @@ class Streamer(object):
                     "tcp://*:{port}".format(
                     port=settings[module_name]['stream_port'] + port_offset))
 
-        self._split_im = None
+        self._im_parts = None
         self._busy = Event()
 
         self._sender = Thread(target=self._sender)
@@ -55,12 +56,12 @@ class Streamer(object):
     def _worker_send(self, idx):
         metadata = dict(image_part=idx,
                 dtype = str(self._fp.im.dtype),
-                shape = self._fp.im.shape)
+                shape = self._im_parts[idx].shape)
         try:
             self._stream['sockets'][idx].send_json(
                     metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
             self._stream['sockets'][idx].send(
-                    self._split_im[idx], copy=True, track=False, flags=zmq.NOBLOCK)
+                    self._im_parts[idx], copy=True, track=False, flags=zmq.NOBLOCK)
         except zmq.ZMQError:
             pass
 
@@ -68,23 +69,11 @@ class Streamer(object):
         # Don't even bother splitting and trying to send if we're already busy
         # with the previous image.
         if not self._busy.isSet():
-            self._split_im = np.split(
+            self._im_parts = np.split(
                     ary=self._fp.im,
                     indices_or_sections=settings[self._module_name]['port_span'])
-            print self._split_im[0].shape
             # Tell our sender thread to get busy!
             self._busy.set()
-
-
-        #metadata = dict(dtype = str(self._fp.im.dtype), shape = self._fp.im.shape)
-        #try:
-        #    self._stream['socket'].send_json(
-        #            metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
-        #    self._stream['socket'].send(
-        #            self._fp.im, copy=True, track=False, flags=zmq.NOBLOCK)
-        #except zmq.ZMQError:
-        #    pass
-
 
 if __name__ == '__main__':
     pass

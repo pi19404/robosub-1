@@ -1,6 +1,6 @@
 port_start = 50000
 # Be careful with port span.
-port_span = 2**4 # Number of ports to use in a video stream.
+port_span = 2**5 # Number of ports to use in a video stream.
 
 def gen_stream_port(start, span):
     port = start

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# FIXME not all of these are needed.
 import sys
 import os
 import zmq
@@ -9,9 +10,10 @@ import numpy
 import cv2
 import cv2.cv as cv
 import time
-from time import sleep
+from time import sleep, time
 from threading import Event
 from multiprocessing.pool import ThreadPool
+import numpy as np
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 from robosub_settings import settings
@@ -30,40 +32,33 @@ class VisionViewer(object):
             self._stream['sockets'][-1].connect(
                     "tcp://{addr}:{port}".format(
                     addr=addr, port=settings[self._module_name]['stream_port'] + port_offset))
-        self._split_im = [None] * settings[self._module_name]['port_span']
+        self._im_parts = [None] * settings[self._module_name]['port_span']
         self._im = None
         self._busy = Event()
 
         self._receiver()
-        #self._receiver = Thread(target=self._receiver)
-        #self._receiver.daemon = True
-        #self._receiver.start
-    #def recv_image(self):
-    #    """Receive an image from the connected stream client socket."""
-    #    metadata = self.subscribers['stream']['socket'].recv_json()
-    #    message = self.subscribers['stream']['socket'].recv(
-    #                copy=True, track=False)
-    #    buf = buffer(message)
-    #    image = frombuffer(buf, dtype=metadata['dtype'])
-    #    return image.reshape(metadata['shape'])
 
     def _worker_receive(self, idx):
         metadata = self._stream['sockets'][idx].recv_json()
-        message = self._stream['sockets'].recv(
+        message = self._stream['sockets'][idx].recv(
                     copy=True, track=False)
         buf = buffer(message)
-        image = frombuffer(buf, dtype=metadata['dtype'])
-        self._split_im[idx] = image.reshape(metadata['shape'])
+        image = np.frombuffer(buf, dtype=metadata['dtype'])
+        self._im_parts[idx] = image.reshape(metadata['shape'])
 
     def _receiver(self):
         p = ThreadPool(processes=settings[self._module_name]['port_span'])
         while True:
-            self._busy.wait()
+            print 'hi'
+            start = time()
             p.map(func=self._worker_receive,
                     iterable=range(settings[self._module_name]['port_span']))
+            print 'bye'
             try:
-                self._im = np.hstack(self._split_im)
-                print self._im.shape
+                self._im = np.vstack(self._im_parts)
+                print time() - start
+                cv2.imshow('vision_monitor', self._im)
+                cv2.waitKey(1)
             except Exception:
                 # Lazy
                 pass
@@ -82,15 +77,7 @@ class VisionViewer(object):
                 cv2.imshow('test window', cv2.subtract(r, b))
                 key = cv2.waitKey(1)
 
-    #def connect_video(self, port, addr='127.0.0.1'):
-    #    """Connect one end of a socket pair for video streaming."""
-    #    self.subscribers['stream'] = {}
-    #    self.subscribers['stream']['context'] = zmq.Context(1)
-    #    self.subscribers['stream']['socket'] = \
-    #                self.subscribers['stream']['context'].socket(zmq.PAIR)
-    #    self.subscribers['stream']['socket'].connect(
-    #                "tcp://{addr}:{port}".format(addr=addr, port=port))
-
+# FIXME actually use this.
 def _command_line():
     parser = argparse.ArgmentParser(description="Vision Monitor")
     parser.add_argument('-i', '--ip', type=str,
