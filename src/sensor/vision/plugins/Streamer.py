@@ -7,8 +7,8 @@ import zmq
 from multiprocessing.pool import ThreadPool
 from time import strftime
 
-#FIXME this logger should be JUST A LOGGER. Video grabbing should happen
-#elsewhere.
+# TODO send video over multiple sockets to parallelize the unpacking on the other side.
+# TODO split each image into smaller parts and send those over multiple
 
 class Streamer(object):
 

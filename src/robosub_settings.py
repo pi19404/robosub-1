@@ -14,6 +14,12 @@
 # a hassle.
 
 import os
+from sensor.vision.settings import settings as vision_settings
+# TODO implement this when sensors are taken care of.
+#from sensor.settings import settings as sensor_settings
+from movement.settings import settings as movement_settings
+from util.settings import settings as util_settings
+from decision.settings import settings as decision_settings
 
 # Maximum time a program might wait before checking for input.
 EPOCH = "0.05"
@@ -21,167 +27,6 @@ EPOCH = "0.05"
 settings = {
     "publisher_high_water_mark": 1024,
     "publisher_buffer_length": 1024,
-    "sensor/vision/cam_front": {
-        "symlink": "/dev/cam_front",
-        "codec": "MJPG",
-        "log": ["raw", "processed"],
-        "stream": {
-        },
-        "fps": 30,
-        "width": 640,
-        "height": 480,
-        "plugins": ["tollbooth"],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/vision/cam_down": {
-        "symlink": "/dev/cam_down",
-        "camera": "down",
-        "enabled": False,
-        "dev": 1,
-        "codec": "MJPG",
-        "log": ["raw", "processed"],
-        "stream": {
-        },
-        "fps": 30,
-        "width": 640,
-        "height": 480,
-        "plugins": ["PathDetection"],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "sensor/vision/fates": {
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None},
-        "maintenance_interval": 5,
-        "vision_processors": [
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down"
-        ]
-    },
-    "util/logger": {
-        # The "listen" value is populated at the end of this file.
-        "listen": [],
-        "release": {
-            "name": "logger.py",
-            "args": ["--epoch", 0.005]},
-        "mock": {
-            "name": "logger.py",
-            "args": ["--epoch", 0.005]}
-    },
-    "movement/fuzzification": {
-        #"ip": "192.168.1.7", # IP address of computer with ps3 controller
-        "listen": [
-            "movement/translation",
-            "decision",
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down"
-        ],
-        # The N values in each fuzzy set will define N + 1 regions.
-        # The first number represents an x value whlie the second number
-        # represents a y value. All points left of the lowest x value will have
-        # the same y value. The regions between specified points will have
-        # a value determined by connecting a straight line between those points
-        # All points to the right of the highest value have the same y value.
-        # For example, the values
-        # [[-3.0, 1.0], [-1.0, 0.5], [0.0, 0.0], [2.0, 1.0], [3.0, 0.0]] will
-        # look (something) like:
-        #-----------\                     1.0           /                      
-        #            ---\                 |            / \                     
-        #                ---\             |          /    \                    
-        #                    ---\         |         /      \                   
-        #                        ---\     0.5     /         \                  
-        #                            \    |      /           \                 
-        #                             \   |    /              \                
-        #                              \  |   /                \               
-        #                               \ | /                   \              
-        #        ------------------------\-/---------------------\-------------
-        #-4.0    -3.0    -2.0    -1.0     0.0    1.0    2.0    3.0
-        "fuzzy_sets": {
-            "is_right": [[-2.0, 1.0], [0.0, 0.0]],
-            "is_left": [[0.0, 0.0], [2.0, 1.0]],
-            "is_forward": [[-2.0, 1.0], [0.0, 0.0]],
-            "is_back": [[2.0, 1.0], [0.0, 0.0]],
-            "is_low": [[2.0, 1.0], [0.0, 0.0]],
-            "is_high": [[-2.0, 1.0], [0.0, 0.0]],
-            "is_rotated_right":
-                [[3.13, 0.0], [3.14, 1.0], [4.712, 1.0], [6.28, 0.0]],
-            "is_rotated_left":
-                [[0.0, 0.0], [1.57, 1.0], [3.12, 1.0], [3.13, 0.0]]
-        },
-        "release": {
-            "name": "fuzzy_logic_fuzzifier.py",
-            "args": ["--epoch", EPOCH]},
-        "mock": {
-            "name": "/test/xbox_controller.py",
-            "args": ["--epoch", EPOCH]}
-    },
-    "movement/defuzzification": {
-        "listen": [
-            "movement/fuzzification",
-            "datafeed/raw/accelerometer"
-        ],
-        "release": {
-            "name": "defuzzifier.py",
-            "args": ["--epoch", EPOCH]},
-        "mock": {
-            "name": "slider1.py",
-            "args": ["--epoch", EPOCH]}
-    },
-    "movement/translation": {
-        #"ip": "192.168.1.7", # IP address of person with slider control
-        "listen": [
-            "movement/defuzzification"
-        ],
-        "thresholds": {
-            "front_left": {
-                # TODO we may need to specify different numbers for forward vs
-                # backward.
-                "positive": [1, 127],
-                "negative": [1, 127],
-                # Multiplier may flip the motor direction for motors that are
-                # wired backwards. Note that multiplier is applied before the
-                # positive and negative thresholds are applied, so positive and
-                # negative are the same direction for each thruster regardless
-                # of wiring.
-                "multiplier": -1
-            },
-            "front_right": {
-                "positive": [1, 127],
-                "negative": [1, 127],
-                "multiplier": 1
-            },
-            "middle_left": {
-                "positive": [1, 127],
-                "negative": [1, 127],
-                "multiplier": 1
-            },
-            "middle_right": {
-                "positive": [1, 127],
-                "negative": [1, 127],
-                "multiplier": 1
-            },
-            "back_left": {
-                "positive": [1, 127],
-                "negative": [1, 127],
-                "multiplier": 1
-            },
-            "back_right": {
-                "positive": [1, 127],
-                "negative": [1, 127],
-                "multiplier": -1
-            }
-        },
-        "release": {
-            "name": "translater.py",
-            "args": ["--epoch", EPOCH]
-        },
-        "mock": {
-            "name": "slider2.py",
-            "args": ["--epoch", EPOCH]
-        },
-    },
     # TODO: The commandline arguments are quite meaningful here, so they
     # should have something of a comment.
     "microcontroller": {
@@ -208,40 +53,6 @@ settings = {
                 #"--magnitude", "100"
             ]
         },
-    },
-    "decision": {
-        "listen": [
-          "decision/advisor",
-          "sensor/vision/cam_front",
-          "sensor/vision/cam_down",
-          "datafeed/sanitized/accelerometer",
-          "datafeed/sanitized/gyroscope",
-          "datafeed/sanitized/compass",
-          "datafeed/sanitized/depth",
-          # XXX: Remove "datafeed/raw/depth".
-          # This is for initial calibration of the depth only.
-          "datafeed/raw/depth",
-        ],
-        "release": {
-            "name": "ai_state_machine.py",
-            "args": ["--epoch", EPOCH]},
-        "mock": {
-            "name": "ai_state_machine.py",
-            "args": ["--epoch", EPOCH]},
-        "depth_threshold": 550
-    },
-    "decision/advisor": {
-        "listen": [],
-        "release": {"name": None},
-        "mock": {"name": None}
-    },
-    "util/vision_viewer": {
-        "listen": [
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down"
-        ],
-        "release": {"name": None},
-        "mock": {"name": None}
     },
     "sensor/sanitation": {
         "listen": [
@@ -324,6 +135,11 @@ settings = {
     "datafeed/filtered/battery_voltage": {
     },
 }
+
+# Merge other settings files into settings.
+settings.update(vision_settings)
+settings.update(movement_settings)
+settings.update(util_settings)
 
 # We need some extra lines for the debug channels. Aside from the logger,
 # nothing should see debug messages.
