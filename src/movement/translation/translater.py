@@ -27,11 +27,6 @@ def translate(motor, defuzzified_value):
         return 0
 
     motor_range = settings['movement/translation']['thresholds'][motor]
-    # Fix value for motors that are wired backwards.
-    # FIXME this logic may be bugged. When should this really be flipped?
-    # Instinct says it doesn't matter, but prove it.
-    defuzzified_value *= motor_range['multiplier']
-    #
     if defuzzified_value >= 0:
         low = motor_range['positive'][0]
         high = motor_range['positive'][1]
@@ -40,7 +35,8 @@ def translate(motor, defuzzified_value):
         high = -motor_range['negative'][1]
     absdif = abs(high - low)
 
-    return int(defuzzified_value * absdif) + low
+    # Return the equivalent 8-bit motor value for defuzzified value.
+    return (int(defuzzified_value * absdif) + low) * motor_range['multiplier']
 
 def main(args):
     com = Communicator("movement/translation")
