@@ -25,7 +25,7 @@ class FrameProcessor(object):
         # XXX Slope might also be a good way to detect these colors.
         # Investigate.
         self._hue_histogram_beta = 0
-        
+
         # Hue midpoints will shift in different light. Midpoints for current
         # image should be calculated and stored here.
         self._hue_midpoints = {

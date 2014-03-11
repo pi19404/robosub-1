@@ -13,6 +13,42 @@ def gen_stream_port(start, span):
 stream_port_gen = gen_stream_port(stream_port_start, stream_port_span)
 
 settings = {
+    'sensor/vision/plugin/Streamer': {
+        'command_map': {
+            'i': {
+                'func': lambda fp : fp.im,
+                'hint': 'Raw image'
+            },
+            'b': {
+                'func': lambda fp : fp.im_blue,
+                'hint': 'Blue channel'
+            },
+            'g': {
+                'func': lambda fp : fp.im_green,
+                'hint': 'Green channel'
+            },
+            'r': {
+                'func': lambda fp : fp.im_red,
+                'hint': 'Red channel'
+            },
+            'j': {
+                'func': lambda fp : fp.hsv,
+                'hint': 'HSV'
+            },
+            'h': {
+                'func': lambda fp : fp.im_hue,
+                'hint': 'Hue channel'
+            },
+            's': {
+                'func': lambda fp : fp.im_saturation,
+                'hint': 'Saturation channel'
+            },
+            'v': {
+                'func': lambda fp : fp.im_value,
+                'hint': 'Value channel'
+            },
+        }
+    },
     'sensor/vision/control': {
         #'port': 20054,
         'listen': [],
