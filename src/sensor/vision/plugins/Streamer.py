@@ -77,6 +77,7 @@ class Streamer(object):
             # Wait until we're told to get busy.
             self._busy.wait()
             self._last_successful_send = time()
+            print self._last_successful_send
             # FIXME if we ever change the resolution to something that can't be
             # split evenly into this many parts, this will break. Possibly
             # check for this and bitwise or the image with a bigger image when
@@ -88,7 +89,7 @@ class Streamer(object):
             # workers finish sending their image parts.
             p.map(func=self._worker_send,
                     iterable=range(self._port_span - 1))
-            #self._busy.clear()
+            self._busy.clear()
 
     def _command_listener(self):
         """Listen for commands from the client.
@@ -118,7 +119,7 @@ class Streamer(object):
                 if command_packet['timestamp'] >= self._last_successful_send:
                     print 'clearing the busy flag'
                     # All done, let the parent know we can handle the next image!
-                    self._busy.clear()
+                    self._busy.set()
             except KeyError:
                 pass
 
