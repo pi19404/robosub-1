@@ -244,12 +244,56 @@ class Compass(Sensor):
     def __init__(self, calibration_samples, epoch):
         Sensor.__init__(
                 self, calibration_samples, "datafeed/sanitized/compass", epoch)
+        self.cx = None
+        self.cy = None
+        self.cz = None
+        self.calibration_samples = calibration_samples
 
     def __str__(self):
         return "TODO: Compass"
 
     def fetch_data(self):
-        raise NotImplementedError()
+        compass = {
+            'cx': None,
+            'cy': None,
+            'cz': None
+        }
+
+        while True:
+            comp_msg = self.com.get_last_message("datafeed/raw/compass")
+            if comp_msg:
+                if compass['cx'] is None:
+                    compass['cx'] = comp_msg.get('MAG_X')
+
+                if compass['cy'] is None:
+                    compass['cy'] = comp_msg.get('MAG_Y')
+
+                if compass['cz'] is None:
+                    compass['cz'] = comp_msg.get('MAG_Z')
+
+                if compass['cx'] is None or compass['cy'] is None or compass['cz'] is None:
+                    continue
+                else:
+                    break
+            self.sleep()
+        return compass
+
+    def calibrate(self, samples=10):
+        self.cx = 0.0
+        self.cy = 0.0
+        self.cz = 0.0
+
+        for _ in xrange(samples):
+            data = self.fetch_data()
+            self.cx += data['cx']
+            self.cy += data['cy']
+            self.cz += data['cz']
+
+        self.cx /= samples
+        self.cy /= samples
+        self.cz /= samples
+
+        self.calibrated = True
 
 
 def commandline():
@@ -280,8 +324,9 @@ def main():
             calibration_samples=args.calibration_samples, epoch=args.epoch)
     depth.start()
 
-   #compass = Compass()
-   #compass.start()
+    compass = Compass(
+            calibration_samples=args.calibration_samples, epoch=args.epoch)
+    compass.start()
 
     # This thread really has nothing to do.
     while True:
