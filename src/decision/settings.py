@@ -3,7 +3,7 @@ EPOCH = "0.05"
 
 settings = {    
     # THIS IS A WORK IN PROGRESS!
-    "decision/MasterAI": {
+    "decision/master_ai": {
         "listen": [
             "sensor/vision/cam_front",
             "sensor/vision/cam_down",
@@ -13,14 +13,14 @@ settings = {
             "datafeed/sanitized/depth",
         ],
         "desired_state": {
-            "state": 0 # integer code for each state
+            "state": 0, # integer code for each state
             "restart": False
         },
         "release": {
-            "name": "MasterAI.py",
+            "name": "master_ai.py",
             "args": ["--epoch", EPOCH]},
         "mock": {
-            "name": "/test/task_selector.py",
+            "name": "", #"/test/task_selector.py",
             "args": ["--epoch", EPOCH]}
     },
 
