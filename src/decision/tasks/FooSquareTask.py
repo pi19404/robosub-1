@@ -23,7 +23,6 @@ class FooToolsClass():
 		return True # Normally this would do something interesting
 
 
-
 class FooSquareTask(FooToolsClass):
 	def __init__(self):
 		print self.isStable()

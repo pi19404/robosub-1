@@ -49,7 +49,7 @@ class FooToolsClass():
                 }
             }
 
-class StandbyTask():
+class StandbyTask(FooToolsClass):
     """This class is a placeholder AI that does nothing, but is still
 	running.  It will give 'zeros' to the pipeline below it, so that they
 	will still function properly.  This will be running while divers 
@@ -79,10 +79,8 @@ class StandbyTask():
             if self.hold_depth: #let stabilization hold our depth
                 packet["Task_AI_Movement"]["up"] = self.target_depth - self.getFooDepth()
             else: #all thrusters should be OFF! (STANDBY MODE)
-                packet["Task_AI_Movement"]["override"] = #override everything?   
-                    ["up","pitch_up","roll_right","heading"]
+                packet["Task_AI_Movement"]["override"] = ["up","pitch_up","roll_right","heading"]
             self.publishCommand(packet)
             time.sleep(self.PUBLISHING_INTERVAL)
         return 1 # 1 for successful. 0 for failure.
-        
 		
