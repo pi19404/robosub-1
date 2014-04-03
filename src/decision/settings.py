@@ -1,7 +1,30 @@
 # Maximum time a program might wait before checking for input.
 EPOCH = "0.05"
 
-settings = {
+settings = {    
+    # THIS IS A WORK IN PROGRESS!
+    "decision/MasterAI": {
+        "listen": [
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down",
+            "datafeed/sanitized/accelerometer",
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/compass",
+            "datafeed/sanitized/depth",
+        ],
+        "desired_state": {
+            "state": 0 # integer code for each state
+            "restart": False
+        },
+        "release": {
+            "name": "MasterAI.py",
+            "args": ["--epoch", EPOCH]},
+        "mock": {
+            "name": "/test/task_selector.py",
+            "args": ["--epoch", EPOCH]}
+    },
+
+# 'decision' left here so nothing breaks on accident. UNUSED BY AI (now)
     "decision": {
         "listen": [
           "decision/advisor",
