@@ -14,10 +14,27 @@ settings = {
         ],
         "desired_state": {
             "state": 0, # integer code for each state
+            "name": "standby",
+            "note": "Default Note",
             "restart": False
         },
         "release": {
             "name": "master_ai.py",
+            "args": ["--epoch", EPOCH]},
+        "mock": {
+            "name": "", #"/test/task_selector.py",
+            "args": ["--epoch", EPOCH]}
+    },
+    "decision/ai_state_machine": {
+        "listen": [
+            "decision/master_ai"
+        ],
+        "desired_state": {
+            "state": 0, # integer code for each state
+            "restart": False
+        },
+        "release": {
+            "name": "ai_state_machine.py",
             "args": ["--epoch", EPOCH]},
         "mock": {
             "name": "", #"/test/task_selector.py",
