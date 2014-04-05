@@ -9,6 +9,8 @@ import cv2
 import Tkinter as tk
 #import cv2.cv as cv
 import argparse
+import zlib
+import cPickle as pickle
 from time import sleep, time
 from threading import Event, Thread
 from multiprocessing.pool import ThreadPool
@@ -66,8 +68,8 @@ class VisionViewer(object):
 
     def _worker_receive(self, idx):
         metadata = self._sockets[idx].recv_json()
-        message = self._sockets[idx].recv(
-                    copy=True, track=False)
+        message = pickle.loads(zlib.decompress(self._sockets[idx].recv(
+                    copy=True, track=False)))
         buf = buffer(message)
         image = np.frombuffer(buf, dtype=metadata['dtype'])
         self._im_parts[idx] = image.reshape(metadata['shape'])

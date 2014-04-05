@@ -50,6 +50,8 @@ class FrameProcessor(object):
 
         self.im = im
         self._hsv = None
+        # Cool image for streaming.
+        self._hud_im = None
         # Used for filtering noise.
         self._eroded_im = None
         # Use to detect objects of interest and hue shifts due to weather.
@@ -93,7 +95,6 @@ class FrameProcessor(object):
             im - A cv2 BGR image.
 
         """
-
         if im is None:
             raise Exception('No image given')
 

@@ -3,6 +3,8 @@ import os
 import sys
 import zmq
 import numpy as np
+import zlib
+import cPickle as pickle
 from time import time
 from threading import Thread, Event
 from multiprocessing.pool import ThreadPool
@@ -150,7 +152,8 @@ class Streamer(object):
                     metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
             # Second part of the packet, the actual image.
             self._sockets[idx].send(
-                    self._im_parts[idx], copy=True, track=False, flags=zmq.NOBLOCK)
+                    zlib.compress(pickle.dumps(self._im_parts[idx], -1)),
+                    copy=True, track=False, flags=zmq.NOBLOCK)
         except zmq.ZMQError:
             self._last_successful_send = 0.0
             # Nobody connected? That's okay.
