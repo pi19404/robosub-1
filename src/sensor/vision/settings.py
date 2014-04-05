@@ -15,37 +15,77 @@ stream_port_gen = gen_stream_port(stream_port_start, stream_port_span)
 settings = {
     'sensor/vision/plugin/Streamer': {
         'command_map': {
-            'i': {
+            '1': {
                 'func': lambda fp : fp.im,
                 'hint': 'Raw image'
             },
-            'b': {
-                'func': lambda fp : fp.im_blue,
-                'hint': 'Blue channel'
-            },
-            'g': {
-                'func': lambda fp : fp.im_green,
-                'hint': 'Green channel'
-            },
-            'r': {
-                'func': lambda fp : fp.im_red,
-                'hint': 'Red channel'
-            },
-            'j': {
+            '2': {
                 'func': lambda fp : fp.hsv,
                 'hint': 'HSV'
             },
-            'h': {
+            'q': {
+                'func': lambda fp : fp.im_blue,
+                'hint': 'Blue channel'
+            },
+            'w': {
+                'func': lambda fp : fp.im_green,
+                'hint': 'Green channel'
+            },
+            'e': {
+                'func': lambda fp : fp.im_red,
+                'hint': 'Red channel'
+            },
+            'r': {
                 'func': lambda fp : fp.im_hue,
                 'hint': 'Hue channel'
             },
-            's': {
+            't': {
                 'func': lambda fp : fp.im_saturation,
                 'hint': 'Saturation channel'
             },
-            'v': {
+            'y': {
                 'func': lambda fp : fp.im_value,
                 'hint': 'Value channel'
+            },
+            'a': {
+                'func': lambda fp : fp.filtered_red,
+                'hint': 'InRange red'
+            },
+            's': {
+                'func': lambda fp : fp.filtered_orange,
+                'hint': 'InRange orange'
+            },
+            'd': {
+                'func': lambda fp : fp.filtered_yellow,
+                'hint': 'InRange yellow'
+            },
+            'f': {
+                'func': lambda fp : fp.filtered_green,
+                'hint': 'InRange green'
+            },
+            'g': {
+                'func': lambda fp : fp.filtered_blue,
+                'hint': 'InRange blue'
+            },
+            'z': {
+                'func': lambda fp : fp.flooded_red,
+                'hint': 'InRange red'
+            },
+            'x': {
+                'func': lambda fp : fp.flooded_orange,
+                'hint': 'InRange orange'
+            },
+            'c': {
+                'func': lambda fp : fp.flooded_yellow,
+                'hint': 'InRange yellow'
+            },
+            'v': {
+                'func': lambda fp : fp.flooded_green,
+                'hint': 'InRange green'
+            },
+            'b': {
+                'func': lambda fp : fp.flooded_blue,
+                'hint': 'InRange blue'
             },
         }
     },

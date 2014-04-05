@@ -4,7 +4,10 @@ import cv2
 import cv2.cv as cv
 import numpy as np
 from math import atan2
+from time import sleep # TODO delete
 
+__author__ = 'Cameron Evans, Tyler Stubenvoll'
+__license__= 'GPLv3, Robosub Club of the Palouse 2014'
 
 class FrameProcessor(object):
     """Image processing functions for Robosub VisionProcessor plugins."""
@@ -87,6 +90,15 @@ class FrameProcessor(object):
             'v': None
         }
 
+        # Floodfilled images.
+        self._floodfills = {
+            'b': None,
+            'g': None,
+            'r': None,
+            'y': None,
+            'o': None
+        }
+
     def load_im(self, im):
         """Load a new image to process.
 
@@ -159,6 +171,31 @@ class FrameProcessor(object):
         return self._channels[key]
 
     @property
+    def flooded_red(self):
+        """Return mask of large, solid, high-saturation orange objects."""
+        return self._memoized_flooded_hue_image('r')
+
+    @property
+    def flooded_orange(self):
+        """Return mask of large, solid, high-saturation orange objects."""
+        return self._memoized_flooded_hue_image('o')
+
+    @property
+    def flooded_blue(self):
+        """Return mask of large, solid, high-saturation blue objects."""
+        return self._memoized_flooded_hue_image('b')
+
+    @property
+    def flooded_green(self):
+        """Return mask of large, solid, high-saturation green objects."""
+        return self._memoized_flooded_hue_image('g')
+
+    @property
+    def flooded_yellow(self):
+        """Return mask of large, solid, high-saturation yellow objects."""
+        return self._memoized_flooded_hue_image('y')
+
+    @property
     def hsv(self):
         """Return hsv of current image."""
 
@@ -177,7 +214,6 @@ class FrameProcessor(object):
         key - One of the keys from self._filtered_images dict.
 
         """
-
         if self._filtered_images[key] is None:
             # The filtered image hasn't been created yet. Memoize it.
             self._filtered_images[key] = \
@@ -187,6 +223,79 @@ class FrameProcessor(object):
                             np.array(170), np.array(255)))
 
         return self._filtered_images[key]
+
+    def _is_good_floodfill_seed(self, row_i, col_i, key):
+        dist_vertical = self.im.shape[0] / 64
+        dist_horizontal = self.im.shape[1] / 64
+        pixel_offsets = [
+                [0, 1 * dist_vertical],
+                [0, -1 * dist_vertical],
+                [1 * dist_horizontal, 0],
+                [-1 * dist_horizontal, 0]]
+        hue_pixel = self.hsv.item(row_i, col_i, 0)
+        sat_pixel = self.hsv.item(row_i, col_i, 1)
+        # Check the pixel to see if it is a worthy seed for flood fill.
+        if sat_pixel > 170 and abs(hue_pixel - self._hue_midpoints[key]) < 5:
+            return True
+            for offset in pixel_offsets:
+                hue_pixel_neighbor = self.hsv.item(
+                        row_i + offset[0], col_i + offset[1], 0)
+                sat_pixel_neighbor = self.hsv.item(
+                        row_i + offset[0], col_i + offset[1], 1)
+                if abs(hue_pixel - hue_pixel_neighbor) > 5 or \
+                        abs(sat_pixel - sat_pixel_neighbor) > 5:
+                    break
+            else:
+                return True
+        return False
+
+    def _memoized_flooded_hue_image(self, key):
+        """Memoize a bitmask near given hue.
+        
+        Pixels at a constant interval are checked to see if they make a good
+        seed point for the flood fill algorithm. A good seed will be high
+        saturation and near the target color range. If the flood fill generates
+        a large, gemoetric object, it is accepted as a target object and
+        included in the flooded hue image.
+
+        """
+        if self._floodfills[key] is None:
+            ret = np.zeros((self.hsv.shape[0] + 2, self.hsv.shape[1] + 2),
+                    np.uint8)
+            # FIXME these two variables need better names. They're the distance
+            # to check horizontally/vertically from a potential seed to make
+            # sure they're close to the same as the seed.
+            # 1/4 the distance between potential seed pixels.
+            # Check pixels from (2**4) - 1 row intersections in the image.
+            for row_i in range(0, self.im.shape[0], self.im.shape[0] / 16)[1:]:
+                # Check pixels from (2**4) - 1 columns intersections in the image.
+                for col_i in range(0, self.im.shape[1], self.im.shape[1] / 16)[1:]:
+                    if self._is_good_floodfill_seed(row_i, col_i, key):
+                        new_floodfill = np.zeros(
+                                (self.hsv.shape[0] + 2, self.hsv.shape[1] + 2),
+                                np.uint8)
+                        cv2.floodFill(
+                                image=self.im_hue,
+                                mask=new_floodfill,
+                                # FIXME? y is row, x is col, right?
+                                seedPoint=(col_i, row_i),
+                                #newVal=254,
+                                newVal=255,
+                                loDiff=5,
+                                upDiff=5,
+                                flags= 4 | cv2.FLOODFILL_FIXED_RANGE)# |
+                                        #cv2.FLOODFILL_MASK_ONLY)
+                        # FIXME just did this to see what it looks like. We
+                        # need to generage more floodfills based on remaining
+                        # seed points and or them together. Also, we need to
+                        # save this in the floodfills dict.
+                        #print 'returning a real floodfill'
+            self._floodfills[key] = self.im_hue
+                        #return new_floodfill[0:480, 0:640]
+
+
+        return self._floodfills[key]
+
 
     @property
     def filtered_blue(self):
@@ -290,8 +399,8 @@ class FrameProcessor(object):
 
         Args:
 
-            mid - Hue to target. Use (real hue / 2). Example, (30 / 2) for
-            orange.
+            mid - Hue to target. Use (real hue / 2). Example, use 15 (real hue
+            is 30) for orange.
 
             include_distance - Hue distance from mid that should be included in
             bitmask.
