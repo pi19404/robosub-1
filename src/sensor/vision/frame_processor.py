@@ -109,6 +109,35 @@ class FrameProcessor(object):
             theta = -atan2(int(line[0] - line[2]), int(line[1] - line[3]))
         return theta
 
+
+    def translate_coordinates(self, x, y):
+        """ Translates the coordinates into a relative format useful to the
+        AI, regardless of the image size. e.g., center of image is
+        (0.0,0.0), top center is (0.0,1.0), far left center is (-1.0, 0.0),
+        ect.
+
+        Args:
+
+        x - x coord for pixel, where top left represents 0 and far right
+            is x_dim max. int or float.
+
+        y - y coord for pixel, where top represents 0 and bottom is y_dim
+            max. int or float.
+
+        returns -  a tuple of the new values, as floats.
+
+        """
+
+        x_dim, y_dim = self.im.shape[:2]
+        try:
+            t_x =  float( (-2.0 / x_dim) * x + 1)
+            t_y =  float( (-2.0 / y_dim) * y + 1)
+        except ZeroDivisionError:
+            # account for empty images, though I doubt we'd get them
+            return 0, 0
+
+        return t_x, t_y
+
     def erode_image(self, im=None, kernel_size=3, iterations=2):
         """ erodes the image. Useful for cleaning image.
 
@@ -183,7 +212,7 @@ class FrameProcessor(object):
             self._filtered_images[key] = \
                     cv2.bitwise_and(
                         self._filter_hue(self._hue_midpoints[key]),
-                        cv2.inRange(self.im_saturation, 
+                        cv2.inRange(self.im_saturation,
                             np.array(170), np.array(255)))
 
         return self._filtered_images[key]
@@ -318,7 +347,7 @@ class FrameProcessor(object):
                     np.array(mid - include_distance),
                     np.array(180))
             return cv2.bitwise_or(low_side, high_side)
-        return cv2.inRange(self.im_hue, 
+        return cv2.inRange(self.im_hue,
                 np.array(mid - include_distance),
                 np.array(mid + include_distance))
 
