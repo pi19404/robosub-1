@@ -23,7 +23,7 @@ class BaseTaskAI(threading.Thread):
 	com = None
 
 	def __init__(self):
-		#self.com = Communicator(module_name='decision/RunningTask')
+		#self.com = Communicator(module_name='decision/running_task')
 		return
 	def start(self):
 		return 0

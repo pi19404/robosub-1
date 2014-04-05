@@ -68,5 +68,15 @@ settings = {
         "release": {"name": None},
         "mock": {"name": None}
     },
+    "decision/running_task": {
+        "listen": [
+            "sensor/sanitized/gyroscope",
+            "sensor/sanitized/depth",
+            "decision/filtering",
+            "sensor/vision/fates"
+        ],
+        "release": {"name": None},
+        "mock": {"name": None}
+    }
 }
 
