@@ -1,132 +1,89 @@
-# COPYRIGHT: Robosub Club of the Palouse under the GPL v3
+# Task AI 
 
-import argparse
-import math
+import threading
+import time
 import os
 import sys
-import time
-from copy import deepcopy
+
+#Include all of our Task AI classes here
+sys.path.append(os.path.abspath("tasks"))
+from StandbyTask import StandbyTask
+from FooSquareTask import FooSquareTask
+
+#include grapevine
 sys.path.append(os.path.abspath(".."))
 from util.communication.grapevine import Communicator
-from advisors_peon import AdvisorsPeon
-from path_oligarch import PathOligarch
-from depth_oligarch import DepthOligarch
-
-def choose_last_packet(com, module, last_packet):
-    packet = com.get_last_message(module)
-    if (packet and
-        (not last_packet or packet['timestamp'] > last_packet['timestamp'])):
-        ret_packet = packet
-        success = True
-    else:
-        ret_packet = last_packet
-        success = False
-
-    return ret_packet, success
-
-def main(args):
-    """The resultant command is communicated over the grapevine in a
-    dicitonary with this format:
-
-    {"desired_offset":
-        {"x": 0.0,
-         "y": 0.0,
-         "z": 0.0},
-     "desired_orientation":
-        {"yaw": 0.0,
-         "pitch": 0.0,
-         "roll": 0.0},
-     "desired_velocity":
-        {"x": 0.0,
-         "y": 0.0,
-         "z": 0.0}
-    }
-
-    yaw, pitch, and roll are in radians. A small positive yaw specifies
-    a desire to turn right, a small possitive pitch specifies a desire
-    to tilt the nose up, and a small positive roll specifies a desire
-    to lower the right side of the sub.
-
-    The AI's job is to interpret sensor data and vision information,
-    and from that, specify where the sub SHOULD be relative to where
-    it CURRENTLY is. The desired location represents a state that
-    should be achieved at some future time.
-
-    The vector "desired_offset" specifies the relative location of
-    that desired state, the "desired_orientation" specifies which
-    direction the submarine should be facing, and the "desired_velocity"
-    specifies how the submarine should be moving at that point.
-
-    This information structure intentionally doesn't allow the AI to specify
-    the "roll" axis or a desired rotational velocity.
-
-    One way to think about this is that the AI module needs to figure out
-    what the next waypoint is, and where that waypoint is relative to
-    where the submarine currenlty is stationed.
-
-    This module should be something of a state machine. Given a specific
-    state, one of the Oligarch classes should be able to decide what to
-    do, but something needs to decide which oligarch is in charge.
-
+        
+        
+class AIStateMachine():
+    """This is the home of the AI state machine controlled by the master 
+	AI.  This class instanciates sub-class AI "tasks" that run the sub
     """
-    com = Communicator(module_name=args.module_name)
+    def __init__(self):
+        self.current_task = self._define_task(StandbyTask)
+        self.current_task.start()
+        print "YESS"
+        self.com = Communicator(module_name="decision/ai_state_machine")
+        
+    #just use the functions, don't make it contemporary!! TODOOOOOO!!!
+    def _define_task(self, task_class, *largs):
+        """Makes a Threading object with the task inherited as well"""
+        
+        #create the class
+        class TaskThreadClass(threading.Thread, task_class): #task and thread
+            def __init__(self, *largs):
+                threading.Thread.__init__(self) #init BOTH
+                task_class.__init__(self, *largs)
+                # -1 is the running condition
+                # this is the return variable 
+                self.task_status = -1
+                
+            def run(self):
+                self.task_status = task_class.run(self)
+                
+        return TaskThreadClass()
+        
+        
+    def run(self):
+        #TODO
+        self.current_task.active = False
+        print "hopefully all done"
+        
+        
 
-    oligarchs = {
-            "AdvisorsPeon": AdvisorsPeon(com),
-            "PathOligarch": PathOligarch(com),
-            "DepthOligarch": DepthOligarch(com),
-    }
-
-    state = None
-    vision_cam_front = None
-    vision_cam_down = None
-    advice = None
-    depth = None
-    while True:
-        advice, success = choose_last_packet(com, "decision/advisor", advice)
-        if success:
-            if advice["command"] == "state: keyboard":
-                state = 'keyboard'
-            elif advice["command"] == "state: path":
-                state = 'path'
-            elif advice["command"] == "state: depth":
-                state = 'depth'
-            elif advice["command"] == "stop":
-                state = "stop"
-
-        vision_cam_front, _ = choose_last_packet(
-                com, "sensor/vision/cam_front", vision_cam_front)
-        vision_cam_down, _ = choose_last_packet(
-                com, "sensor/vision/cam_down", vision_cam_front)
-        # TODO: Allow this to look at sanitized data.
-        depth, _ = choose_last_packet(com, "datafeed/raw/depth", depth)
-
-        if state == "stop":
-            pass
-        elif state == 'keyboard' and success:
-            oligarchs["AdvisorsPeon"].decision(advice)
-        elif state == 'path':
-            oligarchs["PathOligarch"].decision(vision_cam_front, vision_cam_down)
-        elif state == 'depth':
-            oligarchs["DepthOligarch"].decision(depth, advice)
-
-        time.sleep(args.epoch)
+if __name__ == "__main__":
+    a = AIStateMachine()
+    a.run()
+    print "DONE"
 
 
-def commandline():
-    parser = argparse.ArgumentParser(
-            description='Path following decision module.')
-    parser.add_argument(
-            '-m', '--module_name', type=str,
-            default='decision',
-            help='Module name.')
-    parser.add_argument(
-            '-e', '--epoch', type=float,
-            default=0.05,
-            help='Sleep time per cycle.')
-    return parser.parse_args()
 
-if __name__ == '__main__':
-    args = commandline()
-    main(args)
 
+
+
+"""
+Robosub Notes LOL
+
+For Sunday Pool Test
+* Start Gate
+* Line Following
+
+TONIGHT-> hammer out packets
+
+>> other peeps
+	> camera testing
+    
+PUBLISHING:YESS
+ {'Task_AI_Movement': {'override': ['up', 'pitch_up', 'roll_right', 'heading'], 'position': {'forward': 0.0, 'right': 0.0, 'up': 0.0}, 'orientation': {'roll_right': 0.0, 'pitch_up': 0.0, 'heading': 0.0}}}
+Traceback (most recent call last):
+  File "ai_state_machine.py", line 55, in <module>
+    a = AIStateMachine()
+  File "ai_state_machine.py", line 26, in __init__
+    self.com = Communicator(module_name="ai_state_machine")
+  File "/home/chris/Documents/robosub/src/util/communication/grapevine.py", line 78, in __init__
+    self.publisher['socket'].bind(get_socket_name(self.module_name))
+  File "/home/chris/Documents/robosub/src/util/communication/grapevine.py", line 27, in get_socket_name
+    return 'tcp://{ip}:{port}'.format
+    
+"""
+ 

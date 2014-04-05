@@ -1,7 +1,47 @@
 # Maximum time a program might wait before checking for input.
 EPOCH = "0.05"
 
-settings = {
+settings = {    
+    # THIS IS A WORK IN PROGRESS!
+    "decision/master_ai": {
+        "listen": [
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down",
+            "datafeed/sanitized/accelerometer",
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/compass",
+            "datafeed/sanitized/depth",
+        ],
+        "desired_state": {
+            "state": 0, # integer code for each state
+            "name": "standby",
+            "note": "Default Note",
+            "restart": False
+        },
+        "release": {
+            "name": "master_ai.py",
+            "args": ["--epoch", EPOCH]},
+        "mock": {
+            "name": "", #"/test/task_selector.py",
+            "args": ["--epoch", EPOCH]}
+    },
+    "decision/ai_state_machine": {
+        "listen": [
+            "decision/master_ai"
+        ],
+        "desired_state": {
+            "state": 0, # integer code for each state
+            "restart": False
+        },
+        "release": {
+            "name": "ai_state_machine.py",
+            "args": ["--epoch", EPOCH]},
+        "mock": {
+            "name": "", #"/test/task_selector.py",
+            "args": ["--epoch", EPOCH]}
+    },
+
+# 'decision' left here so nothing breaks on accident. UNUSED BY AI (now)
     "decision": {
         "listen": [
           "decision/advisor",

@@ -73,6 +73,15 @@ settings = {
                 "--debug",
                 "--calibration_samples", 10]}
     },
+    "sensor/sanitation/log": {
+        "listen":[
+            "datafeed/sanitized/accelerometer",
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/depth",
+            "datafeed/sanitized/compass",
+            "datafeed/sanitized/battery_voltage"
+        ]
+    },
     # The datafeed "modules" represent the data at its various stages, and
     # unless a mock module is faking a stage of the data pipeline, these
     # modules will not specify "release" or "mock" entries. However, they do
