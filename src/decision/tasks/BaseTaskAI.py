@@ -59,7 +59,12 @@ class BaseTaskAI(threading.Thread):
 
 	def getOrientation(self):
 		# returns Orientation vector (pitch, roll, heading) in radians
-		return 0
+		ori = {
+			'pitch' : self.getPitch(),
+			'roll' : self.getRoll(),
+			'heading' : self.getHeading()
+		}
+		return ori
 	def getPitch(self):
 		# return pitch in radians, upwards from 'flat'
 		pitch = self.com.get_last_message('decision/filtering')['pitch']
