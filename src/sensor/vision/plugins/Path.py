@@ -216,7 +216,7 @@ class Path(object):
                 # FIXME: We should create a system of reporting errors, or behavior.
                 print lines
                 return
-        except AttributeError:
+        except (AttributeError, TypeError):
             return
 
         # calculate angles of the entire set, and parse them into a new list.

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import os
+import sys
 import cv2
 import cv2.cv as cv
 #import threading
 from multiprocessing.pool import ThreadPool
 from time import strftime
+sys.path.append(os.path.abspath('../../..'))
+from robosub_settings import settings
 
 #FIXME this logger should be JUST A LOGGER. Video grabbing should happen
 #elsewhere.
@@ -14,13 +17,13 @@ class VideoLogger(object):
     #XXX does this filepath handling conform with Robosub standards?
     DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
 
-    def __init__(self, fp, settings):
+    def __init__(self, fp, module_name):
         """Initialize opencv capture and writer objects.
 
         Args:
 
         """
-        self._settings = settings
+        self._settings = settings[module_name]
         self._writer = None
         self._pool = ThreadPool(1)
         self._fp = fp
@@ -28,6 +31,7 @@ class VideoLogger(object):
 
     def _init_writer(self):
         #dest = self.DIR + strftime('%yy_%mm_%dd_%Hh_%Mm_%Ss_') + key + '.avi'
+        print self._settings
         dest = '{dir}{timestamp}{name}.avi'.format(
                 dir=self.DIR,
                 timestamp=strftime('%yy_%mm_%dd_%Hh_%Mm_%Ss_'),
@@ -55,7 +59,6 @@ class VideoLogger(object):
                 raise Exception("Could not write image")
 
     def process_image(self, packet):
-        print 'logging'
         self._writer.write(self._fp.im)
         #self._pool.apply_async(func=self._write_image, args=(self._fp.im,))
 

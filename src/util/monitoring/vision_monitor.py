@@ -40,6 +40,7 @@ class VisionViewer(object):
         self._im_parts = [None] * (self._port_span - 1)
         self._im = None
         self._busy = Event()
+        self._current_image_number = 0
 
         self._receiver_thread = Thread(target=self._receiver)
         self._receiver_thread.daemon = True
@@ -70,6 +71,13 @@ class VisionViewer(object):
         metadata = self._sockets[idx].recv_json()
         message = pickle.loads(zlib.decompress(self._sockets[idx].recv(
                     copy=True, track=False)))
+        while metadata['image_number'] < self._current_image_number:
+            # TODO this is basically a do/while. Better way?
+            metadata = self._sockets[idx].recv_json()
+            message = pickle.loads(zlib.decompress(self._sockets[idx].recv(
+                        copy=True, track=False)))
+        if metadata['image_number'] > self._current_image_number:
+            self._current_image_number = metadata['image_number']
         buf = buffer(message)
         image = np.frombuffer(buf, dtype=metadata['dtype'])
         self._im_parts[idx] = image.reshape(metadata['shape'])
