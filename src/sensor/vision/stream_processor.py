@@ -90,7 +90,9 @@ class StreamProcessor(object):
         """Get and store latest frame from video stream as fast as possible."""
         failed_count = 0
         # Assuming 30fps, 150 fails in a row means 5s of no video.
-        while failed_count < self.master_settings['max_failed_frames']:
+
+        #while failed_count < self.master_settings['max_failed_frames']:
+        while True: # FIXME 150 failed frames caused a camera to not start up.
             self._got_im, self._im = self._cap.read()
             self._fresh_frame_available.set()
             self._fresh_frame_available.clear()
