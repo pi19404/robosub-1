@@ -117,8 +117,8 @@ def main(args):
             # No pitch control yet
             outgoing_packet["pitch"] = msg["pitch"]
 
-            #print outgoing_packet
-            com.publish_message(outgoing_packet)
+            print outgoing_packet
+            com.publish_message({"Fuzzy_Sets":outgoing_packet})
         time.sleep(args.epoch)
 
 
