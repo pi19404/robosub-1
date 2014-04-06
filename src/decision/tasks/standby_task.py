@@ -47,3 +47,7 @@ class StandbyTask(BaseTaskAI):
 		
 
 #self.target_depth - self.getFooDepth()
+
+#self.stable_data = []
+        
+        #run the 'is stable' once ever second or so.

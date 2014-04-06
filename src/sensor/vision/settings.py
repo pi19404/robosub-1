@@ -97,7 +97,8 @@ settings = {
         'maintenance_interval': 5,
         'max_failed_frames': 150,
         'vision_processors': [
-            'sensor/vision/cam_down'
+            'sensor/vision/cam_down',
+            #'sensor/vision/cam_front'
         ]
     },
     'sensor/vision/cam_fake': {
