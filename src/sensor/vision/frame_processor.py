@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+__author__ = 'Tyler Stubenvoll, Cameron Evans'
+__License__= 'GPLv3 Robosub Club of the Palouse, 2014'
+
 import cv2
 import cv2.cv as cv
 import numpy as np
@@ -86,6 +89,11 @@ class FrameProcessor(object):
             's': None,
             'v': None
         }
+        self.draw_dict = {
+            "lines":   [],
+            "circles": [],
+            "text":    []
+        }
 
     def load_im(self, im):
         """Load a new image to process.
@@ -107,7 +115,7 @@ class FrameProcessor(object):
         # FIXME, make math good.
         if abs(theta) > cv2.cv.CV_PI / 2:
             theta = -atan2(int(line[0] - line[2]), int(line[1] - line[3]))
-        return theta
+        return round(theta, 4)
 
 
     def translate_coordinates(self, x, y):
@@ -137,6 +145,48 @@ class FrameProcessor(object):
             return 0, 0
 
         return t_x, t_y
+
+    def build_hud(self, img):
+        """
+        Function builds a "HUD" image that is good for streaming. Modules
+        will have to append their values to the list of items they want printed.
+        At the moment, it is assumed that the image to be written two is a three channel
+        color image.
+
+        Args:
+
+        img - an image that the hud will be printed over. Currently not modified.
+
+        """
+        if img is None:
+            # note; may not need to clone
+            im = self.im.clone()
+        else:
+            im = img.clone()
+
+        line_list = self.draw_dict.get("lines")
+        if not line_list:
+            pass
+        else:
+            for l in line_list:
+                cv2.line(im, (l[0][0], l[0][1]), (l[0][2], l[0][3]),
+                         l[1], 4, cv2.CV_AA)
+
+        circle_list = self.draw_dict.get("circles")
+        if not circle_list:
+            pass
+        else:
+            for c in circle_list:
+                cv2.circle(im, c[0], 8, c[1], 2)
+
+        text_list = self.draw_dict.get("text")
+        if not text_list:
+            pass
+        else:
+            for t in text_list:
+                cv2.putText(im, t[0], t[1], cv2.FONT_HERSHEY_PLAIN, 2, t[2])
+
+        return im
 
     def erode_image(self, im=None, kernel_size=3, iterations=2):
         """ erodes the image. Useful for cleaning image.
@@ -188,6 +238,13 @@ class FrameProcessor(object):
         return self._channels[key]
 
     @property
+    def hud(self):
+        if self._hud is None:
+            self._hud = self.build_hud(self.im)
+        else:
+            return self._hud
+
+    @property
     def hsv(self):
         """Return hsv of current image."""
 
@@ -195,6 +252,7 @@ class FrameProcessor(object):
             self._hsv = cv2.cvtColor(self.im, cv2.COLOR_BGR2HSV)
         return self._hsv
 
+    #ReviewQ: Does this need to have a @property key?
     def _memoized_filtered_hue_image(self, key):
         """Memoize a bitmask near given hue.
 
