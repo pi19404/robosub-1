@@ -2,6 +2,7 @@ EPOCH = '0.05'
 
 settings = {
     "movement/orientation": { 
+        "constants": {"accel_constant": .95, "gyro_constant": .05},
         "listen": [
             "datafeed/sanitized/accelerometer",
             "datafeed/sanitized/gyroscope",
