@@ -1,4 +1,4 @@
-stream_port_start = 50000
+stream_port_start = 50110
 # Be careful with port span.
 # Number of ports to use in a video stream. 1 port for control, 2**x for
 # sending images.
@@ -97,11 +97,11 @@ settings = {
         'maintenance_interval': 5,
         'max_failed_frames': 150,
         'vision_processors': [
-            'sensor/vision/cam_down'
+            'sensor/vision/cam_down',
+            #'sensor/vision/cam_front'
         ]
     },
     'sensor/vision/cam_fake': {
-        'ip': '10.99.66.106',
         'name': 'cam_fake',
         'recorded_video': '/home/cevans/Videos/RoboSub/Obstacles/pathOutOfStartGate640x480.mp4',
         'recorded_video_': '/home/cevans/Videos/RoboSub/Obstacles/tollBooth640x480.mp4',
@@ -119,7 +119,7 @@ settings = {
         'height': 480,
         'release': {'path': None},
         'mock': {'path': None},
-        'plugins': ['Tester', 'Path']
+        'plugins': ['Path'] # Tester module can be added for debug
     },
     'sensor/vision/cam_front': {
         'name': 'cam_front',

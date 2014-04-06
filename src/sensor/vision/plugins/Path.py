@@ -88,6 +88,9 @@ class Path(object):
         b2 = 0
 
         try:
+            # FIXME: if this exception triggers, it prints a warning.
+            # It can be silenced with a numpy.seterr call, but don't want
+            # to break it for next testing.
             m1 = (line1f[3] - line1f[1]) / (line1f[2] - line1f[0])
         except ZeroDivisionError:
             m1flag = True
@@ -257,8 +260,8 @@ class Path(object):
 
             self._tools.draw_dict["lines"].append([longest_line1, (0,0,255)])
             self._tools.draw_dict["lines"].append([longest_line2, (0,0,255)])
-            self._tools.draw_dict["circle"].append([(longest_line1[2], longest_line1[3]), (100,0,255)])
-            self._tools.draw_dict["circle"].append([(longest_line2[2:]), (100,0,255)])
+            self._tools.draw_dict["circles"].append([(longest_line1[2], longest_line1[3]), (100,0,255)])
+            self._tools.draw_dict["circles"].append([(longest_line2[2:]), (100,0,255)])
 
 
 def main():
