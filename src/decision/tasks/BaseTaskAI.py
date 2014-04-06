@@ -27,8 +27,24 @@ class BaseTaskAI():
 		return
 	def publishCommand(self, packet):
 		self.com.publish_message(packet)
-
-	def isStable(self, numSamples):
+		
+	def getBlankPacket(self):
+	        return {
+	            "Task_AI_Movement": {
+	                "override":[], # override module (to hold strings
+	                "position": {
+	                    "right": 0.0,
+	                    "forward": 0.0,
+	                    "up": 0.0
+	                },
+	                "orientation": { # Notably, this is the desired state, not a requested change in state
+	                    "pitch_up": 0.0, 
+	                    "roll_right": 0.0,
+	                    "heading": 0.0  #looking down, Clockwise, in radians
+	                    }
+	                }
+	            }
+	def isStable(self, numSamples, limit):
 		# Use standard deviation on Gyroscope and/or Accelerometer
 		# to measure stability in sensor data
 
@@ -36,6 +52,7 @@ class BaseTaskAI():
 		dataX = dataY = dataZ = [];
 
 		for _ in numSamples:
+			self.com.get_messages()
 			gyro = self.com.get_last_message('datafeed/sanitized/gyroscope')
 			dataX.append(gyro['gx'])
 			dataY.append(gyro['gy'])
@@ -45,6 +62,9 @@ class BaseTaskAI():
 		stdY = self.stdDev(dataY)
 		stdZ = self.stdDev(dataZ)
 
+		if stdX < limit and stdY < limit and stdZ < limit:
+			return True
+		return False
 		
 
 	def getDepth(self):
