@@ -85,9 +85,9 @@ def main(args):
 
     last_timestamp = 0.0
     while True:
-        # TODO: Figure out AI module name
-        missive = com.get_last_message("decision")
+        missive = com.get_last_message("movement/stabalization")
 
+        # TODO: Fix packet name
         if missive and missive['timestamp'] > last_timestamp:
             last_timestamp = missive['timestamp']
             packet = {}
