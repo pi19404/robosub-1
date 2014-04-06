@@ -35,6 +35,16 @@ settings = {
             "state": 0, # integer code for each state
             "restart": False
         },
+        "Task_AI_Movement":
+        {
+            "override":["up/down"] # override module
+            "forward/backward": 0.0,
+            "right/left": 0.0,
+            "up/down": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0,
+            "pitch": 0.0
+        },
         "release": {
             "name": "ai_state_machine.py",
             "args": ["--epoch", EPOCH]},

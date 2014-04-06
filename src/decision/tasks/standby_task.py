@@ -33,21 +33,17 @@ class FooToolsClass():
         return 2.3 #meters
     
     def getBlankPacket(self):
-        return {
-            "Task_AI_Movement": {
-                "override":[], # override module (to hold strings
-                "position": {
-                    "right": 0.0,
-                    "forward": 0.0,
-                    "up": 0.0
-                },
-                "orientation": { # Notably, this is the desired state, not a requested change in state
-                    "pitch_up": 0.0, 
-                    "roll_right": 0.0,
-                    "heading": 0.0  #looking down, Clockwise, in radians
+        return  {"Task_AI_Movement":
+                    {
+                        "override":[] # override module
+                        "forward/backward": 0.0,
+                        "right/left": 0.0,
+                        "up/down": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0,
+                        "pitch": 0.0
                     }
                 }
-            }
 
 class StandbyTask(FooToolsClass):
     """This class is a placeholder AI that does nothing, but is still
