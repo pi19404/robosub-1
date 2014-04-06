@@ -9,12 +9,13 @@ return {"desired_offset": {"x": 0.0, "y": 0.0, "z": 0.0},
                 "face_of_power": self.face_of_power}
                 
 """
-import argparse
+
 import os
 import sys
 import threading
 import time
 import numpy as np
+
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 
@@ -24,7 +25,12 @@ class BaseTaskAI():
 
 	def __init__(self):
 		self.com = Communicator(module_name='decision/running_task')
-		return
+        self.active = True # parent class can change this status to 
+                           #  gracefully exit the looping 'run' function
+        self.result = None # result variable returned by task
+
+        self.stable_data = []
+
 	def publishCommand(self, packet):
 		self.com.publish_message(packet)
 
@@ -79,10 +85,10 @@ class BaseTaskAI():
 	def stdDev(self, data_samples):
 		return np.std(data_samples)
 
-    def getBlankPacket(self):
-        return  {"Task_AI_Movement":
+	def getBlankPacket(self):
+		return  {"Task_AI_Movement":
                     {
-                        "override":[] # override module
+                        "override":[], # override module
                         "forward/backward": 0.0,
                         "right/left": 0.0,
                         "up/down": 0.0,

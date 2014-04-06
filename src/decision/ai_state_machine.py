@@ -98,6 +98,7 @@ class AIStateMachine():
                     termination_result = self.terminate_task()
                     self.begin_task( message["task_code"], message["parameter"], termination_result )
                     
+                # TODO normal task operation
             #self.current_task.active = False
             print "."
             time.sleep(1)
@@ -119,18 +120,6 @@ TONIGHT-> hammer out packets
 
 >> other peeps
 	> camera testing
-    
-PUBLISHING:YESS
- {'Task_AI_Movement': {'override': ['up', 'pitch_up', 'roll_right', 'heading'], 'position': {'forward': 0.0, 'right': 0.0, 'up': 0.0}, 'orientation': {'roll_right': 0.0, 'pitch_up': 0.0, 'heading': 0.0}}}
-Traceback (most recent call last):
-  File "ai_state_machine.py", line 55, in <module>
-    a = AIStateMachine()
-  File "ai_state_machine.py", line 26, in __init__
-    self.com = Communicator(module_name="ai_state_machine")
-  File "/home/chris/Documents/robosub/src/util/communication/grapevine.py", line 78, in __init__
-    self.publisher['socket'].bind(get_socket_name(self.module_name))
-  File "/home/chris/Documents/robosub/src/util/communication/grapevine.py", line 27, in get_socket_name
-    return 'tcp://{ip}:{port}'.format
     
 """
  

@@ -1,6 +1,6 @@
 # Dive Task .py
 
-class DiveTask():   #FooToolsClass):
+class DiveTask():
     """This task is for simply reaching a certain depth.  It will then finish elegantly.
 	"""
     def __init__(self, goal_depth, *largs):
@@ -10,9 +10,8 @@ class DiveTask():   #FooToolsClass):
         self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
         self.PUBLISHING_INTERVAL = 0.5 #seconds
-
+        self.depth_threshold = 0.5 #meters
         self.result = None # placeholder result
-
         self.goal_depth = goal_depth 
             
     def run(self, *largs):  #largs unused
@@ -22,7 +21,12 @@ class DiveTask():   #FooToolsClass):
 
             current_depth = self.getDepth() # from base class
 
-            packet["Task_AI_Movement"]["up"]
+            if abs(self.goal_depth-current_depth) < (self.depth_threshold/2.0): #TODO stabilize
+                if isSta
+                return 1 #Successfully reached our specified depth
+
+            # still traveling  :p
+            packet["Task_AI_Movement"]["up"] = self.goal_depth-current_depth
             
             self.publishCommand(packet)
             
