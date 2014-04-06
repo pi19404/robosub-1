@@ -101,6 +101,7 @@ settings = {
         ]
     },
     'sensor/vision/cam_fake': {
+        'ip': '10.99.66.106',
         'name': 'cam_fake',
         'recorded_video': '/home/cevans/Videos/RoboSub/Obstacles/pathOutOfStartGate640x480.mp4',
         'recorded_video_': '/home/cevans/Videos/RoboSub/Obstacles/tollBooth640x480.mp4',

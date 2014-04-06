@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #import statements
 import serial
 import os
@@ -19,13 +19,10 @@ CONTROL_BYTE = '\n'
 
 LED_CONTROL_0 = 0x30
 
-
-
 #Function Definitions#########################################################################
 
+com = Communicator(module_name="microcontroller/debug_lights")
 def cmd_LED(pattern) :
-
-    com = Communicator(module_name=args.module_name)
 
     last_packet_time = 0
 
@@ -56,7 +53,7 @@ def cmd_LED(pattern) :
 
 #initialize the serial port
 s = serial.Serial()	#get instance of serial class
-s.port = 9 #this will vary, depending on what port the OS gives the microcontroller
+s.port = "/dev/ttyUSB0" #this will vary, depending on what port the OS gives the microcontroller
 s.baudrate = 56818      #the baudrate may change in the future
 s.open()		#attempt to open the serial port (there is no guard code, I'm assuming this does not fail)
 
@@ -70,10 +67,11 @@ patternNumber = 3
 
 #Main reading loop
 #directionary index of incoming_packet
-last_packet_time = 0
-while 1 :
+last_packet_time = 0.0
+while True:
     incoming_packet = com.get_last_message("sensor/vision/cam_fake")
     if incoming_packet and incoming_packet['timestamp'] > last_packet_time:
+        print 'got a packet'
         last_packet_time = incoming_packet['timestamp']
         if "VisionPath" in incoming_packet:
             if incoming_packet["VisionPath"]["angle2"] is not None:
