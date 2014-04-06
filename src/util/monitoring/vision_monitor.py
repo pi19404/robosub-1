@@ -9,6 +9,8 @@ import cv2
 import Tkinter as tk
 #import cv2.cv as cv
 import argparse
+import zlib
+import cPickle as pickle
 from time import sleep, time
 from threading import Event, Thread
 from multiprocessing.pool import ThreadPool
@@ -20,6 +22,8 @@ from robosub_settings import settings
 class VisionViewer(object):
     def __init__(self, addr, camera):
         self._module_name = 'sensor/vision/cam_{direction}'.format(direction=camera)
+        # Timestame associated with last successful recieved frame.
+        self._last_successful_receive = 0.0
         self._port_span = settings[self._module_name]['port_span']
         self._context = zmq.Context(1)
         self._sockets = []
@@ -36,6 +40,7 @@ class VisionViewer(object):
         self._im_parts = [None] * (self._port_span - 1)
         self._im = None
         self._busy = Event()
+        self._current_image_number = 0
 
         self._receiver_thread = Thread(target=self._receiver)
         self._receiver_thread.daemon = True
@@ -50,15 +55,29 @@ class VisionViewer(object):
             # Send the keypress over the command socket. If it's valid, the
             # streamer will change the type of image it streams.
             self._control_socket.send_json({'command':str(event.char)[0]}, zmq.NOBLOCK)
+        command_map = settings['sensor/vision/plugin/Streamer']['command_map']
         root = tk.Tk()
         root.bind('<KeyPress>', onKeyPress)
+        root.geometry('300x200')
+        text = tk.Text(root, background='black', foreground='white')
+        hint_text = '\n'.join(c + ' - ' + command_map[c]['hint'] for c in command_map)
+        text.insert('end', hint_text)
+        text.pack()
+
         # Just listen for keypresses until the window closes.
         root.mainloop()
 
     def _worker_receive(self, idx):
         metadata = self._sockets[idx].recv_json()
-        message = self._sockets[idx].recv(
-                    copy=True, track=False)
+        message = pickle.loads(zlib.decompress(self._sockets[idx].recv(
+                    copy=True, track=False)))
+        while metadata['image_number'] < self._current_image_number:
+            # TODO this is basically a do/while. Better way?
+            metadata = self._sockets[idx].recv_json()
+            message = pickle.loads(zlib.decompress(self._sockets[idx].recv(
+                        copy=True, track=False)))
+        if metadata['image_number'] > self._current_image_number:
+            self._current_image_number = metadata['image_number']
         buf = buffer(message)
         image = np.frombuffer(buf, dtype=metadata['dtype'])
         self._im_parts[idx] = image.reshape(metadata['shape'])
@@ -66,20 +85,18 @@ class VisionViewer(object):
     def _receiver(self):
         p = ThreadPool(processes=self._port_span - 1)
         while True:
-            print 'hi'
             start = time()
             p.map(func=self._worker_receive,
                     iterable=range(self._port_span - 1))
-            print 'bye'
             try:
                 self._im = np.vstack(self._im_parts)
-                print time() - start
-                cv2.imshow('vision_monitor', self._im)
-                cv2.waitKey(1)
             except Exception:
                 # Lazy
-                print "I'm too lazy"
+                self._control_socket.send_json({'send_more': None}, zmq.NOBLOCK)
                 pass
+            print time() - start
+            cv2.imshow('vision_monitor', self._im)
+            cv2.waitKey(1)
             # FIXME parse input from the user
             self._busy.clear()
 

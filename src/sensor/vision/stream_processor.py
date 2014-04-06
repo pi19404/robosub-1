@@ -27,7 +27,7 @@ class StreamProcessor(object):
         self.module_name = module_name
         self.master_settings = settings['sensor/vision/control']
         self.settings = settings[module_name]
-        self.processor = FrameProcessor()
+        self._fp = FrameProcessor()
         self._com = Communicator(module_name)
         # Nagging messages from the parent come from here. The process must
         # respond quickly enough or be killed by the parent.
@@ -45,7 +45,7 @@ class StreamProcessor(object):
             # Name of module and the class should be the same.
             module_obj = getattr(import_module(
                     '..'+plugin_name, package='plugins.subpkg'),
-                    plugin_name)(self.processor, self.module_name)
+                    plugin_name)(self._fp, self.module_name)
             self._plugins += [module_obj]
 
         # Configure the VideoCapture object.
@@ -114,8 +114,8 @@ class StreamProcessor(object):
             if got_im:
                 # Check if parent sent a message over the pipe.
 
-                self.processor.load_im(im)
-                # self.processor.hacky_display() # FIXME this needs to go away.
+                self._fp.load_im(im)
+                # self._fp.hacky_display() # FIXME this needs to go away.
                 packet = {}
                 for plugin in self._plugins:
                     plugin.process_image(packet)

@@ -215,6 +215,7 @@ def respond_to_serial_packet(packet, accel_com, gyro_com, compass_com,
             GYRO_1_X_val = (GYRO_1_X_val-65536)
 
         # XXX com?
+        print "GYRO_X: ", GYRO_1_X_val
         gyro_com.publish_message({"GYRO_X": GYRO_1_X_val})
     elif device == GYRO_1_Y_addr:
         GYRO_1_Y_val = ord(packet[2]) | (ord(packet[3]) << 8)
@@ -313,7 +314,7 @@ def commandline():
     parser = argparse.ArgumentParser(description='Mock module.')
     parser.add_argument(
             '-e', '--epoch', type=float,
-            default=0.05,
+            default=0.005,
             help='Sleep time per cycle.')
     parser.add_argument(
             '-b', '--baudrate', type=int,

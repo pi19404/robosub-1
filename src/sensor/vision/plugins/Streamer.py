@@ -3,6 +3,9 @@ import os
 import sys
 import zmq
 import numpy as np
+import zlib
+import cPickle as pickle
+from time import time
 from threading import Thread, Event
 from multiprocessing.pool import ThreadPool
 sys.path.append(os.path.abspath('../../..'))
@@ -32,7 +35,7 @@ class Streamer(object):
         self._port_span = settings[module_name]['port_span']
         self._context = zmq.Context(1)
         # Set the function that chooses which image to send.
-        self._image_chooser = lambda : self._fp.im
+        self._image_chooser = lambda fp : fp.im
         # Image gets split horizontally into 2**x images and stored as a list
         # of image parts. Sender thread sends image parts over 2**x sockets.
         self._im_parts = None
@@ -49,6 +52,9 @@ class Streamer(object):
             self._sockets += [self._context.socket(zmq.PAIR)]
             self._sockets[-1].bind("tcp://*:{port}".format(
                     port=settings[module_name]['stream_port'] + port_offset))
+        # Used to ensure that image strips are being put together in the same
+        # image.
+        self._image_number = 0
 
         # Parent thread sets busy to tell sender thread to get busy. Sender
         # thread clears busy when it's done sending.
@@ -75,48 +81,62 @@ class Streamer(object):
         while True:
             # Wait until we're told to get busy.
             self._busy.wait()
+            self._last_successful_send = time()
+            print self._last_successful_send
             # FIXME if we ever change the resolution to something that can't be
             # split evenly into this many parts, this will break. Possibly
             # check for this and bitwise or the image with a bigger image when
             # necessary?
             self._im_parts = np.split(
-                    ary=self._image_chooser(),
+                    ary=self._image_chooser(self._fp),
                     indices_or_sections=self._port_span - 1)
             # Map each image part to a pool worker and wait until all the
             # workers finish sending their image parts.
             p.map(func=self._worker_send,
                     iterable=range(self._port_span - 1))
-            # All done, let the parent know we can handle the next image!
+            self._image_number += 1
             self._busy.clear()
 
     def _command_listener(self):
         """Listen for commands from the client.
 
         Client commands tell which stage of image processing should be
-        streamed. This should be run as a thread.
+        streamed.
+
+        Remarks - This method should be run as a thread.
 
         """
-        command_map = {
-            # TODO add other channels as needed. It would be really cool to
-            # have some post-houghline, houghcircle, floodfill, etc.
-            'i': lambda : self._fp.im,
-            'b': lambda : self._fp.im_blue,
-            'g': lambda : self._fp.im_green,
-            'r': lambda : self._fp.im_red,
-            'j': lambda : self._fp.hsv,
-            'h': lambda : self._fp.im_hue,
-            's': lambda : self._fp.im_saturation,
-            'v': lambda : self._fp.im_value,
-            # TODO make something like this!
-            #'z': lambda : self._fp.interesting_image
-        }
         while True:
-            # Get a command from the client.
             command_packet = self._control_socket.recv_json()
+            # Check for a keyboard command.
             try:
-                # Change which image we are sending to the user to the image
-                # they asked for.
-                self._image_chooser = command_map[command_packet['command']]
+                # Change the image choosing function we use.
+                self._image_chooser = \
+                        settings['sensor/vision/plugin/Streamer'] \
+                        ['command_map'][command_packet['command']]['func']
+            except KeyError:
+                pass
+
+            # Check if this is a confirmation that the last frame was received
+            # and clear the busy event if it is. Wait for this confirmation
+            # because we don't want to queue frames up in the socket. It's
+            # better to skip frames.
+            try:
+                if command_packet['timestamp'] >= self._last_successful_send:
+                    print 'clearing the busy flag'
+                    # All done, let the parent know we can handle the next image!
+                    self._busy.set()
+            except KeyError:
+                pass
+
+            # Client can also specifically ask for more data. Prevents
+            # deadlocks where Streamer thinks it sent a packet, but client
+            # never confirms it. Instead of waiting forever, the client asks
+            # for the next packet when nothing is in the socket.
+            try:
+                if 'send_more' in command_packet:
+                    print 'client asking for more'
+                    self._busy.clear()
             except KeyError:
                 pass
 
@@ -127,7 +147,9 @@ class Streamer(object):
         # Build the important information about how to reconstruct this image.
         metadata = dict(image_part=idx,
                 dtype = str(self._fp.im.dtype),
-                shape = self._im_parts[idx].shape)
+                shape = self._im_parts[idx].shape,
+                timestamp = self._last_successful_send,
+                image_number = self._image_number)
         try:
             # Send metadata, but let the receiver know we're sending more stuff
             # that's part of this packet.
@@ -135,8 +157,10 @@ class Streamer(object):
                     metadata, flags=zmq.SNDMORE | zmq.NOBLOCK)
             # Second part of the packet, the actual image.
             self._sockets[idx].send(
-                    self._im_parts[idx], copy=True, track=False, flags=zmq.NOBLOCK)
+                    zlib.compress(pickle.dumps(self._im_parts[idx], -1)),
+                    copy=True, track=False, flags=zmq.NOBLOCK)
         except zmq.ZMQError:
+            self._last_successful_send = 0.0
             # Nobody connected? That's okay.
             pass
 
