@@ -11,18 +11,20 @@ settings = {
             "datafeed/sanitized/gyroscope",
             "datafeed/sanitized/compass",
             "datafeed/sanitized/depth",
+            "movement/defuzzification"
         ],
         "desired_state": {
             "state": 0, # integer code for each state
-            "name": "standby",
+            "task_code": "standby",
             "note": "Default Note",
-            "restart": False
+            "restart": False,
+            "parameter": None
         },
         "release": {
             "name": "master_ai.py",
             "args": ["--epoch", EPOCH]},
         "mock": {
-            "name": "", #"/test/task_selector.py",
+            "name": "master_ai_gui.py", #"/test/task_selector.py",
             "args": ["--epoch", EPOCH]}
     },
     "decision/ai_state_machine": {
@@ -32,6 +34,16 @@ settings = {
         "desired_state": {
             "state": 0, # integer code for each state
             "restart": False
+        },
+        "Task_AI_Movement":
+        {
+            "override":["up/down"] # override module
+            "forward/backward": 0.0,
+            "right/left": 0.0,
+            "up/down": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0,
+            "pitch": 0.0
         },
         "release": {
             "name": "ai_state_machine.py",
@@ -68,5 +80,16 @@ settings = {
         "release": {"name": None},
         "mock": {"name": None}
     },
+    "decision/running_task": {
+        "listen": [
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/depth",
+			"datafeed/sanitized/accelerometer"
+            #"decision/filtering",
+            #"sensor/vision/fates"
+        ],
+        "release": {"name": None},
+        "mock": {"name": None}
+    }
 }
 

@@ -18,7 +18,7 @@ class MySimpleButton():
         self.txt = txt
 
         #config text
-        self.basicFont = pygame.font.SysFont("monospace", 22)
+        self.basicFont = pygame.font.SysFont("monospace", int(size[1]/4) )
         self.text = self.basicFont.render(self.txt, True,  self.WHITE, self.buttonColor)
 
         #construct

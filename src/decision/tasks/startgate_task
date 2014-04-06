@@ -1,10 +1,12 @@
-# Standby Task
+# StartGate Task
 
 import time
 
-from BaseTaskAI import BaseTaskAI
+import BaseTaskAI
 
-class StandbyTask(BaseTaskAI):
+    
+
+class StartGateTask(BaseTaskAI):
     """This class is a placeholder AI that does nothing, but is still
 	running.  It will give 'zeros' to the pipeline below it, so that they
 	will still function properly.  This will be running while divers 
@@ -17,8 +19,6 @@ class StandbyTask(BaseTaskAI):
         """
         Takes no parameters, or a depth to hold.
         """
-        BaseTaskAI.__init__(self) #initiallize BaseClassAI so it can have it's communicator
-
         self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
         self.PUBLISHING_INTERVAL = 2.0 #seconds
@@ -36,9 +36,9 @@ class StandbyTask(BaseTaskAI):
             packet = self.getBlankPacket()
             
             if self.hold_depth: #let stabilization hold our depth
-                packet["Task_AI_Movement"]["up/down"] = 0.0 
+                packet["Task_AI_Movement"]["up"] = 0.0 
             else: #all thrusters should be OFF! (STANDBY MODE)
-                packet["Task_AI_Movement"]["override"] = ["up/down", "yaw", "roll", "pitch"]
+                packet["Task_AI_Movement"]["override"] = ["up","pitch_up","roll_right","heading"]
             
             self.publishCommand(packet)
             
