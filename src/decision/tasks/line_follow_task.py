@@ -84,7 +84,7 @@ class LineFollowTask(BaseTaskAI):
     
     def find_best_packet(self):
         self.best_packet = None
-        vision_packets = self.getVision()
+        vision_packets = self.getVision('sensor/vision/cam_down')
         for packet in vision_packets:
             if "VisionPath" in packet:
                 if not self.best_packet:
