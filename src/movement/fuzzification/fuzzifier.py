@@ -65,56 +65,63 @@ def main(args):
     # they should be controlled by either the stabilization module, or by
     # the awesome balancing skills of the mech-e's.
 
-    # Expected packet sent by this module:
-    #   packet = {
-    #           'is_left': 0.0,
-    #           'is_right': 0.0,
-    #           'is_back': 0.0,
-    #           'is_forward': 0.0,
-    #           'is_low': 0.0,
-    #           'is_high': 0.0,
-    #           'is_rotated_left': 0.0,
-    #           'is_rotated_right': 0.0}
+    # Incoming packet:
+    #    "Stabilization_to_Fuzzification"
+    #    {
+    #        "forward/backward": 0.0,
+    #        "right/left": 0.0,
+    #        "up/down": 0.0,
+    #        "yaw": 0.0,
+    #        "roll": 0.0,
+    #        "pitch": 0.0
+    #    }
 
-    # Received missive is of the form:
-    #   {"desired_offset": {"x": 0.0, "y": 0.0, "z": 0.0},
-    #    "desired_orientation": {"yaw": 0.0, "pitch": 0.0, "roll": 0.0},
-    #    "desired_velocity": {"x": 0.0, "y": 0.0, "z": 0.0},
-    #    "face_of_power": self.face_of_power,
-    #    "timestamp": time.time()}
+    # Outgoing packet sent by this module (identical to incoming)
+    #    "Fuzzy_Sets"
+    #    {
+    #        "forward/backward": 0.0,
+    #        "right/left": 0.0,
+    #        "up/down": 0.0,
+    #        "yaw": 0.0,
+    #        "roll": 0.0,
+    #        "pitch": 0.0
+    #    }
 
     last_timestamp = 0.0
     while True:
-        missive = com.get_last_message("movement/stabalization")
+        msg = com.get_last_message("movement/stabilization")
+        outgoing_packet = {"forward/backward": 0.0, "right/left": 0.0, "up/down": 0.0, "yaw": 0.0, "pitch": 0.0, "roll": 0.0}
 
         # TODO: Fix packet name
-        if missive and missive['timestamp'] > last_timestamp:
-            last_timestamp = missive['timestamp']
-            packet = {}
-            packet['is_left'] = get_membership(
-                    missive['desired_offset']['x'], fuzzy_sets['is_left'])
-            packet['is_right'] = get_membership(
-                    missive['desired_offset']['x'], fuzzy_sets['is_right'])
-            packet['is_back'] = get_membership(
-                    missive['desired_offset']['y'], fuzzy_sets['is_back'])
-            packet['is_forward'] = get_membership(
-                    missive['desired_offset']['y'], fuzzy_sets['is_forward'])
-            packet['is_low'] = get_membership(
-                    missive['desired_offset']['z'], fuzzy_sets['is_low'])
-            packet['is_high'] = get_membership(
-                    missive['desired_offset']['z'], fuzzy_sets['is_high'])
-            packet['is_rotated_left'] = get_membership(
-                    missive['desired_orientation']['yaw'],
-                    fuzzy_sets['is_rotated_left'])
-            packet['is_rotated_right'] = get_membership(
-                    missive['desired_orientation']['yaw'],
-                    fuzzy_sets['is_rotated_right'])
+        if msg and msg['timestamp'] > last_timestamp:
+            last_timestamp = msg['timestamp']
+            
+            # Forward/backward and right/left directions are being controlled by fuzzy sets
+            outgoing_packet['is_left'] = get_membership(
+                    msg["right/left"], fuzzy_sets['is_left'])
+            outgoing_packet['is_right'] = get_membership(
+                    msg["right/left"], fuzzy_sets['is_right'])
+            outgoing_packet['is_back'] = get_membership(
+                    msg["forward/backward"], fuzzy_sets['is_back'])
+            outgoing_packet['is_forward'] = get_membership(
+                    msg["forward/backward"], fuzzy_sets['is_forward'])
+
+            # up/down and roll are being stabilized
+            outgoing_packet["up/down"] = PID["depth"].compute (depth["value"])
+            outgoing_packet["roll"] = PID["roll"].compute (orientation["roll"])
+
+            # Yaw is being controlled by ai directly
+            outgoing_packet["yaw"] = msg["yaw"]
+
+            # No pitch control yet
+            outgoing_packet["pitch"] = msg["pitch"]
+
             com.publish_message(packet)
         time.sleep(args.epoch)
 
 
 def commandline():
-    parser = argparse.ArgumentParser(description='Mock module.')
+    parser = argparse.ArgumentParser(description='Fuzzification module.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')

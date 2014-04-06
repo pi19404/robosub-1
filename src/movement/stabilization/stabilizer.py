@@ -72,47 +72,51 @@ def main(args):
 
     last_timestamp = 0
     while True:
-        ai_packet = com.get_last_message ("decision")
+        if settings["movement/stabilization"]["stabilize"]:
+            ai_packet = com.get_last_message ("decision")
 
-        # Get depth and orientation data.
-        depth = com.get_last_message("datafeed/sanitized/depth")
-        orientation = com.get_last_message("movement/orientation")
+            # Get depth and orientation data.
+            depth = com.get_last_message("datafeed/sanitized/depth")
+            orientation = com.get_last_message("movement/orientation")
 
-        # Update rate of the ai is arbitrary and variable. Stabilization should continue regardless of message availability.
-        # If we get an ai_packet that is different check if the desired roll and depth are different. If they are update the 
-        # controllers and continue stabilizing. If the packet is not different continue stabilizing.
-        # If this does not get a packet continue to stabilize but pass the old packet values so that the movement
-        # stack continues to run.
-        if ai_packet and ai_packet["timestamp"] > last_timestamp:
-            last_timestamp = ai_packet["timestamp"]
+            # Update rate of the ai is arbitrary and variable. Stabilization should continue regardless of message availability.
+            # If we get an ai_packet that is different check if the desired roll and depth are different. If they are update the 
+            # controllers and continue stabilizing. If the packet is not different continue stabilizing.
+            # If this does not get a packet continue to stabilize but pass the old packet values so that the movement
+            # stack continues to run.
+            if ai_packet and ai_packet["timestamp"] > last_timestamp:
+                last_timestamp = ai_packet["timestamp"]
 
-            # Override currently just outputs zero
-            if "up/down" in ai_packet["Task_AI_Movement"]["override"]:
-                outgoing_packet["up/down"] = 0.0
-            if "roll" in ai_packet["Task_AI_Movement"]["override"]:
-                outgoing_packet["roll"] = 0.0
-                
-            # Check if stabilization point needs to be changed. If yes: change it.
-            if PID["depth"].setpoint != ai_packet["Task_AI_Movement"]["depth"]:
-                PID["depth"].set_setpoint (ai_packet["Task_AI_Movement"]["depth"])
-            if PID["roll"].setpoint != ai_packet["Task_AI_Movement"]["roll"]:
-                PID["roll"].set_setpoint (ai_packet["Task_AI_Movement"]["roll"])
+                # Override currently just outputs zero
+                if "up/down" in ai_packet["Task_AI_Movement"]["override"]:
+                    outgoing_packet["up/down"] = 0.0
+                if "roll" in ai_packet["Task_AI_Movement"]["override"]:
+                    outgoing_packet["roll"] = 0.0
+                    
+                # Check if stabilization point needs to be changed. If yes: change it.
+                if PID["depth"].setpoint != ai_packet["Task_AI_Movement"]["depth"]:
+                    PID["depth"].set_setpoint (ai_packet["Task_AI_Movement"]["depth"])
+                if PID["roll"].setpoint != ai_packet["Task_AI_Movement"]["roll"]:
+                    PID["roll"].set_setpoint (ai_packet["Task_AI_Movement"]["roll"])
 
 
-        if depth:
-            outgoing_packet["up/down"] = PID["depth"].compute (depth["value"])
-        if orientation:
-            outgoing_packet["roll"] = PID["roll"].compute (orientation["roll"])
+            if depth:
+                outgoing_packet["up/down"] = PID["depth"].compute (depth["value"])
+            if orientation:
+                outgoing_packet["roll"] = PID["roll"].compute (orientation["roll"])
 
-        if ai_packet:
-            # These values are not being stabilized
-            outgoing_packet["forward/backward"] = ai_packet["Task_AI_Movement"]["forward/backward"]
-            outgoing_packet["right/left"] = ai_packet["Task_AI_Movement"]["right/left"]
-            outgoing_packet["yaw"] = ai_packet["Task_AI_Movement"]["yaw"]
-            outgoing_packet["pitch"] = ai_packet["Task_AI_Movement"]["pitch"]
+            if ai_packet:
+                # These values are not being stabilized
+                outgoing_packet["forward/backward"] = ai_packet["Task_AI_Movement"]["forward/backward"]
+                outgoing_packet["right/left"] = ai_packet["Task_AI_Movement"]["right/left"]
+                outgoing_packet["yaw"] = ai_packet["Task_AI_Movement"]["yaw"]
+                outgoing_packet["pitch"] = ai_packet["Task_AI_Movement"]["pitch"]
 
-        # Add name
-        stabilization_packet = {"Stabilization_to_Fuzzification": outgoing_packet}
+            stabilization_packet = {"Stabilization_to_Fuzzification": outgoing_packet}
+
+        else:
+            stabilization_packet = {"Stabilization_to_Fuzzification": ai_packet["Task_AI_Movement"]}
+
         com.publish_message(stabilization_packet)
 
         time.sleep(args.epoch)
