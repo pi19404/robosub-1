@@ -18,17 +18,13 @@ import numpy as np
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
 
-class BaseTaskAI(threading.Thread):
+class BaseTaskAI():
 	DEBUG = False
 	com = None
 
 	def __init__(self):
-		#self.com = Communicator(module_name='decision/running_task')
+		self.com = Communicator(module_name='decision/running_task')
 		return
-	def start(self):
-		return 0
-	def stop(self):
-		return 0
 	def publishCommand(self, packet):
 		self.com.publish_message(packet)
 
@@ -81,21 +77,26 @@ class BaseTaskAI(threading.Thread):
 		vision = self.com.get_last_message('sensor/vision/fates')
 		return vision
 	def stdDev(self, data_samples):
-		total = 0
-		for el in data_samples:
-			total += el
-
-		mean = total / len(data_samples)
-
-		covariance = 0
-		for el in data_samples:
-			covariance += (el - mean)*(el - mean)
-
-		stddev = np.sqrt(covariance / (len(data_samples) - 1))
-		print mean, total, len(data_samples),covariance
-		return stddev
+		return np.std(data_samples)
 
 
 if __name__ == "__main__":
-	bt = BaseTaskAI()
-	print bt.stdDev([600,470,170,430,300])
+    bt = BaseTaskAI()
+    i = 0
+    data = []
+    prevTime = 0
+
+    while True:
+        val = bt.com.get_last_message('datafeed/sanitized/accelerometer')
+      
+        if val is not None:
+            dt = val.get('ax')
+            timestamp = val.get('timestamp')
+            
+            if timestamp != prevTime:
+                prevTime = timestamp
+                data.append(dt)
+                if(len(data) >= 10):
+			        break
+          
+    print bt.stdDev(data)

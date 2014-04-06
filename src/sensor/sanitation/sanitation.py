@@ -78,6 +78,7 @@ class Gyroscope(Sensor):
 
         while True:
             data_msg = self.com.get_last_message("datafeed/raw/gyroscope")
+            print data_msg
             if data_msg:
                 if data['gx'] is None:
                     data['gx'] = data_msg.get('GYRO_X')
@@ -134,6 +135,7 @@ class Accelerometer(Sensor):
 
         while True:
             accel_msg = self.com.get_last_message("datafeed/raw/accelerometer")
+
             if accel_msg:
                 if accel['ax'] is None:
                     accel['ax'] = accel_msg.get('ACL_X')
@@ -147,6 +149,7 @@ class Accelerometer(Sensor):
                 if accel['ax'] is None or accel['ay'] is None or accel['az'] is None:
                     continue
                 else:
+					#print accel
 					break
             self.sleep()
 		
@@ -299,7 +302,7 @@ class Compass(Sensor):
 def commandline():
     parser = argparse.ArgumentParser(description='Sanitization module.')
     parser.add_argument(
-            '-e', '--epoch', type=float, default=0.05,
+            '-e', '--epoch', type=float, default=0.01667,
             help='Sleep time per cycle.')
     parser.add_argument('-d', '--debug', action="store_true", default=False)
     parser.add_argument('--calibration_samples', type=int, default=10)
@@ -317,11 +320,11 @@ def main():
     accel.start()
 
     volt = BatteryVoltage(
-            calibration_samples=args.calibration_samples, epoch=args.epoch)
+            calibration_samples=args.calibration_samples, epoch=1)
     volt.start()
 
     depth = Depth(
-            calibration_samples=args.calibration_samples, epoch=args.epoch)
+            calibration_samples=args.calibration_samples, epoch=0.05)
     depth.start()
 
     compass = Compass(

@@ -82,10 +82,11 @@ settings = {
     },
     "decision/running_task": {
         "listen": [
-            "sensor/sanitized/gyroscope",
-            "sensor/sanitized/depth",
-            "decision/filtering",
-            "sensor/vision/fates"
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/depth",
+			"datafeed/sanitized/accelerometer"
+            #"decision/filtering",
+            #"sensor/vision/fates"
         ],
         "release": {"name": None},
         "mock": {"name": None}
