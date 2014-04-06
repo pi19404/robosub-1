@@ -99,6 +99,18 @@ class BaseTaskAI():
 	def stdDev(self, data_samples):
 		return np.std(data_samples)
 
+    def getBlankPacket(self):
+        return  {"Task_AI_Movement":
+                    {
+                        "override":[] # override module
+                        "forward/backward": 0.0,
+                        "right/left": 0.0,
+                        "up/down": 0.0,
+                        "yaw": 0.0,
+                        "roll": 0.0,
+                        "pitch": 0.0
+                    }
+                }
 
 if __name__ == "__main__":
     bt = BaseTaskAI()
