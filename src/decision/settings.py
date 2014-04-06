@@ -37,7 +37,7 @@ settings = {
         },
         "Task_AI_Movement":
         {
-            "override":["up/down"] # override module
+            "override":["up/down"], # override module
             "forward/backward": 0.0,
             "right/left": 0.0,
             "up/down": 0.0,
@@ -50,6 +50,39 @@ settings = {
             "args": ["--epoch", EPOCH]},
         "mock": {
             "name": "", #"/test/task_selector.py",
+            "args": ["--epoch", EPOCH]}
+    },
+    "decision/running_task": {
+        "listen": [
+            "datafeed/sanitized/depth",
+            "sensor/vision/cam_front",
+            "sensor/vision/cam_down",
+            "datafeed/sanitized/accelerometer",
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/compass",
+            "sensor/filtering",
+            'sensor/vision/fates'
+            
+        ],
+        "desired_state": {
+            "state": 0, # integer code for each state
+            "restart": False
+        },
+        "Task_AI_Movement":
+        {
+            "override":["up/down"], # override module
+            "forward/backward": 0.0,
+            "right/left": 0.0,
+            "up/down": 0.0,
+            "yaw": 0.0,
+            "roll": 0.0,
+            "pitch": 0.0
+        },
+        "release": {
+            "name": None,
+            "args": ["--epoch", EPOCH]},
+        "mock": {
+            "name": None, #"/test/task_selector.py",
             "args": ["--epoch", EPOCH]}
     },
 
@@ -80,16 +113,5 @@ settings = {
         "release": {"name": None},
         "mock": {"name": None}
     },
-    "decision/running_task": {
-        "listen": [
-            "datafeed/sanitized/gyroscope",
-            "datafeed/sanitized/depth",
-			"datafeed/sanitized/accelerometer"
-            #"decision/filtering",
-            #"sensor/vision/fates"
-        ],
-        "release": {"name": None},
-        "mock": {"name": None}
-    }
 }
 

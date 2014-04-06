@@ -25,19 +25,33 @@ class BaseTaskAI():
 
 	def __init__(self):
 		self.com = Communicator(module_name='decision/running_task')
-        self.active = True # parent class can change this status to 
+		self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
-        self.result = None # result variable returned by task
+		self.result = None # result variable returned by task
 
-        self.stable_data = []
+		self.data = []
 
 	def publishCommand(self, packet):
 		self.com.publish_message(packet)
 		
-	def isStable(self, numSamples, limit):
+	def isStable(self):# numSamples, limit):
 		# Use standard deviation on Gyroscope and/or Accelerometer
 		# to measure stability in sensor data
-
+		all_data = self.com.get_messages('datafeed/sanitized/depth')
+        
+        #sample in new data
+		for pt in all_data:
+			self.data.append( pt.get('ax') )
+			if len(self.data) > 10:
+				self.data.pop() #pop off the oldest data
+		std = np.std(data_samples) # get dat STD slut!
+        
+        # decide if it is stable!
+		if std > 2.0:
+			return False
+		else:
+			return True
+        """  Matt's try-hard std function
 		# Grab N number of gyroscope values and run stddev on them
 		dataX = dataY = dataZ = [];
 
@@ -55,7 +69,8 @@ class BaseTaskAI():
 		if stdX < limit and stdY < limit and stdZ < limit:
 			return True
 		return False
-		
+        """        
+            
 
 	def getDepth(self):
 
@@ -73,19 +88,23 @@ class BaseTaskAI():
 		return ori
 	def getPitch(self):
 		# return pitch in radians, upwards from 'flat'
-		pitch = self.com.get_last_message('decision/filtering')['pitch']
+		pitch = self.com.get_last_message('sensor/filtering')['pitch']  #DUSTIN CHANGE TO THIS THING!!!
 		return pitch
 	def getRoll(self):
 		# return roll in radians, clockwise from 'flat'
-		roll = self.com.get_last_message('decision/filtering')['roll']
+		roll = self.com.get_last_message('sensor/filtering')['roll']
 		return roll
 	def getHeading(self):
 		# return heading in radians, clockwise from Magnetic North
-		heading = self.com.get_last_message('decision/filtering')['heading']
+		heading = self.com.get_last_message('sensor/filtering')['heading']
 		return heading
+        
 	def getVision(self):
-		vision = self.com.get_last_message('sensor/vision/fates')
+		print "made it"
+		vision = self.com.get_messages('sensor/vision/cam_down')
+		__unused = self.com.get_last_message('sensor/vision/cam_down')
 		return vision
+        
 	def stdDev(self, data_samples):
 		return np.std(data_samples)
 
