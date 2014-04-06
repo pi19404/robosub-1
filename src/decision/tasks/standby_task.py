@@ -2,6 +2,7 @@
 
 import time
 
+from BaseTaskAI import BaseTaskAI.py
 
 #TODO: import the AI tools class
 class FooToolsClass():
