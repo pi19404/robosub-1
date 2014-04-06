@@ -161,7 +161,7 @@ settings = {
         'height': 480,
         'release': {'path': None},
         'mock': {'path': None},
-        'plugins': ['Streamer']
+        'plugins': ['Path', 'Streamer']
     },
     'sensor/vision/cam_left': {
         'symlink': '/dev/cam_left',

@@ -69,7 +69,7 @@ patternNumber = 3
 #directionary index of incoming_packet
 last_packet_time = 0.0
 while True:
-    incoming_packet = com.get_last_message("sensor/vision/cam_fake")
+    incoming_packet = com.get_last_message("sensor/vision/cam_down")
     if incoming_packet and incoming_packet['timestamp'] > last_packet_time:
         print 'got a packet'
         last_packet_time = incoming_packet['timestamp']

@@ -56,7 +56,7 @@ settings = {
     },
     "microcontroller/debug_lights": {
         "listen": [
-            "sensor/vision/cam_fake",
+            "sensor/vision/cam_down",
         ],
         "release": {},
         "mock": {}
