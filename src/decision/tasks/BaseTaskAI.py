@@ -25,10 +25,6 @@ class BaseTaskAI():
 	def __init__(self):
 		self.com = Communicator(module_name='decision/running_task')
 		return
-	"""def start(self):
-		return 0
-	def stop(self):
-		return 0
 	def publishCommand(self, packet):
 		self.com.publish_message(packet)
 
@@ -79,7 +75,7 @@ class BaseTaskAI():
 		return heading
 	def getVision(self):
 		vision = self.com.get_last_message('sensor/vision/fates')
-		return vision"""
+		return vision
 	def stdDev(self, data_samples):
 		return np.std(data_samples)
 
