@@ -221,6 +221,7 @@ class SliderDebugger():
         if code == TaskCode.STANDBY_AT_DEPTH:
             msg["desired_state"]["parameter"] = True
         elif code == TaskCode.DIVE:
+            print "SEXY"
             msg["desired_state"]["parameter"] = 2. #meters
         else:
             msg["desired_state"]["parameter"] = None

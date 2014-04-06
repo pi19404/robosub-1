@@ -36,7 +36,7 @@ class AIStateMachine():
         
     
     #just use the functions, don't make it contemporary!! TODOOOOOO!!!
-    def _define_task(self, task_class, task_com, *largs):
+    def _define_task(self, task_class, *largs):
         """Makes a Threading object with the task inherited as well"""
         
         #create the class
