@@ -172,9 +172,11 @@ class FrameProcessor(object):
         """
         if img is None:
             # note; may not need to clone
-            im = self.im.clone()
+            #im = self.im.clone()
+            im = np.copy(self.im)
         else:
-            im = img.clone()
+            #im = img.clone()
+            im = np.copy(img)
 
         line_list = self.draw_dict.get("lines")
         if not line_list:
@@ -189,7 +191,12 @@ class FrameProcessor(object):
             pass
         else:
             for c in circle_list:
-                cv2.circle(im, c[0], 8, c[1], 2)
+                cv2.circle(
+                        img=im,
+                        center=tuple(c[0]),
+                        radius=8,
+                        color=tuple(c[1]),
+                        thickness=2)
 
         text_list = self.draw_dict.get("text")
         if not text_list:
@@ -251,10 +258,9 @@ class FrameProcessor(object):
 
     @property
     def hud(self):
-        if self._hud is None:
-            self._hud = self.build_hud(self.im)
-        else:
-            return self._hud
+        if self._hud_im is None:
+            self._hud_im = self.build_hud(self.im)
+        return self._hud_im
 
     @property
     def flooded_red(self):
@@ -518,6 +524,11 @@ class FrameProcessor(object):
         return cv2.inRange(self.im_hue,
                 np.array(mid - include_distance),
                 np.array(mid + include_distance))
+
+    def shifted_hue_im(self, shift):
+        # Subtract
+        # if we shift down, subtract shift from original image. Then add
+        pass
 
     ###########################################################################
     # FUTURE: Implement functions requiring bitmasking edge detection images

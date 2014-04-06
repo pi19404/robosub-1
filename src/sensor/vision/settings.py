@@ -87,6 +87,10 @@ settings = {
                 'func': lambda fp : fp.flooded_blue,
                 'hint': 'InRange blue'
             },
+            'i': {
+                'func': lambda fp : fp.hud,
+                'hint': 'Hud'
+            },
         }
     },
     'sensor/vision/control': {
