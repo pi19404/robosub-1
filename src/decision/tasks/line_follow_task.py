@@ -31,11 +31,11 @@ class LineFollowTask(BaseTaskAI):
             #           correct for slight mistakes.
             #           if error is too large, restart
     """
-    def __init__(self, *largs):
+    def __init__(self, com, *largs):
         """
         Takes no parameters, or a depth to hold.
         """
-        BaseTaskAI.__init__(self) #initialize BaseClassAI so it can have it's communicator
+        BaseTaskAI.__init__(self,com) #initialize BaseClassAI so it can have it's communicator
         self.PUBLISHING_INTERVAL = 0.2 #seconds
         
         #get anticipated angle
@@ -44,7 +44,7 @@ class LineFollowTask(BaseTaskAI):
         else:
             self.anticipated_angle = 45.
         self.two_angles = False
-        self.last_seen = None
+        self.last_seen = time.time()
             
     def run(self, *largs):  # largs unused
         while(self.active):
@@ -65,6 +65,7 @@ class LineFollowTask(BaseTaskAI):
             else:
                 if self.last_seen + 0.5 < time.time(): #lost sight, stop moving!
                     self.publishCommand(self.getBlankPacket())
+                    print "Lost sight!"
                 if self.last_seen + 5.0 < time.time(): # totally lost!
                     return 0 # FAIL
                     
@@ -136,9 +137,6 @@ class LineFollowTask(BaseTaskAI):
             return False
         return True
         
-        
-lf = LineFollowTask(-90.)
-lf.run()
         
 """ NOTEWORTHY:
 {

@@ -60,9 +60,7 @@ settings = {
             "datafeed/sanitized/accelerometer",
             "datafeed/sanitized/gyroscope",
             "datafeed/sanitized/compass",
-            "sensor/filtering",
-            'sensor/vision/fates'
-            
+            'movement/orientation'
         ],
         "desired_state": {
             "state": 0, # integer code for each state
