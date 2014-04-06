@@ -13,11 +13,11 @@ class StandbyTask(BaseTaskAI):
     control for that, that stabilization will take into account. 
     Otherwise all thrusters will be off; a true standby.
 	"""
-    def __init__(self, *largs):
+    def __init__(self, com, *largs):
         """
         Takes no parameters, or a depth to hold.
         """
-        BaseTaskAI.__init__(self) #initiallize BaseClassAI so it can have it's communicator
+        BaseTaskAI.__init__(self, com) #initiallize BaseClassAI so it can have it's communicator
 
         self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
@@ -41,13 +41,8 @@ class StandbyTask(BaseTaskAI):
                 packet["Task_AI_Movement"]["override"] = ["up/down", "yaw", "roll", "pitch"]
             
             self.publishCommand(packet)
+            print "Standing By"
             
             time.sleep(self.PUBLISHING_INTERVAL)
         self.result = 1 # 1 for successful. 0 for failure.
-		
 
-#self.target_depth - self.getFooDepth()
-
-#self.stable_data = []
-        
-        #run the 'is stable' once ever second or so.

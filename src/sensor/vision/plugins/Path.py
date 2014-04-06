@@ -88,6 +88,9 @@ class Path(object):
         b2 = 0
 
         try:
+            # FIXME: if this exception triggers, it prints a warning.
+            # It can be silenced with a numpy.seterr call, but don't want
+            # to break it for next testing.
             m1 = (line1f[3] - line1f[1]) / (line1f[2] - line1f[0])
         except ZeroDivisionError:
             m1flag = True

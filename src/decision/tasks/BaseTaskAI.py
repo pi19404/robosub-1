@@ -23,14 +23,14 @@ class BaseTaskAI():
 	DEBUG = False
 	com = None
 
-	def __init__(self):
-		self.com = Communicator(module_name='decision/running_task')
+	def __init__(self, com):
+		self.com = com
 		self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
 		self.result = None # result variable returned by task
 
 		self.data = []
-
+        
 	def publishCommand(self, packet):
 		self.com.publish_message(packet)
 		
@@ -88,19 +88,18 @@ class BaseTaskAI():
 		return ori
 	def getPitch(self):
 		# return pitch in radians, upwards from 'flat'
-		pitch = self.com.get_last_message('sensor/filtering')['pitch']  #DUSTIN CHANGE TO THIS THING!!!
+		pitch = self.com.get_last_message('movement/orientation')["filtered_orientation"]['pitch']  #DUSTIN CHANGE TO THIS THING!!!
 		return pitch
 	def getRoll(self):
 		# return roll in radians, clockwise from 'flat'
-		roll = self.com.get_last_message('sensor/filtering')['roll']
+		roll = self.com.get_last_message('movement/orientation')["filtered_orientation"]['roll']
 		return roll
 	def getHeading(self):
 		# return heading in radians, clockwise from Magnetic North
-		heading = self.com.get_last_message('sensor/filtering')['heading']
+		heading = self.com.get_last_message('movement/orientation')["filtered_orientation"]['heading']
 		return heading
         
 	def getVision(self):
-		print "made it"
 		vision = self.com.get_messages('sensor/vision/cam_down')
 		__unused = self.com.get_last_message('sensor/vision/cam_down')
 		return vision

@@ -1,17 +1,21 @@
 # Dive Task .py
 
-class DiveTask():
+import time
+from BaseTaskAI import BaseTaskAI
+
+
+class DiveTask(BaseTaskAI):
     """This task is for simply reaching a certain depth.  It will then finish elegantly.
 	"""
-    def __init__(self, goal_depth, *largs):
+    def __init__(self, com, goal_depth, *largs):
         """
         Takes no parameters, or a depth to hold.
         """
-        self.active = True # parent class can change this status to 
-                           #  gracefully exit the looping 'run' function
+        BaseTaskAI.__init__(self, com) #initiallize BaseClassAI so it can have it's communicator
+
         self.PUBLISHING_INTERVAL = 0.5 #seconds
         self.depth_threshold = 0.5 #meters
-        self.result = None # placeholder result
+        
         self.goal_depth = goal_depth 
             
     def run(self, *largs):  #largs unused
@@ -22,13 +26,17 @@ class DiveTask():
             current_depth = self.getDepth() # from base class
 
             if abs(self.goal_depth-current_depth) < (self.depth_threshold/2.0): #TODO stabilize
-                if isSta
-                return 1 #Successfully reached our specified depth
+                if self.isStable():
+                    return 1 #Successfully reached our specified depth
+                else: # not stable! settle down
+                    self.publishCommand(self.getBlankPacket()) #send 0's
+                    
 
             # still traveling  :p
             packet["Task_AI_Movement"]["up"] = self.goal_depth-current_depth
             
             self.publishCommand(packet)
+            print "Diving", self.goal_depth-current_depth, "meters"
             
             time.sleep(self.PUBLISHING_INTERVAL)
 
