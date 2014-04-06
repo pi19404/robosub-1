@@ -37,7 +37,7 @@ settings = {
         },
         "Task_AI_Movement":
         {
-            "override":["up/down"] # override module
+            "override":["up/down"], # override module
             "forward/backward": 0.0,
             "right/left": 0.0,
             "up/down": 0.0,

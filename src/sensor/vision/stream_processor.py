@@ -119,4 +119,5 @@ class StreamProcessor(object):
                 packet = {}
                 for plugin in self._plugins:
                     plugin.process_image(packet)
+                print packet
                 self._com.publish_message(packet)

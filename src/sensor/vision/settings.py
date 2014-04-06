@@ -132,7 +132,7 @@ settings = {
             'raw',
             'processed'
         ],
-        'fps': 5,
+        'fps': 10,
         'width': 640,
         'height': 480,
         'release': {'path': None},
