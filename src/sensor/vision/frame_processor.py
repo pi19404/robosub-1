@@ -322,16 +322,16 @@ class FrameProcessor(object):
         hue_pixel = self.hsv.item(row_i, col_i, 0)
         sat_pixel = self.hsv.item(row_i, col_i, 1)
         # Check the pixel to see if it is a worthy seed for flood fill.
-        if sat_pixel > 100 and abs(hue_pixel - self._hue_midpoints[key]) < 5:
-            print "found worthy seed"
+        if sat_pixel > 170 and abs(hue_pixel - self._hue_midpoints[key]) < 5:
+            #print "found worthy seed"
             return True
             for offset in pixel_offsets:
                 hue_pixel_neighbor = self.hsv.item(
                         row_i + offset[0], col_i + offset[1], 0)
                 sat_pixel_neighbor = self.hsv.item(
                         row_i + offset[0], col_i + offset[1], 1)
-                if abs(hue_pixel - hue_pixel_neighbor) > 5 or \
-                        abs(sat_pixel - sat_pixel_neighbor) > 5:
+                if abs(hue_pixel - hue_pixel_neighbor) > 8 or \
+                        abs(sat_pixel - sat_pixel_neighbor) > 8:
                     break
             else:
                 return True
@@ -348,7 +348,7 @@ class FrameProcessor(object):
 
         """
         if self._floodfills[key] is None:
-            self._floodfills[key] = np.zeros((self.hsv.shape[0], self.hsv.shape[1]),
+            self._floodfills[key] = np.zeros((self.im_hue.shape[0], self.im_hue.shape[1]),
                     np.uint8)
             # FIXME these two variables need better names. They're the distance
             # to check horizontally/vertically from a potential seed to make
@@ -365,18 +365,22 @@ class FrameProcessor(object):
                         dummy_mask = np.zeros(
                                 (self.im_hue.shape[0] + 2, self.im_hue.shape[1] + 2),
                                 np.uint8)
-                        write_to = cv2.merge([self.im_hue, new_mask, new_mask])
+                        write_to = cv2.merge([self.im_hue, self.im_saturation, new_mask])
                         cv2.floodFill(
                                 image=write_to,
                                 mask=dummy_mask,
                                 seedPoint=(col_i, row_i),
                                 newVal=(255, 255, 255),
-                                loDiff=5,
-                                upDiff=5,
+                                loDiff=(5, 40, 255),
+                                upDiff=(5, 40, 255),
                                 flags= 4 | cv2.FLOODFILL_FIXED_RANGE)
-                        self._floodfills[key] = cv2.bitwise_or(
-                                self._floodfills[key], cv2.split(write_to)[1])
-
+                        write_to = cv2.split(write_to)[2]
+                        if self._floodfills[key] is not None and write_to is not None:
+                            self._floodfills[key] = cv2.bitwise_or(
+                                    self._floodfills[key], write_to)
+            if self._floodfills[key] is None:
+                self._floodfills[key] = np.zeros(
+                        (self.im_hue.shape[0], self.im_hue.shape[1]), np.uint8)
 
         return self._floodfills[key]
 

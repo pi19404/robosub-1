@@ -30,7 +30,7 @@ settings = {
             "args": ["--epoch", EPOCH]}
     },
     "movement/fuzzification": {
-        #"ip": "192.168.1.7", # IP address of computer with ps3 controller
+        #"ip": "10.99.66.129", # IP address of computer with ps3 controller
         "listen": [
             "movement/stabilization"
         ],

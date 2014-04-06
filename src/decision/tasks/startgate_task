@@ -1,7 +1,6 @@
 # StartGate Task
 
 import time
-
 import BaseTaskAI
 
     
@@ -22,28 +21,71 @@ class StartGateTask(BaseTaskAI):
         self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
         self.PUBLISHING_INTERVAL = 2.0 #seconds
+        self.last_seen = None
         
-        if largs: # this means there is a depth to hold!
-            self.hold_depth = True
-            print "HOLDING DEPTH"
-        else:
-            self.hold_depth = False
-        self.result = None
             
     def run(self, *largs):  #largs unused
         while(self.active):
-            #prepare packet
-            packet = self.getBlankPacket()
+            self.best_packet = None
+            self.find_best_packet()
+
+            if self.best_packet:
+
+                self.last_seen = self.best_packet['timestamp']
+
+                # Find the midpoint between the two columns. This is our goal
+                leftCol = self.best_packet['left_column']
+                rightCol = self.best_packet['right_column']
+
+                if leftCol and rightCol:
+                    midPoint = (leftCol + rightCol) / 2
+
+                    # If the midpoint is within 0.2, just go straight
+                    if abs(midPoint) < 0.1:
+                        out_packet = self.getBlankPacket()
+                        out_packet['Task_AI_Movement']['forward/backward'] = 0.5 # Move forward slowly
+                        self.publishCommand(out_packet)
+                    else:
+                        # We should move towards the midpoint a little bit
+                        out_packet = self.getBlankPacket()
+                        out_packet['Task_AI_Movement']['forward/backward'] = 0.5 # Move forward slowly
+                        out_packet['Task_AI_Movement']['right/left'] = midPoint # Move towards the midpoint at speed relative to distance away
+                        self.publishCommand(out_packet)
+                else if leftCol:
+
+                    # If we only see the left column move right a very little and go straight
+                    out_packet = self.getBlankPacket()
+                    out_packet['Task_AI_Movement']['forward/backward'] = 0.5 # Move forward slowly
+                    out_packet['Task_AI_Movement']['right/left'] = 0.1 # Move right a tiny bit
+                    self.publishCommand(out_packet)
+
+                else if rightCol:
+
+                    # If we only see the right column move left a very little and go straight
+                    out_packet = self.getBlankPacket()
+                    out_packet['Task_AI_Movement']['forward/backward'] = 0.5 # Move forward slowly
+                    out_packet['Task_AI_Movement']['right/left'] = -0.1 # Move left a tiny bit
+                    self.publishCommand(out_packet)
+            else:
+                if self.last_seen is None:
+                    # This means we never saw the start gate at all
+                    return 0 # FAIL
+                else:
+                    # This means that we have previously seen the gate, but now do not. Therefore meaning we have gone through it
+                    return 1
             
-            if self.hold_depth: #let stabilization hold our depth
-                packet["Task_AI_Movement"]["up"] = 0.0 
-            else: #all thrusters should be OFF! (STANDBY MODE)
-                packet["Task_AI_Movement"]["override"] = ["up","pitch_up","roll_right","heading"]
-            
-            self.publishCommand(packet)
             
             time.sleep(self.PUBLISHING_INTERVAL)
         self.result = 1 # 1 for successful. 0 for failure.
-		
+
+    def find_best_packet(self):
+        self.best_packet = None
+        vision_packets = self.getVision('sensor/vision/cam_forward')
+        for packet in vision_packets:
+            if "Start_Gate" in packet:
+                if not self.best_packet:
+                    self.best_packet = packet["Start_Gate"][0]
+                elif packet["timestamp"] > self.best_packet["timestamp"]:
+                    self.best_packet = packet["Start_Gate"][0]
 
 #self.target_depth - self.getFooDepth()
