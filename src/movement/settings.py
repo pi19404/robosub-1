@@ -1,13 +1,38 @@
 EPOCH = '0.05'
 
 settings = {
+    "movement/orientation": { 
+        "constants": {"accel_constant": .95, "gyro_constant": .05},
+        "listen": [
+            "datafeed/sanitized/accelerometer",
+            "datafeed/sanitized/gyroscope",
+            "datafeed/sanitized/compass"
+        ],
+        "release": {
+            "name": "stabilization/complementary_filter.py",
+            "args": ["--epoch", EPOCH]}
+    },
+    "movement/stabilization": { 
+        "stabilize": True,
+        "listen": [
+            "decision",
+            "datafeed/sanitized/depth",
+            "movement/orientation"
+        ],
+        # kP, kI, and kD are tuning variables. They determine the magnitude of the effect the P, I, and D terms have on the output.
+        # Max and Min Integrator governs the total effect the Integrator term can have on the output.
+        # The names of these must coorespond to the name of the direction or orientation in
+        # the incoming ai packet
+        "PID_Settings": {"roll": {"kP": 0.1, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0},
+                         "up/down": {"kP": 0.1, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0}},
+        "release": {
+            "name": "stabilization/stabilizer.py",
+            "args": ["--epoch", EPOCH]}
+    },
     "movement/fuzzification": {
         #"ip": "192.168.1.7", # IP address of computer with ps3 controller
         "listen": [
-            "movement/translation",
-            "decision",
-            "sensor/vision/cam_front",
-            "sensor/vision/cam_down"
+            "movement/stabilization"
         ],
         # The N values in each fuzzy set will define N + 1 regions.
         # The first number represents an x value whlie the second number
@@ -30,16 +55,10 @@ settings = {
         #        ------------------------\-/---------------------\-------------
         #-4.0    -3.0    -2.0    -1.0     0.0    1.0    2.0    3.0
         "fuzzy_sets": {
-            "is_right": [[-2.0, 1.0], [0.0, 0.0]],
-            "is_left": [[0.0, 0.0], [2.0, 1.0]],
-            "is_forward": [[-2.0, 1.0], [0.0, 0.0]],
-            "is_back": [[2.0, 1.0], [0.0, 0.0]],
-            "is_low": [[2.0, 1.0], [0.0, 0.0]],
-            "is_high": [[-2.0, 1.0], [0.0, 0.0]],
-            "is_rotated_right":
-                [[3.13, 0.0], [3.14, 1.0], [4.712, 1.0], [6.28, 0.0]],
-            "is_rotated_left":
-                [[0.0, 0.0], [1.57, 1.0], [3.12, 1.0], [3.13, 0.0]]
+            "is_right": [[0.0, 0.0], [2.0, 1.0]],
+            "is_left": [[-2.0, 1.0], [0.0, 0.0]],
+            "is_forward": [[0.0, 0.0], [2.0, 1.0]],
+            "is_back": [[-2.0, 1.0], [0.0, 0.0]]
         },
         "release": {
             "name": "fuzzy_logic_fuzzifier.py",

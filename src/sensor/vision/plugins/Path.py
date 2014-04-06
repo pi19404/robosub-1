@@ -22,7 +22,8 @@ class Path(object):
     """
 
     def __init__(self, tools, settings):
-        self._tools = tools
+        self._tools    = tools
+        self._settings = settings
 
     @staticmethod
     def get_longest_index(line_set):
@@ -215,7 +216,7 @@ class Path(object):
                 # FIXME: We should create a system of reporting errors, or behavior.
                 print lines
                 return
-        except AttributeError:
+        except (AttributeError, TypeError):
             return
 
         # calculate angles of the entire set, and parse them into a new list.
@@ -239,6 +240,9 @@ class Path(object):
             center_x, center_y = self._tools.translate_coordinates(center_x, center_y)
             packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[longest_index]),
                                     "angle2": None, "center": (center_x, center_y)}
+            # add to the hud's draw_dict.
+            self._tools.draw_dict["lines"].append([lines[longest_index], (0,0,255)])
+            self._tools.draw_dict["circles"].append([lines[longest_index][2:], (0,0,255)])
 
         else:
             longest_line1 = lines[longest_index]
@@ -250,6 +254,12 @@ class Path(object):
             packet["VisionPath"] = {"angle1": self._tools.lineAngle(lines[longest_index]),
                                     "angle2": self._tools.lineAngle(line_set2[longest_index2]),
                                     "center": (center_x, center_y)}
+
+            self._tools.draw_dict["lines"].append([longest_line1, (0,0,255)])
+            self._tools.draw_dict["lines"].append([longest_line2, (0,0,255)])
+            self._tools.draw_dict["circle"].append([(longest_line1[2], longest_line1[3]), (100,0,255)])
+            self._tools.draw_dict["circle"].append([(longest_line2[2:]), (100,0,255)])
+
 
 def main():
     """

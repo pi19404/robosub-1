@@ -54,6 +54,13 @@ settings = {
             ]
         },
     },
+    "microcontroller/debug_lights": {
+        "listen": [
+            "sensor/vision/cam_fake",
+        ],
+        "release": {},
+        "mock": {}
+    },
     "sensor/sanitation": {
         "listen": [
             "datafeed/raw/depth",

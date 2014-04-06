@@ -101,6 +101,7 @@ settings = {
         ]
     },
     'sensor/vision/cam_fake': {
+        'ip': '10.99.66.106',
         'name': 'cam_fake',
         'recorded_video': '/home/cevans/Videos/RoboSub/Obstacles/pathOutOfStartGate640x480.mp4',
         'recorded_video_': '/home/cevans/Videos/RoboSub/Obstacles/tollBooth640x480.mp4',
@@ -132,7 +133,7 @@ settings = {
             'raw',
             'processed'
         ],
-        'fps': 5,
+        'fps': 10,
         'width': 640,
         'height': 480,
         'release': {'path': None},
