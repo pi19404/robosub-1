@@ -44,7 +44,7 @@ class BaseTaskAI():
 			self.data.append( pt.get('ax') )
 			if len(self.data) > 10:
 				self.data.pop() #pop off the oldest data
-		std = np.std(data_samples) # get dat STD slut!
+		std = np.std(self.data) # get dat STD slut!
         
         # decide if it is stable!
 		if std > 2.0:

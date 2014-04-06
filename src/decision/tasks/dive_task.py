@@ -24,9 +24,16 @@ class DiveTask(BaseTaskAI):
             packet = self.getBlankPacket()
 
             current_depth = self.getDepth() # from base class
-
+            print "cur:", current_depth, "goal", self.goal_depth
+            #for debug purposes, making it a number type
+            if not current_depth:
+                current_depth = 1.0
+            if not self.goal_depth:
+                self.goal_depth = 2.0
+            
             if abs(self.goal_depth-current_depth) < (self.depth_threshold/2.0): #TODO stabilize
                 if self.isStable():
+                    self.result = 1
                     return 1 #Successfully reached our specified depth
                 else: # not stable! settle down
                     self.publishCommand(self.getBlankPacket()) #send 0's
