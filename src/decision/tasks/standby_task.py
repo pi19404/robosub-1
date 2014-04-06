@@ -65,12 +65,13 @@ class StandbyTask(FooToolsClass):
         self.active = True # parent class can change this status to 
                            #  gracefully exit the looping 'run' function
         self.PUBLISHING_INTERVAL = 2.0 #seconds
+        
         if largs: # this means there is a depth to hold!
             self.hold_depth = True
-            self.target_depth = largs[0]
+            print "HOLDING DEPTH"
         else:
             self.hold_depth = False
-            self.target_depth = 0.0
+        self.result = None
             
     def run(self, *largs):  #largs unused
         while(self.active):
@@ -78,12 +79,14 @@ class StandbyTask(FooToolsClass):
             packet = self.getBlankPacket()
             
             if self.hold_depth: #let stabilization hold our depth
-                packet["Task_AI_Movement"]["up"] = self.target_depth - self.getFooDepth()
+                packet["Task_AI_Movement"]["up"] = 0.0 
             else: #all thrusters should be OFF! (STANDBY MODE)
                 packet["Task_AI_Movement"]["override"] = ["up","pitch_up","roll_right","heading"]
             
             self.publishCommand(packet)
             
             time.sleep(self.PUBLISHING_INTERVAL)
-        return 1 # 1 for successful. 0 for failure.
+        self.result = 1 # 1 for successful. 0 for failure.
 		
+
+#self.target_depth - self.getFooDepth()

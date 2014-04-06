@@ -11,18 +11,20 @@ settings = {
             "datafeed/sanitized/gyroscope",
             "datafeed/sanitized/compass",
             "datafeed/sanitized/depth",
+            "movement/defuzzification"
         ],
         "desired_state": {
             "state": 0, # integer code for each state
-            "name": "standby",
+            "task_code": "standby",
             "note": "Default Note",
-            "restart": False
+            "restart": False,
+            "parameter": None
         },
         "release": {
             "name": "master_ai.py",
             "args": ["--epoch", EPOCH]},
         "mock": {
-            "name": "", #"/test/task_selector.py",
+            "name": "master_ai_gui.py", #"/test/task_selector.py",
             "args": ["--epoch", EPOCH]}
     },
     "decision/ai_state_machine": {
