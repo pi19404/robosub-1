@@ -224,18 +224,19 @@ class FrameProcessor(object):
 
         return self._filtered_images[key]
 
-    def _is_good_floodfill_seed(self, row_i, col_i, key):
-        dist_vertical = self.im.shape[0] / 64
-        dist_horizontal = self.im.shape[1] / 64
+    def _validate_seed(self, row_i, col_i, key):
+        row_offset = self.im.shape[0] / 64
+        col_offset = self.im.shape[1] / 64
         pixel_offsets = [
-                [0, 1 * dist_vertical],
-                [0, -1 * dist_vertical],
-                [1 * dist_horizontal, 0],
-                [-1 * dist_horizontal, 0]]
+                [0, 1 * col_offset],
+                [0, -1 * col_offset],
+                [1 * row_offset, 0],
+                [-1 * row_offset, 0]]
         hue_pixel = self.hsv.item(row_i, col_i, 0)
         sat_pixel = self.hsv.item(row_i, col_i, 1)
         # Check the pixel to see if it is a worthy seed for flood fill.
-        if sat_pixel > 170 and abs(hue_pixel - self._hue_midpoints[key]) < 5:
+        if sat_pixel > 100 and abs(hue_pixel - self._hue_midpoints[key]) < 5:
+            print "found worthy seed"
             return True
             for offset in pixel_offsets:
                 hue_pixel_neighbor = self.hsv.item(
@@ -251,7 +252,7 @@ class FrameProcessor(object):
 
     def _memoized_flooded_hue_image(self, key):
         """Memoize a bitmask near given hue.
-        
+
         Pixels at a constant interval are checked to see if they make a good
         seed point for the flood fill algorithm. A good seed will be high
         saturation and near the target color range. If the flood fill generates
@@ -260,7 +261,7 @@ class FrameProcessor(object):
 
         """
         if self._floodfills[key] is None:
-            ret = np.zeros((self.hsv.shape[0] + 2, self.hsv.shape[1] + 2),
+            self._floodfills[key] = np.zeros((self.hsv.shape[0], self.hsv.shape[1]),
                     np.uint8)
             # FIXME these two variables need better names. They're the distance
             # to check horizontally/vertically from a potential seed to make
@@ -270,28 +271,24 @@ class FrameProcessor(object):
             for row_i in range(0, self.im.shape[0], self.im.shape[0] / 16)[1:]:
                 # Check pixels from (2**4) - 1 columns intersections in the image.
                 for col_i in range(0, self.im.shape[1], self.im.shape[1] / 16)[1:]:
-                    if self._is_good_floodfill_seed(row_i, col_i, key):
-                        new_floodfill = np.zeros(
-                                (self.hsv.shape[0] + 2, self.hsv.shape[1] + 2),
+                    if self._validate_seed(row_i, col_i, key):
+                        new_mask = np.zeros(
+                                (self.im_hue.shape[0], self.im_hue.shape[1]),
                                 np.uint8)
+                        dummy_mask = np.zeros(
+                                (self.im_hue.shape[0] + 2, self.im_hue.shape[1] + 2),
+                                np.uint8)
+                        write_to = cv2.merge([self.im_hue, new_mask, new_mask])
                         cv2.floodFill(
-                                image=self.im_hue,
-                                mask=new_floodfill,
-                                # FIXME? y is row, x is col, right?
+                                image=write_to,
+                                mask=dummy_mask,
                                 seedPoint=(col_i, row_i),
-                                #newVal=254,
-                                newVal=255,
+                                newVal=(255, 255, 255),
                                 loDiff=5,
                                 upDiff=5,
-                                flags= 4 | cv2.FLOODFILL_FIXED_RANGE)# |
-                                        #cv2.FLOODFILL_MASK_ONLY)
-                        # FIXME just did this to see what it looks like. We
-                        # need to generage more floodfills based on remaining
-                        # seed points and or them together. Also, we need to
-                        # save this in the floodfills dict.
-                        #print 'returning a real floodfill'
-            self._floodfills[key] = self.im_hue
-                        #return new_floodfill[0:480, 0:640]
+                                flags= 4 | cv2.FLOODFILL_FIXED_RANGE)
+                        self._floodfills[key] = cv2.bitwise_or(
+                                self._floodfills[key], cv2.split(write_to)[1])
 
 
         return self._floodfills[key]

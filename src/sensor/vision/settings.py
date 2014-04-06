@@ -118,7 +118,7 @@ settings = {
         'height': 480,
         'release': {'path': None},
         'mock': {'path': None},
-        'plugins': ['VideoLogger', 'Path']
+        'plugins': ['Tester', 'Path']
     },
     'sensor/vision/cam_front': {
         'name': 'cam_front',
@@ -151,12 +151,12 @@ settings = {
             'raw',
             'processed'
         ],
-        'fps': 5,
+        'fps': 10,
         'width': 640,
         'height': 480,
         'release': {'path': None},
         'mock': {'path': None},
-        'plugins': ['Streamer', 'Tester']
+        'plugins': ['Streamer']
     },
     'sensor/vision/cam_left': {
         'symlink': '/dev/cam_left',

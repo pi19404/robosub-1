@@ -52,6 +52,9 @@ class Streamer(object):
             self._sockets += [self._context.socket(zmq.PAIR)]
             self._sockets[-1].bind("tcp://*:{port}".format(
                     port=settings[module_name]['stream_port'] + port_offset))
+        # Used to ensure that image strips are being put together in the same
+        # image.
+        self._image_number = 0
 
         # Parent thread sets busy to tell sender thread to get busy. Sender
         # thread clears busy when it's done sending.
@@ -91,6 +94,7 @@ class Streamer(object):
             # workers finish sending their image parts.
             p.map(func=self._worker_send,
                     iterable=range(self._port_span - 1))
+            self._image_number += 1
             self._busy.clear()
 
     def _command_listener(self):
@@ -144,7 +148,8 @@ class Streamer(object):
         metadata = dict(image_part=idx,
                 dtype = str(self._fp.im.dtype),
                 shape = self._im_parts[idx].shape,
-                timestamp = self._last_successful_send)
+                timestamp = self._last_successful_send,
+                image_number = self._image_number)
         try:
             # Send metadata, but let the receiver know we're sending more stuff
             # that's part of this packet.
