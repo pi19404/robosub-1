@@ -9,29 +9,21 @@ from random import random
 from PID import PID_Controller
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
+from movement.settings import settings as settings
 
-# kP, kI, and kD are tuning variables. They determine the magnitude of the effect the P, I, and D terms have on the output.
-# Max and Min Integrator governs the total effect the Integrator term can have on the output.
-PID_Settings = {"pitch": {"kP": 0.0, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0},
-               "roll": {"kP": 0.0, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0},
-               "up/down": {"kP": 0.0, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0}}
-
-# This needs to change
 # Movement Decision Packet:
+# {
 #     "Task_AI_Movement":
 #     {
-#         "override":["up"] # override module
-#         "position": {
-#             "right": 0.0
-#             "forward": 0.0
-#             "up": 0.0
-#         }
-#         "orientation": { # Notably, this is the desired state, not a requested change in state
-#             "pitch_up": 0.0, 
-#             "roll_right": 0.0,
-#             "heading": 0.0  #looking down, Clockwise, in radians
-#         }
+#         "override":["up/down"] # override module
+#         "forward/backward": 0.0,
+#         "right/left": 0.0,
+#         "up/down": 0.0,
+#         "yaw": 0.0,
+#         "roll": 0.0,
+#         "pitch": 0.0
 #     }
+# }
 
 # Sensor Packet Format: (from sensor/sanitation-main.py)
 # sensors = {
@@ -71,9 +63,9 @@ def main(args):
 
     # Initializing PIDs
     PID = {}
-    for i in PID_Settings.keys ():
-        PID[i] = PID_Controller (PID_Settings[i]["kP"], PID_Settings[i]["kI"], PID_Settings[i]["kD"], PID_Settings[i]["Min_I"], PID_Settings[i]["Max_I"], 0.0)
-        PID[i].set_setpoint (0)
+    for i in settings["movement/stabilization"]["PID_Settings"].keys ():
+        # Setpoint is initalized to zero
+        PID[i] = PID_Controller (settings["movement/stabilization"]["PID_Settings"][i]["kP"], settings["movement/stabilization"]["PID_Settings"][i]["kI"], settings["movement/stabilization"]["PID_Settings"][i]["kD"], settings["movement/stabilization"]["PID_Settings"][i]["Min_I"], settings["movement/stabilization"]["PID_Settings"][i]["Max_I"], 0.0)
 
     # Outgoing packet format
     outgoing_packet = {"forward/backward": 0.0, "right/left": 0.0, "up/down": 0.0, "yaw": 0.0, "pitch": 0.0, "roll": 0.0}
@@ -84,12 +76,12 @@ def main(args):
 
         # Get depth and orientation data.
         depth = com.get_last_message("datafeed/sanitized/depth")
-        orientation = com.get_last_message("decision/filtering")
+        orientation = com.get_last_message("movement/orientation")
 
-        # Update rate of the ai is arbitrary and variable. Stabalization should continue regardless of message availability.
+        # Update rate of the ai is arbitrary and variable. Stabilization should continue regardless of message availability.
         # If we get an ai_packet that is different check if the desired roll and depth are different. If they are update the 
-        # controllers and continue stabalizing. If the packet is not different continue stabalizing.
-        # If this does not get a packet continue to stabalize but pass the old packet values so that the movement
+        # controllers and continue stabilizing. If the packet is not different continue stabilizing.
+        # If this does not get a packet continue to stabilize but pass the old packet values so that the movement
         # stack continues to run.
         if ai_packet and ai_packet["timestamp"] > last_timestamp:
             last_timestamp = ai_packet["timestamp"]
@@ -100,7 +92,7 @@ def main(args):
             if "roll" in ai_packet["Task_AI_Movement"]["override"]:
                 outgoing_packet["roll"] = 0.0
                 
-            # Check if stabalization point needs to be changed. If yes: change it.
+            # Check if stabilization point needs to be changed. If yes: change it.
             if PID["depth"].setpoint != ai_packet["Task_AI_Movement"]["depth"]:
                 PID["depth"].set_setpoint (ai_packet["Task_AI_Movement"]["depth"])
             if PID["roll"].setpoint != ai_packet["Task_AI_Movement"]["roll"]:
@@ -112,20 +104,21 @@ def main(args):
         if orientation:
             outgoing_packet["roll"] = PID["roll"].compute (orientation["roll"])
 
-        # These values are not being stabalized
-        outgoing_packet["forward/backward"] = ai_packet["Task_AI_Movement"]["forward/backward"]
-        outgoing_packet["right/left"] = ai_packet["Task_AI_Movement"]["right/left"]
-        outgoing_packet["yaw"] = ai_packet["Task_AI_Movement"]["yaw"]
-        outgoing_packet["pitch"] = ai_packet["Task_AI_Movement"]["pitch"]
+        if ai_packet:
+            # These values are not being stabilized
+            outgoing_packet["forward/backward"] = ai_packet["Task_AI_Movement"]["forward/backward"]
+            outgoing_packet["right/left"] = ai_packet["Task_AI_Movement"]["right/left"]
+            outgoing_packet["yaw"] = ai_packet["Task_AI_Movement"]["yaw"]
+            outgoing_packet["pitch"] = ai_packet["Task_AI_Movement"]["pitch"]
 
         # Add name
-        stabalization_packet = {"Stabalization_to_Fuzzification": outgoing_packet}
-        com.publish_message(stabalization_packet)
+        stabilization_packet = {"Stabilization_to_Fuzzification": outgoing_packet}
+        com.publish_message(stabilization_packet)
 
         time.sleep(args.epoch)
 
 def commandline():
-    parser = argparse.ArgumentParser(description='Stabalization module.')
+    parser = argparse.ArgumentParser(description='Stabilization module.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.02,
             help='Sleep time per cycle.')

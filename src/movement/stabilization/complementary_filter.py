@@ -80,12 +80,12 @@ def main(args):
         
 
 def commandline():
-    parser = argparse.ArgumentParser(description='Filtering module.')
+    parser = argparse.ArgumentParser(description='Filtering module for orientation.')
     parser.add_argument('-e', '--epoch', type=float,
             default=0.05,
             help='Sleep time per cycle.')
     parser.add_argument('-m', '--module_name', type=str,
-            default='sensor/filtering',
+            default='movement/orientation',
             help='Module name.')
     return parser.parse_args()
 
