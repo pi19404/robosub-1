@@ -94,14 +94,14 @@ def main(args):
                     outgoing_packet["roll"] = 0.0
                     
                 # Check if stabilization point needs to be changed. If yes: change it.
-                if PID["depth"].setpoint != ai_packet["Task_AI_Movement"]["depth"]:
-                    PID["depth"].set_setpoint (ai_packet["Task_AI_Movement"]["depth"])
+                if PID["up/down"].setpoint != ai_packet["Task_AI_Movement"]["depth"]:
+                    PID["up/down"].set_setpoint (ai_packet["Task_AI_Movement"]["depth"])
                 if PID["roll"].setpoint != ai_packet["Task_AI_Movement"]["roll"]:
                     PID["roll"].set_setpoint (ai_packet["Task_AI_Movement"]["roll"])
 
 
             if depth:
-                outgoing_packet["up/down"] = PID["depth"].compute (depth["value"])
+                outgoing_packet["up/down"] = PID["up/down"].compute (depth["value"])
             if orientation:
                 outgoing_packet["roll"] = PID["roll"].compute (orientation["roll"])
 
@@ -117,7 +117,7 @@ def main(args):
         else:
             stabilization_packet = {"Stabilization_to_Fuzzification": ai_packet["Task_AI_Movement"]}
 
-        #print stabilization_packet
+        print stabilization_packet
         com.publish_message(stabilization_packet)
 
         time.sleep(args.epoch)

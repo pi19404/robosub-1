@@ -7,8 +7,10 @@ import sys
 from copy import deepcopy
 from random import random
 from time import sleep, time
+from math import atan2
 sys.path.append(os.path.abspath("../.."))
 from util.communication.grapevine import Communicator
+from movement.settings import settings
 
 # Sensor Packet Format: (from sensor/sanitation-main.py)
 # sensors = {
@@ -33,11 +35,10 @@ from util.communication.grapevine import Communicator
 #   }
 # }
 
-# TODO: Needs to go in settings file
-Settings = {"accel_constant": .95, "gyro_constant": .05}
-
 def main(args):
     com = Communicator(module_name=args.module_name)
+    
+    Settings = settings["movement/orientation"]["constants"]
 
     last_accel_timestamp = 0
     last_gyro_timestamp = 0
@@ -56,27 +57,28 @@ def main(args):
         gyro = com.get_last_message("datafeed/sanitized/gyroscope")
         compass = com.get_last_message("datafeed/sanitized/compass")
 
-        # Update gyro measurements
-        if gyro and gyro["timestamp"] > last_gyro_timestamp:
+        # Update gyro and accel measurements
+        if gyro and gyro["timestamp"] > last_gyro_timestamp and accel and accel["timestamp"] > last_accel_timestamp:
+            last_accel_timestamp = accel["timestamp"]
+            last_gyro_timestamp = gyro["timestamp"]
+
             dt = gyro["timestamp"] - last_gyro_timestamp
-            last_gyro_timestamp = gyro_timestamp
 
             raw_gyro_pitch = raw_gyro_pitch + (gyro["gy"] * dt)
             raw_gyro_roll = raw_gyro_roll + (gyro["gx"] * dt)
             # This will be very innacurate right now
             raw_gyro_yaw = raw_gyro_yaw + (gyro["gz"] * dt)
 
-        # Update accel measurements
-        if accel and accel["timestamp"] > last_accel_timestamp:
-            last_accel_timestamp = accel_timestamp
-
-            raw_accel_pitch = atan2 (accel["ax"], accel["az"])
-            raw_accel_roll = atan2 (accel["ay"], accel["az"])
+            raw_accel_pitch = atan2 (accel["ay"], -accel["az"]) * 57.2957
+            raw_accel_roll = atan2 (accel["ax"], -accel["az"]) * 57.2957
         
-        # Perform filtering
-        filtered_orientation["pitch"] = ((Settings["gyro_constant"]) * raw_gyro_pitch) + ((1 - Settings["accel_constant"]) * raw_accel_pitch)
-        filtered_orientation["roll"] = ((Settings["gyro_constant"]) * raw_gyro_roll) + ((1 - Settings["accel_constant"]) * raw_accel_roll)
-        filtered_orientation["yaw"] = raw_gyro_yaw
+            # Perform filtering
+            filtered_orientation["pitch"] = ((Settings["gyro_constant"]) * raw_gyro_pitch) + (Settings["accel_constant"] * raw_accel_pitch)
+            filtered_orientation["roll"] = ((Settings["gyro_constant"]) * raw_gyro_roll) + (Settings["accel_constant"] * raw_accel_roll)
+            filtered_orientation["yaw"] = raw_gyro_yaw
+
+            print filtered_orientation
+            com.publish_message (filtered_orientation)
         
 
 def commandline():
