@@ -95,6 +95,7 @@ def main(args):
         # TODO: Fix packet name
         if msg and msg['timestamp'] > last_timestamp:
             last_timestamp = msg['timestamp']
+            msg = msg["Stabilization_to_Fuzzification"]
             
             # Forward/backward and right/left directions are being controlled by fuzzy sets
             outgoing_packet['is_left'] = get_membership(
@@ -107,8 +108,8 @@ def main(args):
                     msg["forward/backward"], fuzzy_sets['is_forward'])
 
             # up/down and roll are being stabilized
-            outgoing_packet["up/down"] = PID["depth"].compute (depth["value"])
-            outgoing_packet["roll"] = PID["roll"].compute (orientation["roll"])
+            outgoing_packet["up/down"] = msg["up/down"]
+            outgoing_packet["roll"] = msg["roll"]
 
             # Yaw is being controlled by ai directly
             outgoing_packet["yaw"] = msg["yaw"]
@@ -116,7 +117,8 @@ def main(args):
             # No pitch control yet
             outgoing_packet["pitch"] = msg["pitch"]
 
-            com.publish_message(packet)
+            #print outgoing_packet
+            com.publish_message(outgoing_packet)
         time.sleep(args.epoch)
 
 

@@ -117,6 +117,7 @@ def main(args):
         else:
             stabilization_packet = {"Stabilization_to_Fuzzification": ai_packet["Task_AI_Movement"]}
 
+        #print stabilization_packet
         com.publish_message(stabilization_packet)
 
         time.sleep(args.epoch)
