@@ -142,7 +142,7 @@ settings = {
         'height': 480,
         'release': {'path': None},
         'mock': {'path': None},
-        'plugins': []
+        'plugins': ['Streamer', 'VideoLogger']
     },
     'sensor/vision/cam_down': {
         'name': 'cam_down',
@@ -161,7 +161,7 @@ settings = {
         'height': 480,
         'release': {'path': None},
         'mock': {'path': None},
-        'plugins': ['Path', 'Streamer']
+        'plugins': ['Path', 'Streamer', 'VideoLogger']
     },
     'sensor/vision/cam_left': {
         'symlink': '/dev/cam_left',

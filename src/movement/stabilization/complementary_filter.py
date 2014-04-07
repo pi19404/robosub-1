@@ -79,6 +79,7 @@ def main(args):
 
             print filtered_orientation
             com.publish_message (filtered_orientation)
+            sleep (args.epoch)
         
 
 def commandline():

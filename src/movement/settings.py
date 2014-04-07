@@ -13,9 +13,9 @@ settings = {
             "args": ["--epoch", EPOCH]}
     },
     "movement/stabilization": { 
-        "stabilize": True,
+        "stabilize": False,
         "listen": [
-            "decision",
+            "decision/running_task",
             "datafeed/sanitized/depth",
             "movement/orientation"
         ],
@@ -23,14 +23,14 @@ settings = {
         # Max and Min Integrator governs the total effect the Integrator term can have on the output.
         # The names of these must coorespond to the name of the direction or orientation in
         # the incoming ai packet
-        "PID_Settings": {"roll": {"kP": 0.1, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0},
-                         "up/down": {"kP": 0.1, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0}},
+        "PID_Settings": {"roll": {"kP": 0.002, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0, "Setpoint": 0.0},
+                         "up/down": {"kP": 1.0, "kI": 0.0, "kD": 0.0, "Min_I": -20.0, "Max_I": 20.0, "Setpoint": -2.0}},
         "release": {
             "name": "stabilization/stabilizer.py",
             "args": ["--epoch", EPOCH]}
     },
     "movement/fuzzification": {
-        #"ip": "10.99.66.129", # IP address of computer with ps3 controller
+        #"ip": "192.168.1.3", # IP address of computer with ps3 controller
         "listen": [
             "movement/stabilization"
         ],

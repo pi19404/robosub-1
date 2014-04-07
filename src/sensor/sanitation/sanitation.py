@@ -78,7 +78,7 @@ class Gyroscope(Sensor):
 
         while True:
             data_msg = self.com.get_last_message("datafeed/raw/gyroscope")
-            print data_msg
+            #print data_msg
             if data_msg:
                 if data['gx'] is None:
                     data['gx'] = data_msg.get('GYRO_X')
@@ -232,7 +232,8 @@ class Depth(Sensor):
             self.com.debug('Error getting depth value')
         else:
             # XXX: Why these numbers?
-            depth['value'] = 0.1075 * float(depth_raw) - 54.622
+            depth['value'] = -1.0 * (0.1075 * float(depth_raw) - 54.622)
+        print depth
         return depth
 
     def calibrate(self, samples=10):

@@ -4,6 +4,7 @@ EPOCH = "0.05"
 settings = {    
     # THIS IS A WORK IN PROGRESS!
     "decision/master_ai": {
+        'ip': '192.168.1.6',
         "listen": [
             "sensor/vision/cam_front",
             "sensor/vision/cam_down",

@@ -24,7 +24,10 @@ class DiveTask(BaseTaskAI):
             packet = self.getBlankPacket()
 
             current_depth = self.getDepth() # from base class
+            
             print "cur:", current_depth, "goal", self.goal_depth
+            if not current_depth:
+                current_depth = 0.5
             #for debug purposes, making it a number type
             if not current_depth:
                 current_depth = 1.0
