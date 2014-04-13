@@ -6,7 +6,7 @@ import os
 import sys
 import time
 from microcontroller import Thruster
-
+	
 #Global Constants#############################################################################
 #These values are temporary, for testing. They WILL change in the final product
 #It was recommended that these values should be placed in a dictionary
@@ -29,9 +29,9 @@ s.open()		#attempt to open the serial port (there is no guard code, I'm assuming
 
 
 #initalize the thrusters
-X_HBRIDGE_ADDR = 0x78
-Y_HBRIDGE_ADDR = 0x74
-Z_HBRIDGE_ADDR = 0x73
+X_HBRIDGE_ADDR = 128
+Y_HBRIDGE_ADDR = 129
+Z_HBRIDGE_ADDR = 130
 
 
 thruster_X_A = Thruster(X_HBRIDGE_ADDR, 1, s)
@@ -48,18 +48,27 @@ os.system(CLEAR_CMD)
 magnitude = 0
 direction = 1
 
+thruster_Z_B.send(0)
+thruster_Z_B.send(0)
+thruster_X_A.send(0)
+thruster_X_B.send(0)
+thruster_Y_A.send(0)
+thruster_Y_B.send(0)
+thruster_Z_A.send(0)
+thruster_Z_B.send(0)
+
 
 #Main reading loop
 while 1 :
 
-	time.sleep(.2)
+	time.sleep(.001)
 	
-	thruster_X_A.send(magnitude*direction)
-	thruster_X_B.send(magnitude*direction)
-	thruster_Y_A.send(magnitude*direction)
-	thruster_Y_B.send(magnitude*direction)
-	thruster_Z_A.send(magnitude*direction)
-	thruster_Z_B.send(magnitude*direction)
+	thruster_X_A.send(magnitude*direction) #2
+	thruster_X_B.send(magnitude*direction) #4
+	thruster_Y_A.send(magnitude*direction) #1
+	thruster_Y_B.send(magnitude*direction) #3
+	thruster_Z_A.send(magnitude*direction) #2
+	thruster_Z_B.send(magnitude*direction) #3
 	
 	#clear the screen
 	os.system(CLEAR_CMD)

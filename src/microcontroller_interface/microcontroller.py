@@ -4,6 +4,7 @@ This is the microcontroller library. All classes and functions that interact
 with the microcontrollers that might be shared across different micrcocontroller
 modules should (eventually) go in here.
 """
+import os
 
 class Thruster:
 	"""
@@ -136,6 +137,19 @@ class Thruster:
 		#generate the entire command
 		cmd = self.raw_address + raw_function_code + chr(value) + chr(checksum)
 		
+		# os.system('pause')
+		# print ("address " + str(ord(cmd[0])))
+		# self.serial_port.write(cmd[0])
+		# os.system('pause')
+		# print ("function code " + str(ord(cmd[1])))
+		# self.serial_port.write(cmd[1])
+		# os.system('pause')
+		# print ("value " + str(ord(cmd[2])))
+		# self.serial_port.write(cmd[2])
+		# os.system('pause')
+		# print ("checksum " + hex(ord(cmd[3])))
+		# self.serial_port.write(cmd[3])
+		# print (" ")
 		self.serial_port.write(cmd)
 		
 	#end send()
