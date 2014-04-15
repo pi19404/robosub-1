@@ -11,12 +11,13 @@ import time
 CONTROL_BYTE = '\n'
 
 LED_CONTROL_0 = 0x30
+LED_CONTROL_1 = 0x31
 
 
 
 #Function Definitions#########################################################################
 
-def cmd_LED(pattern) :
+def cmd_LED(pattern, id) :
 
 	raw_id = '\0'
 	raw_pattern = '\0'
@@ -25,7 +26,7 @@ def cmd_LED(pattern) :
 	#the chr() command converts the integer to the ascii character representation, which is a raw byte
 
 	#convert the LED id to a raw binary value	
-	raw_id = chr(LED_CONTROL_0)
+	raw_id = chr(id)
 	
 	#convert pattern to raw binary value
 	raw_pattern = chr(pattern)
@@ -45,8 +46,8 @@ def cmd_LED(pattern) :
 
 #initialize the serial port
 s = serial.Serial()	#get instance of serial class
-s.port = "/dev/ttyUSB0" #this will vary, depending on what port the OS gives the microcontroller
-s.baudrate = 56818      #the baudrate may change in the future
+s.port = 14 #this will vary, depending on what port the OS gives the microcontroller
+s.baudrate = 9600      #the baudrate may change in the future
 s.open()		#attempt to open the serial port (there is no guard code, I'm assuming this does not fail)
 
 
@@ -58,7 +59,8 @@ patternNumber = 3
 while 1 :
 	if (time.time() > wait_time) :
 		print patternNumber
-		cmd_LED(patternNumber) #number reprensents which pattern to show from 0-255
+		cmd_LED(patternNumber, LED_CONTROL_0)
+		cmd_LED(patternNumber, LED_CONTROL_1)
 		wait_time = time.time() + .5
 		patternNumber = patternNumber + 1
 		if(patternNumber > 5):
