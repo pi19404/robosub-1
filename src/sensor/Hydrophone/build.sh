@@ -1,2 +1,1 @@
-#! /bin/bash
-gcc -Wall record.c -I/usr/include/alsa -lasound -lsndfile -o record.exe
+gcc -lsndfile -lfftw3 sndcode.c autocorr.c -o sndcode.exe
