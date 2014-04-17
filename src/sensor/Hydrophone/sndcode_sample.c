@@ -24,7 +24,7 @@
 
 #define SAMPLING_RATE		96000
 #define SIGNAL_LENGTH		SAMPLING_RATE
-//#define CROSSCOR_LENGTH		(2*SIGNAL_LENGTH-1)
+#define CROSSCOR_LENGTH		(2*SIGNAL_LENGTH-1)
 #define CROSSCOR_SHORT		(CROSSCOR_LENGTH/2 + 1)
 
 #define PI					3.141592653589793
@@ -37,7 +37,7 @@ typedef struct SoundData {
 	int sr;  //sample rate
 	int c;  //channels
 	int num_items;
-	double **idata;  //Input data
+	int **idata;  //Input data
 } SoundData;
 
 /*************************************************************************
@@ -54,11 +54,11 @@ void parse_wav(SoundData *Sdata)
 	SNDFILE *sf;
 	SF_INFO info;
 	int num_channels;
-	double *buf;  //Buffer
+	int *buf;  //Buffer
 	int num;
 	int i,j;
 	//int **idata;  //Input data
-	FILE *out;
+	//FILE *out;
 	
 	/* Open the WAV file. */
 	info.format = 0;
@@ -78,21 +78,21 @@ void parse_wav(SoundData *Sdata)
 	Sdata->num_items = Sdata->f*Sdata->c;
 	//printf("num_items=%d\n",Sdata->num_items);
 	/* Allocate space for the data to be read, then read it. */
-	buf = malloc(Sdata->num_items*sizeof(double));
+	buf = malloc(Sdata->num_items*sizeof(int));
 	if((int) buf == ENOMEM)  //Check if we have enough memory
 	{
 		printf("Error: Not enough memory to allocate buffer memory");
 		free(buf);
 		exit(-1);
 	}
-	num = sf_read_double(sf,buf,Sdata->num_items);
+	num = sf_read_int(sf,buf,Sdata->num_items);
 	sf_close(sf);
 	printf("Read %d items\n",num);
 	
 	/* Reorganize data for easier logical computations */
-	Sdata->idata = (double **) malloc(Sdata->c*sizeof(double*));
-	for (i=0; i< Sdata->c; i++)
-	Sdata->idata[i] = calloc((2*Sdata->f-1),sizeof(double));
+	Sdata->idata = (int **) malloc(Sdata->f*sizeof(int*));
+	for (i=0; i< Sdata->f; i++)
+	Sdata->idata[i] = malloc(Sdata->c*sizeof(int));
 	if((int) Sdata->idata == ENOMEM)  //Check if we have enough memory
 	{
 		printf("Error: Not enough memory to allocate idata memory");
@@ -100,27 +100,28 @@ void parse_wav(SoundData *Sdata)
 		exit(-1);
 	}
 
-	for (i = 0; i < Sdata->c; i++)
+	for (i = 0; i < Sdata->f; i++)
 	{
-		for (j = 0; j < Sdata->f; j++)
+		for (j = 0; j < Sdata->c; j++)
 		Sdata->idata[i][j] = buf[i*Sdata->c+j];
 	}
+	
+	free(buf);  //Free buffer memory, we are done with it
 
 	//test the function
-	printf("first row: %lf %lf %lf %lf \n",Sdata->idata[0][0],Sdata->idata[0][1],Sdata->idata[0][2],Sdata->idata[0][3]);
+	//printf("first row: %d %d %d %d \n",Sdata->idata[0][0],Sdata->idata[0][1],Sdata->idata[0][2],Sdata->idata[0][3]);
 	
 	/* Write the data to file data.out. */
 	/*
-	out = fopen("filedata2.out","w");
-	for (i = 0; i < num; i += Sdata->c)
+	out = fopen("filedata.out","w");
+	for (i = 0; i < num; i += c)
 		{
-		for (j = 0; j < Sdata->c; ++j)
-			fprintf(out,"%lf ",buf[i+j]);
+		for (j = 0; j < c; ++j)
+			fprintf(out,"%d ",buf[i+j]);
 		fprintf(out,"\n");
 		}
 	fclose(out);
 	*/
-	free(buf);  //Free buffer memory, we are done with it
 
 }
 
@@ -226,16 +227,12 @@ int main()
 	double *xcorr;
 	// And we'll have a special structure we need for our actual computation tool
 	struct xcorr_rsc xcorr_data;
-	int CROSSCOR_LENGTH;
-	int start_time,end_time;
-	
-	start_time = time(NULL);
 	
 	// Allocate memory for all of our signals. Note that because our signal will be used for cross-
 	// correlation computation, we'll need to make sure that the memory is long enough to keep
 	// everything padded for the fast autocorrelation computation.
-	
-/*	if ((sig1 = calloc(CROSSCOR_LENGTH, sizeof(double))) == NULL) {
+	printf("Allocating memory...\n");
+	if ((sig1 = calloc(CROSSCOR_LENGTH, sizeof(double))) == NULL) {
 		printf("Error: Could not allocate signal 1 memory.\n");
 		exit(1);
 	}
@@ -244,19 +241,13 @@ int main()
 		free(sig1);
 		exit(1);
 	}
-*/
-	printf("Parsing WAV File...\n");
-	parse_wav(&Sdata);
-
-	CROSSCOR_LENGTH = 2*Sdata.f-1;
-	printf("Allocating Memory...\n");
 	if ((xcorr = calloc(CROSSCOR_LENGTH, sizeof(double))) == NULL) {
 		printf("Error: Could not allocate output cross-correlation signal memory.\n");
-		free(Sdata.idata);
+		free(sig1);
+		free(sig2);
 		exit(1);
 	}
-
-	
+	parse_wav(&Sdata);
 	
 		// To prepare for the fast-correlation, we need to generate the computational plans first
 	// This must be done BEFORE we actually pass in the signal as the computational plans run
@@ -267,44 +258,37 @@ int main()
 		"\tThis takes a LONG TIME on slower systems. Consider:\n"
 		"\t8-core 3.6GHz i7     ~10 seconds\n"
 		"\t2-core 1.6GHz Atom   ~8 minutes\n");
-	init_xcorr(&xcorr_data, CROSSCOR_LENGTH, Sdata.idata[0], Sdata.idata[1], xcorr);
+	init_xcorr(&xcorr_data, CROSSCOR_LENGTH, sig1, sig2, xcorr);
 	
 	// Now we setup our input signals
-	//printf("Generating input signals...\n");
-	//zero_signal(CROSSCOR_LENGTH, sig1);
-	//zero_signal(CROSSCOR_LENGTH, sig2);
-	//zero_signal(CROSSCOR_LENGTH, xcorr);
-	//setup_signals(SIGNAL_LENGTH, sig1, SIGNAL_LENGTH, sig2);	
+	printf("Generating input signals...\n");
+	zero_signal(CROSSCOR_LENGTH, sig1);
+	zero_signal(CROSSCOR_LENGTH, sig2);
+	zero_signal(CROSSCOR_LENGTH, xcorr);
+	setup_signals(SIGNAL_LENGTH, sig1, SIGNAL_LENGTH, sig2);	
 	
 	// Reverse the second signal in preparation for the computation
-	printf("Reversing signal...\n");
-	reverse_signal_xcorr(Sdata.idata[1], Sdata.f);
+	reverse_signal_xcorr(sig2, SIGNAL_LENGTH);
 	
-	printf("writing signals...\n");
-	//write_signal("signal1",CROSSCOR_LENGTH, Sdata.idata[0]);
-	//write_signal("signal2",CROSSCOR_LENGTH, Sdata.idata[1]);
+	write_signal("signal1",CROSSCOR_LENGTH, sig1);
+	write_signal("signal2",CROSSCOR_LENGTH, sig2);
 	
 	// AND EXECUTE!
 	printf("Computing...\n");
 	compute_xcorr(&xcorr_data);
 	
-	printf("Writing final output...\n");
-	//write_signal("xcorr_result",CROSSCOR_LENGTH, xcorr);
+	write_signal("xcorr_result",CROSSCOR_LENGTH, xcorr);
 		
 	
 	// Clean up everything
 	printf("Cleaning up...\n");
 
-	
+	free(Sdata.idata);
 	clean_xcorr(&xcorr_data);
-	//free(sig1);
-	//free(sig2);
+	free(sig1);
+	free(sig2);
 	free(xcorr);
 
-	free(Sdata.idata);
-	printf("Program Complete\n");
-	
-	end_time = time(NULL);
-	printf("Program Run time: %d seconds\n", (end_time-start_time));
+	printf("Bye bye.\n");
 	return 0;
 }
