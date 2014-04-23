@@ -4,6 +4,8 @@
 import serial
 import os
 import time
+import signal
+import sys
 
 #Global Constants#############################################################################
 #These values are temporary, for testing. They WILL change in the final product
@@ -20,6 +22,16 @@ ADC_DEPTH = 0x30
 ADC_BATT  = 0x31
 
 #Function Definitions#########################################################################
+
+
+"""
+exit handler
+"""
+def exit_handler(signum, frame) :
+	s.close()
+	sys.exit()
+
+
 
 """
 	Here we are trying to make sure we have actually found
@@ -82,6 +94,9 @@ def get_packet() :
 
 	success = False
 	
+	while (s.inWaiting() < 4) :
+		time.sleep(.1)
+
 	while success == False :
 
 		#read 4 bytes from the serial port
@@ -107,8 +122,10 @@ def get_packet() :
 #initialize the serial port
 s = serial.Serial()	#get instance of serial class
 s.port = "/dev/ttyUSB0" #this may change, depending on what port the OS gives the microcontroller
-s.baudrate = 56818      #the baudrate may change in the future
+s.baudrate = 9600      #the baudrate may change in the future
 s.open()		#attempt to open the serial port (there is no guard code, I'm assuming this does not fail)
+
+signal.signal(signal.SIGINT, exit_handler)
 
 #clear the screen
 os.system('clear')
